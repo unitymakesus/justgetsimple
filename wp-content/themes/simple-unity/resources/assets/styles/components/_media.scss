@@ -1,0 +1,76 @@
+.wp-block-cover-image {
+  &.has-background-dim {
+    $opacity-list: 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100;
+    $themes-list: "bright", "chrome", "executive", "grass", "ocean", "sunrise";
+    $color-1-list: $color-bright-1, $color-chrome-1, $color-executive-1, $color-grass-1, $color-ocean-1, $color-sunrise-1;
+
+    @for $j from 1 through length($opacity-list) {
+      &.has-background-dim-#{nth($opacity-list, $j)} {
+        @for $k from 1 through length($themes-list) {
+          [data-color="#{nth($themes-list, $k)}"] &::before {
+            background: rgba(nth($color-1-list, $k), (nth($opacity-list, $j) / 100));
+          }
+        }
+      }
+    }
+  }
+
+  .wp-block-cover-image-text, .wp-block-cover-image h2 {
+    margin-top: 0;
+    font-size: 2.5rem;
+
+    $fonts-list: $font-bitter, $font-didact-gothic, $font-fjalla-one, $font-dancing-script, $font-open-sans, $font-ovo;
+    $fonts-fallback-list: "serif", "sans-serif", "sans-serif", "cursive", "sans-serif", "serif";
+
+    @for $i from 1 through length($fonts-list) {
+      [data-font="#{$i}"] & {
+        font-family: nth($fonts-list, $i), nth($fonts-fallback-list, $i);
+      }
+    }
+  }
+}
+
+/** Media alignment */
+.wp-block-image {
+  figure {
+    margin-top: 0;
+  }
+}
+
+.alignwide {
+  margin-left: -80px;
+  margin-right: -80px;
+}
+
+.alignfull {
+  margin-left: calc(-100vw / 2 + 100% / 2);
+  margin-right: calc(-100vw / 2 + 100% / 2);
+  max-width: 100vw;
+  width: 100vw;
+
+  img {
+    width: 100vw;
+  }
+}
+
+.entry-content-asset {
+  position: relative;
+  padding-bottom: 56.25%;
+  padding-top: 30px;
+  height: 0;
+  overflow: hidden;
+
+  iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+/** Captions */
+
+// TODO: .wp-caption {}
+// TODO: .wp-caption img {}
+// TODO: .wp-caption-text {}

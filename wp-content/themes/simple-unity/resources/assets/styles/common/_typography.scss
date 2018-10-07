@@ -1,0 +1,151 @@
+html {
+  font-size: 18px;
+
+  &[data-text-size="medium"] {
+    font-size: 20px;
+  }
+
+  &[data-text-size="large"] {
+    font-size: 24px;
+  }
+
+  @media #{$small-and-down} {
+    font-size: 16px;
+  }
+}
+
+$body-fonts-list: $font-source-sans-pro, $font-arimo, $font-crimson-text, $font-open-sans, $font-libre-baskerville, $font-muli;
+$header-fonts-list: $font-bitter, $font-didact-gothic, $font-fjalla-one, $font-dancing-script, $font-open-sans, $font-ovo;
+$themes-list: "bright", "chrome", "executive", "grass", "ocean", "sunrise";
+$color-1-list: $color-bright-1, $color-chrome-2, $color-executive-2, $color-grass-1, $color-ocean-2, $color-sunrise-1;
+
+body {
+  @for $i from 1 through length($body-fonts-list) {
+    &[data-font="#{$i}"] {
+      font-family: nth($body-fonts-list, $i);
+
+      h1, .h1, h2, .h2, h3, .h3, h4, .h4, h5, .h5, blockquote {
+        font-family: nth($header-fonts-list, $i);
+      }
+    }
+  }
+  @for $j from 1 through length($themes-list) {
+    &[data-color="#{nth($themes-list, $j)}"] {
+      h1, .h1, h2, .h2, h3, .h3, h4, .h4, h5, .h5 {
+        color: nth($color-1-list, $j);
+      }
+    }
+  }
+}
+
+h1, .h1 {
+  font-size: rem-calc(50px);
+  font-weight: 600;
+}
+
+h2, .h2 {
+  font-size: rem-calc(36px);
+  font-weight: 600;
+}
+
+h3, .h3 {
+  font-size: rem-calc(24px);
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+h4, .h4 {
+  font-size: rem-calc(24px);
+}
+
+h5, .h5 {
+  font-size: 1rem;
+  text-transform: uppercase;
+}
+
+a {
+  text-decoration: underline;
+  font-weight: bold;
+  transition: all 0.3s;
+
+  &:hover, &:active {
+    text-decoration-style: double;
+    // color: $color-green;
+
+    html[data-contrast="true"] & {
+      color: $color-white;
+    }
+  }
+}
+
+.main {
+  p, li, dt, dd {
+    line-height: 1.6em;
+  }
+
+  dt {
+    font-weight: bold;
+    clear: both;
+  }
+
+  dd {
+    margin-bottom: 1em;
+    margin-left: 2em;
+
+    @media #{$xsmall-and-down} {
+      margin-left: 1em;
+    }
+  }
+
+  ul {
+    li {
+      list-style: none;
+      position: relative;
+      padding-left: 30px;
+
+      &::before {
+        content: '\2022';
+        display: block;
+        position: absolute;
+        left: 10px;
+        speak: none;
+
+        html[data-contrast="true"] & {
+          color: $color-white;
+        }
+
+        $themes-list: "bright", "chrome", "executive", "grass", "ocean", "sunrise";
+        $color-list: $color-bright-4, $color-chrome-3, $color-executive-4, $color-grass-4, $color-ocean-4, $color-sunrise-4;
+
+        @for $n from 1 through length($themes-list) {
+          [data-color="#{nth($themes-list, $n)}"] & {
+            color: nth($color-list, $n);
+          }
+        }
+      }
+    }
+  }
+}
+
+blockquote {
+  border-left: 0;
+
+  &.wp-block-pullquote {
+    clear: both;
+    padding-left: 3em;
+    padding-right: 3em;
+  }
+}
+
+.label {
+  // font-family: $font-serif;
+  font-weight: 600;
+}
+
+strong {
+  font-weight: 700;
+}
+
+abbr[title] {
+  border-bottom: 0;
+}
