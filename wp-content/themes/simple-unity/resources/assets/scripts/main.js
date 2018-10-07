@@ -1,6 +1,6 @@
 // import external dependencies
 import 'jquery';
-import 'materialize-css';
+// import 'materialize-css';
 
 // Import everything from autoload
 import "./autoload/*";

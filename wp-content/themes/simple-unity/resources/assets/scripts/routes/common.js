@@ -147,9 +147,6 @@ export default {
       // Remove br
       $(this).parent().prevAll('br').remove();
 
-      // Move label to after field element
-      // $(this).parent().prevAll('label').insertAfter($(this).parent());
-
       // Set field wrapper to active
       $(this).on('focus', function() {
         $(this).parent().prev('label').addClass('active');

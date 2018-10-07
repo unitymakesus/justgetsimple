@@ -11,8 +11,8 @@
       "./scripts/customizer-panel.js"
     ]
   },
-  "publicPath": "/wp-content/themes/simple",
-  "devUrl": "http://hearinghealthcare.test",
+  "publicPath": "/wp-content/themes/simple-unity",
+  "devUrl": "http://justgetsimple.local",
   "proxyUrl": "http://localhost:3000",
   "cacheBusting": "[name]_[hash:8]",
   "watch": [
