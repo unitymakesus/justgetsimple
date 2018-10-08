@@ -1,5 +1,6 @@
 .pagination {
   background: none;
+  text-align: center;
 
   @extend .z-depth-0;
 
@@ -40,6 +41,7 @@
     height: 40px;
     line-height: 1.7em !important;
     font-size: 1.2em;
+    font-weight: normal;
     text-decoration: none;
 
     &:hover, &:focus {
@@ -67,6 +69,12 @@
         background: $color-grey-dark;
         color: $color-white !important;
       }
+    }
+  }
+
+  [data-font="3"] & {
+    a, span {
+      line-height: 1.4em !important;
     }
   }
 }

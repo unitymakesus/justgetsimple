@@ -11438,6 +11438,7 @@ figure.post-thumbnail {
 
 .pagination {
   background: none;
+  text-align: center;
 }
 
 .pagination ul li {
@@ -11476,6 +11477,7 @@ figure.post-thumbnail {
   height: 40px;
   line-height: 1.7em !important;
   font-size: 1.2em;
+  font-weight: normal;
   text-decoration: none;
 }
 
@@ -11513,6 +11515,11 @@ html[data-contrast="true"] .pagination span.active,
 html[data-contrast="true"] .pagination span.current {
   background: #66666E;
   color: #FFF !important;
+}
+
+[data-font="3"] .pagination a,
+[data-font="3"] .pagination span {
+  line-height: 1.4em !important;
 }
 
 [data-color="bright"] .pagination a,
