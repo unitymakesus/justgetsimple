@@ -58,6 +58,33 @@ add_action('customize_register', function (\WP_Customize_Manager $wp_customize) 
   ]);
 
   /**
+   * Add logo resizing setting
+   */
+  $wp_customize->add_setting( 'header_logo_width',
+    array(
+      'default' => 200,
+      'capability'  => 'edit_theme_options',
+      'transport'  => 'refresh'
+    )
+  );
+
+  $wp_customize->add_control( new \O2_Customizer_Range_Slider_Control(
+    $wp_customize,
+    'simple_logo_width', //Set a unique ID for the control
+    array(
+      'label'      => __( 'Logo Width', 'simple' ), //Admin-visible name of the control
+      'section'    => 'simple_header', //ID of the section this control should render in (can be one of yours, or a WordPress default section)
+      'settings'   => 'header_logo_width', //Which setting to load and manipulate (serialized is okay)
+      'input_attrs' => array(
+        'priority'   => 10, //Determines the order this control appears in for the specified section
+        'min'        => 100,
+        'max'        => 300,
+        'step'       => 1,
+      )
+    )
+  ) );
+
+  /**
    * Add Simple Theme Settings
    */
   $wp_customize->add_section( 'simple_settings' , array(
@@ -138,6 +165,26 @@ add_action('customize_register', function (\WP_Customize_Manager $wp_customize) 
     )
   );
 
+  $wp_customize->add_setting( 'button_font',
+    array(
+      'default'   => 'Body',
+      'type'      => 'theme_mod',
+      'transport' => 'refresh',
+    )
+  );
+
+  $wp_customize->add_control(
+    'simple_button_font',
+    array(
+      'label'     => __( 'Button Font', 'simple' ),
+      'section'   => 'simple_settings',
+      'settings'  => 'button_font',
+      'priority'  => 20,
+      'type'      => 'radio',
+      'choices'   => array('Body', 'Header')
+    )
+  );
+
   /**
    * Customize colors based on selected color scheme
    */
@@ -211,11 +258,11 @@ add_action('customize_register', function (\WP_Customize_Manager $wp_customize) 
   );
 
   $wp_customize->add_setting( 'header_cta_link', //No need to use a SERIALIZED name, as `theme_mod` settings already live under one db record
-  array(
-   'default'    => '', //Default setting/value to save
-   'type'       => 'theme_mod', //Is this an 'option' or a 'theme_mod'?
-   'transport'  => 'postMessage', //What triggers a refresh of the setting? 'refresh' or 'postMessage' (instant)?
-  )
+    array(
+     'default'    => '', //Default setting/value to save
+     'type'       => 'theme_mod', //Is this an 'option' or a 'theme_mod'?
+     'transport'  => 'postMessage', //What triggers a refresh of the setting? 'refresh' or 'postMessage' (instant)?
+    )
   );
 
   $wp_customize->add_control(
@@ -226,6 +273,25 @@ add_action('customize_register', function (\WP_Customize_Manager $wp_customize) 
      'settings'   => 'header_cta_link', //Which setting to load and manipulate (serialized is okay)
      'priority'   => 10, //Determines the order this control appears in for the specified section
      'type'       => 'url'
+    )
+  );
+
+  $wp_customize->add_setting( 'header_cta_target',
+    array(
+      'default'   => '',
+      'type'      => 'theme_mod',
+      'transport' => 'refresh',
+    )
+  );
+
+  $wp_customize->add_control(
+    'simple_header_cta_target',
+    array(
+      'label'     => __( 'Open CTA in New Tab?', 'simple' ),
+      'section'   => 'simple_header',
+      'settings'  => 'header_cta_target',
+      'priority'  => 10,
+      'type'      => 'checkbox'
     )
   );
 

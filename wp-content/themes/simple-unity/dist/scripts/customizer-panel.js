@@ -92,7 +92,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 wp.customize.bind('ready', function() {
   function hideShowColorOptions() {
     var selectedColor = wp.customize.instance( 'theme_color' ).get();
-    var neutral = ['transparent', '#000000', '#FFFFFF']
+    var neutral = ['sparent', '#000000', '#FFFFFF']
     var themes = {
       'bright'    : ['#2E827C', '#2EC4B6', '#FF9F1C', '#FFBF69', '#FFF7ED'],
       'chrome'    : ['#47474C', '#66666E', '#9999A1', '#C5C5CC', '#F9F9FC'],

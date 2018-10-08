@@ -1,12 +1,15 @@
-$themes-list: "bright", "chrome", "executive", "grass", "ocean", "sunrise";
-$color-primary-list: $color-bright-3, $color-chrome-1, $color-executive-4, $color-grass-4, $color-ocean-4, $color-sunrise-4;
-$color-secondary-list: $color-bright-1, $color-chrome-2, $color-executive-3, $color-grass-1, $color-ocean-2, $color-sunrise-1;
-$color-tertiary-list: $color-bright-5, $color-chrome-5, $color-executive-5, $color-grass-5, $color-ocean-5, $color-sunrise-5;
-
 .btn {
   padding: 10px 2rem;
   height: auto;
   font-weight: 700;
+
+  [data-font="3"] & {
+    font-weight: 500;
+  }
+}
+
+a.btn {
+  color: $color-white;
 }
 
 @for $n from 1 through length($themes-list) {

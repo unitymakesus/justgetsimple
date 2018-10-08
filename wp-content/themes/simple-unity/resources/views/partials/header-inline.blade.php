@@ -1,12 +1,27 @@
 @php
   $header_color = get_theme_mod( 'header_color' );
+  $text_color = get_theme_mod( 'header_text_color' );
+  $logo_width = get_theme_mod( 'header_logo_width' );
   $cta_text = get_theme_mod( 'header_cta_text' );
   $cta_link = get_theme_mod( 'header_cta_link' );
+  $cta_target_bool = get_theme_mod( 'header_cta_target' );
+  $cta_target = '';
+
+  if ($cta_target_bool == true) {
+    $cta_target = 'target="_blank" rel="noopener"';
+  }
 @endphp
 <header class="banner header-inline" role="banner" style="background-color: {{ $header_color }}">
   <nav class="nav-primary" role="navigation">
-    <div class="navbar flex flex-center space-between">
-      <a class="logo" href="{{ home_url('/') }}" rel="home">
+    <div class="navbar flex flex-center space-between" data-text-color="{{ $text_color }}">
+      @php
+        if (!empty($logo_width)) {
+          $custom_logo_width = 'style=width:' . $logo_width . 'px;';
+        } else {
+          $custom_logo_width = '';
+        }
+      @endphp
+      <a class="logo" href="{{ home_url('/') }}" rel="home" {{ $custom_logo_width }}>
         @if (has_custom_logo())
           @php
             $custom_logo_id = get_theme_mod( 'custom_logo' );
@@ -30,7 +45,7 @@
           {!! wp_nav_menu(['theme_location' => 'primary_navigation', 'container' => FALSE, 'menu_class' => 'flex flex-center space-between']) !!}
           @if (!empty($cta_text) && !empty($cta_link))
             <div class="cta-link">
-              <a href="{{ $cta_link }}" class="btn">{{ $cta_text }}</a>
+              <a href="{{ $cta_link }}" class="btn" {{ $cta_target }}>{{ $cta_text }}</a>
             </div>
           @endif
         @endif

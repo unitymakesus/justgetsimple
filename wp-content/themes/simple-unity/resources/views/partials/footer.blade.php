@@ -20,7 +20,7 @@
       <p class="copyright">&copy; {!! current_time('Y') !!} {{ get_bloginfo('name', 'display') }}</p>
     </div>
     <div class="footer-center col m4 s12">
-      <a href="/privacy-policy/">Privacy Policy</a>
+      <a href="{{ get_home_url() }}/privacy-policy/">Privacy Policy</a>
     </div>
     <div class="footer-right col m4 s12">
       @include('partials.unity')

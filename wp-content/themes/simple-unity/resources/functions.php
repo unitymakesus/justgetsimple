@@ -48,11 +48,12 @@ if (!class_exists('Roots\\Sage\\Container')) {
 }
 
 /**
- * Setting up O2 customizer controls
+ * Setting up  customizer controls
  */
  define( 'O2_DIRECTORY', get_template_directory() . '/../app/o2/' );
  define( 'O2_DIRECTORY_URI', get_template_directory_uri() . '/../app/o2/' );
  require O2_DIRECTORY . 'controls/color-palette/color-palette-control.php';
+ require O2_DIRECTORY . 'controls/range-slider/range-slider-control.php';
 
 /**
  * Sage required files

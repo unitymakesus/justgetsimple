@@ -54,9 +54,6 @@
       max-width: 200px;
       text-align: center;
 
-      $themes-list: "bright", "chrome", "executive", "grass", "ocean", "sunrise";
-      $color-1-list: $color-bright-1, $color-chrome-1, $color-executive-1, $color-grass-1, $color-ocean-1, $color-sunrise-1;
-
       @for $n from 1 through length($themes-list) {
         [data-color="#{nth($themes-list, $n)}"] & {
           color: nth($color-1-list, $n);
@@ -134,6 +131,15 @@ nav {
       font-weight: normal;
       padding: 1rem 15px;
       color: $color-black;
+      font-size: 1.1rem;
+
+      [data-font="3"] & {
+        font-size: 1.2rem;
+      }
+
+      .header-inline & {
+        padding: 1rem 25px;
+      }
     }
 
     li.current_page_item {
@@ -150,6 +156,10 @@ nav {
   margin: 0;
   box-shadow: none;
   padding: 0 15px;
+
+  & > ul {
+    flex: 1 1 auto;
+  }
 
   li {
     &.menu-item-has-children {

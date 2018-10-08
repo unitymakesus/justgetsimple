@@ -1,0 +1,32 @@
+{
+  "name": "mailoptin/authifly",
+  "description": "PHP OAuth Authentication Library",
+  "keywords": [
+    "oauth",
+    "openid",
+    "authentication",
+    "authorization",
+    "social",
+    "api"
+  ],
+  "type": "library",
+  "license": "MIT",
+  "require": {
+    "php": ">=5.4.0"
+  },
+  "require-dev": {
+    "ext-curl": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "Authifly\\": "src/"
+    },
+    "files": [
+      "OAuthCredentialStorage.php",
+      "ConstantContact.php",
+      "Aweber.php",
+      "CampaignMonitor.php",
+      "Facebook.php"
+    ]
+  }
+}

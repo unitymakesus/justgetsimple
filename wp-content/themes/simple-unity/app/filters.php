@@ -34,7 +34,7 @@ add_filter('body_class', function (array $classes) {
  * Add "… Continued" to the excerpt
  */
 add_filter('excerpt_more', function () {
-    return ' &hellip; <a href="' . get_permalink() . '">' . __('Continued', 'sage') . '</a>';
+    // return ' &hellip; <a href="' . get_permalink() . '">' . __('Continued', 'sage') . '</a>';
 });
 
 /**
@@ -89,3 +89,93 @@ add_filter('sage/display_sidebar', function ($display) {
 
   return $display;
 });
+
+/**
+ * If there's a subtitle, auto add it after the titles
+ */
+if ( ! is_admin() ) { // Don't touch anything inside of the WordPress Dashboard, yet.
+	add_filter( 'the_title', function($title, $id = null) {
+    /**
+     * Which globals will we need?
+     */
+    global $post;
+
+    /**
+     * Check if $post is set. There's a chance that this can
+     * be NULL on search results pages with zero results.
+     */
+    if ( ! isset( $post ) ) {
+    	return $title;
+    }
+
+    /**
+     * Make sure we're not touching any of the titles in the Dashboard
+     * This filtering should only happen on the front end of the site.
+     */
+    if ( is_admin() ) {
+    	return $title;
+    }
+
+    /**
+     * Bail early if ACF isn't active
+     */
+    if ( !function_exists('get_field') ) {
+      return $title;
+    }
+
+    /**
+     * Bail early if no subtitle has been set for the post.
+     */
+    $post_id = (int) absint( $post->ID ); // post ID should always be a non-negative integer
+    $subtitle = (string) html_entity_decode( get_field('subtitle'), ENT_QUOTES );
+
+    if ( empty($subtitle) ) {
+    	return $title;
+    }
+
+		/**
+		 * Make sure we're in The Loop.
+		 *
+		 * @see in_the_loop()
+		 * @link http://codex.wordpress.org/Function_Reference/in_the_loop
+		 *
+		 * @since 1.0.0
+		 */
+		if ( ! in_the_loop() ) {
+			return $title;
+		}
+
+    /**
+     * Let theme authors modify the subtitle markup, in case spans aren't appropriate
+     * for what they are trying to do with their themes.
+     *
+     * The reason that spans are being used is because HTML does not have a dedicated
+     * mechanism for marking up subheadings, alternative titles, or taglines. There
+     * are suggested alternatives from the World Wide Web Consortium (W3C); among them
+     * are spans, which work well for what we're trying to do with titles in WordPress.
+     * See the linked documentation for more information.
+     *
+     * @link http://www.w3.org/html/wg/drafts/html/master/common-idioms.html#sub-head
+     *
+     * @since 1.0.0
+     */
+    $subtitle_markup = apply_filters(
+    	'subtitle_markup',
+    	array(
+    		'before' => '<span class="entry-subtitle">',
+    		'after'  => '</span>',
+    	)
+    );
+
+    $subtitle = $subtitle_markup['before'] . $subtitle . $subtitle_markup['after'];
+
+    /**
+     * Put together the final title and subtitle set
+     *
+     * @since 1.0.0
+     */
+    $title = '<span class="entry-title-primary">' . $title . '</span> ' . $subtitle;
+
+    return $title;
+  }, 10, 2 );
+}

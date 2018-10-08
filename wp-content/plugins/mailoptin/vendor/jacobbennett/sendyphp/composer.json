@@ -1,0 +1,25 @@
+{
+    "name": "jacobbennett/sendyphp",
+    "description": "A PHP Library for interfacing with the Sendy newsletter system (http://sendy.co)",
+    "keywords": ["sendy", "newsletter"],
+    "license": "MIT",
+    "authors": [
+        {
+            "email": "me@jakebennett.net", 
+            "name": "Jacob Bennett",
+            "homepage": "http://jakebennett.net"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.0"
+    },
+    "require-dev": {
+        "squizlabs/php_codesniffer": "1.*",
+        "phpunit/phpunit": "3.7.*"
+    },
+    "autoload": {
+        "psr-4": {
+            "SendyPHP\\": "src/"
+        }
+    }
+}

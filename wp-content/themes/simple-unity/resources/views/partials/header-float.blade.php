@@ -3,15 +3,29 @@
   $nav_color = get_theme_mod( 'header_nav_color' );
   $text_color = get_theme_mod( 'header_text_color' );
   $logo_align = get_theme_mod( 'header_logo_align' );
+  $logo_width = get_theme_mod( 'header_logo_width' );
   $cta_headline = get_theme_mod( 'header_cta_headline' );
   $cta_text = get_theme_mod( 'header_cta_text' );
   $cta_link = get_theme_mod( 'header_cta_link' );
+  $cta_target_bool = get_theme_mod( 'header_cta_target' );
+  $cta_target = '';
+
+  if ($cta_target_bool == true) {
+    $cta_target = 'target="_blank" rel="noopener"';
+  }
 @endphp
 <header class="banner header-float" role="banner" style="background-color: {{ $header_color }}">
   <nav class="nav-primary" role="navigation">
     <div class="container-wide relative flex flex-center space-between">
       <div class="{{ $logo_align }}">
-        <a class="logo" href="{{ home_url('/') }}" rel="home">
+        @php
+          if (!empty($logo_width)) {
+            $custom_logo_width = 'style=width:' . $logo_width . 'px;';
+          } else {
+            $custom_logo_width = '';
+          }
+        @endphp
+        <a class="logo" href="{{ home_url('/') }}" rel="home" {{ $custom_logo_width }}>
           @if (has_custom_logo())
             @php
               $custom_logo_id = get_theme_mod( 'custom_logo' );
@@ -32,7 +46,7 @@
           @if (!empty($cta_headline))
             <div class="cta-headline">{{ $cta_headline }}</div>
           @endif
-          <a href="{{ $cta_link }}" class="btn btn-primary">{{ $cta_text }}</a>
+          <a href="{{ $cta_link }}" class="btn btn-primary" {{ $cta_target }}>{{ $cta_text }}</a>
         </div>
       @endif
     </div>
