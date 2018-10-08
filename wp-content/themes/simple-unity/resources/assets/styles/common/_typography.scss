@@ -26,6 +26,10 @@ body {
       &[data-buttons="1"] .btn {
         font-family: nth($header-fonts-list, $i);
       }
+
+      .et_bloom .et_bloom_optin_1 .et_bloom_form_container h2, .et_bloom .et_bloom_optin_1 .et_bloom_form_container h2 span, .et_bloom .et_bloom_optin_1 .et_bloom_form_container h2 strong {
+        font-family: nth($body-fonts-list, $i) !important;
+      }
     }
   }
   @for $j from 1 through length($themes-list) {
