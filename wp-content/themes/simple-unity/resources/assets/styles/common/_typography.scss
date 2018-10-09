@@ -27,12 +27,12 @@ body {
         font-family: nth($header-fonts-list, $i);
       }
 
-      &.et_bloom .et_bloom_optin_1 .et_bloom_form_container h2, &.et_bloom .et_bloom_optin_1 .et_bloom_form_container h2 span, &.et_bloom .et_bloom_optin_1 .et_bloom_form_container h2 strong {
+      .et_bloom_optin.et_bloom_optin .et_bloom_form_container h2, .et_bloom_optin.et_bloom_optin .et_bloom_form_container h2 span, .et_bloom_optin.et_bloom_optin .et_bloom_form_container h2 strong {
         font-family: nth($header-fonts-list, $i) !important;
         font-size: rem-calc(36px) !important;
       }
 
-      &.et_bloom .et_bloom_optin_1 .et_bloom_form_container p {
+      .et_bloom_optin.et_bloom_optin .et_bloom_form_container p {
         font-family: nth($body-fonts-list, $i) !important;
         font-size: 1rem !important;
       }

@@ -10146,14 +10146,14 @@ body[data-font="1"][data-buttons="1"] .ctct-form-wrapper.ctct-form-wrapper .ctct
   font-family: "Bitter", serif;
 }
 
-body[data-font="1"].et_bloom .et_bloom_optin_1 .et_bloom_form_container h2,
-body[data-font="1"].et_bloom .et_bloom_optin_1 .et_bloom_form_container h2 span,
-body[data-font="1"].et_bloom .et_bloom_optin_1 .et_bloom_form_container h2 strong {
+body[data-font="1"] .et_bloom_optin.et_bloom_optin .et_bloom_form_container h2,
+body[data-font="1"] .et_bloom_optin.et_bloom_optin .et_bloom_form_container h2 span,
+body[data-font="1"] .et_bloom_optin.et_bloom_optin .et_bloom_form_container h2 strong {
   font-family: "Bitter", serif !important;
   font-size: 2rem !important;
 }
 
-body[data-font="1"].et_bloom .et_bloom_optin_1 .et_bloom_form_container p {
+body[data-font="1"] .et_bloom_optin.et_bloom_optin .et_bloom_form_container p {
   font-family: "Source Sans Pro", sans-serif !important;
   font-size: 1rem !important;
 }
@@ -10183,14 +10183,14 @@ body[data-font="2"][data-buttons="1"] .ctct-form-wrapper.ctct-form-wrapper .ctct
   font-family: "Didact Gothic", sans-serif;
 }
 
-body[data-font="2"].et_bloom .et_bloom_optin_1 .et_bloom_form_container h2,
-body[data-font="2"].et_bloom .et_bloom_optin_1 .et_bloom_form_container h2 span,
-body[data-font="2"].et_bloom .et_bloom_optin_1 .et_bloom_form_container h2 strong {
+body[data-font="2"] .et_bloom_optin.et_bloom_optin .et_bloom_form_container h2,
+body[data-font="2"] .et_bloom_optin.et_bloom_optin .et_bloom_form_container h2 span,
+body[data-font="2"] .et_bloom_optin.et_bloom_optin .et_bloom_form_container h2 strong {
   font-family: "Didact Gothic", sans-serif !important;
   font-size: 2rem !important;
 }
 
-body[data-font="2"].et_bloom .et_bloom_optin_1 .et_bloom_form_container p {
+body[data-font="2"] .et_bloom_optin.et_bloom_optin .et_bloom_form_container p {
   font-family: "Arimo", sans-serif !important;
   font-size: 1rem !important;
 }
@@ -10220,14 +10220,14 @@ body[data-font="3"][data-buttons="1"] .ctct-form-wrapper.ctct-form-wrapper .ctct
   font-family: "Fjalla One", sans-serif;
 }
 
-body[data-font="3"].et_bloom .et_bloom_optin_1 .et_bloom_form_container h2,
-body[data-font="3"].et_bloom .et_bloom_optin_1 .et_bloom_form_container h2 span,
-body[data-font="3"].et_bloom .et_bloom_optin_1 .et_bloom_form_container h2 strong {
+body[data-font="3"] .et_bloom_optin.et_bloom_optin .et_bloom_form_container h2,
+body[data-font="3"] .et_bloom_optin.et_bloom_optin .et_bloom_form_container h2 span,
+body[data-font="3"] .et_bloom_optin.et_bloom_optin .et_bloom_form_container h2 strong {
   font-family: "Fjalla One", sans-serif !important;
   font-size: 2rem !important;
 }
 
-body[data-font="3"].et_bloom .et_bloom_optin_1 .et_bloom_form_container p {
+body[data-font="3"] .et_bloom_optin.et_bloom_optin .et_bloom_form_container p {
   font-family: "Crimson Text", serif !important;
   font-size: 1rem !important;
 }
@@ -10257,14 +10257,14 @@ body[data-font="4"][data-buttons="1"] .ctct-form-wrapper.ctct-form-wrapper .ctct
   font-family: "Dancing Script", cursive;
 }
 
-body[data-font="4"].et_bloom .et_bloom_optin_1 .et_bloom_form_container h2,
-body[data-font="4"].et_bloom .et_bloom_optin_1 .et_bloom_form_container h2 span,
-body[data-font="4"].et_bloom .et_bloom_optin_1 .et_bloom_form_container h2 strong {
+body[data-font="4"] .et_bloom_optin.et_bloom_optin .et_bloom_form_container h2,
+body[data-font="4"] .et_bloom_optin.et_bloom_optin .et_bloom_form_container h2 span,
+body[data-font="4"] .et_bloom_optin.et_bloom_optin .et_bloom_form_container h2 strong {
   font-family: "Dancing Script", cursive !important;
   font-size: 2rem !important;
 }
 
-body[data-font="4"].et_bloom .et_bloom_optin_1 .et_bloom_form_container p {
+body[data-font="4"] .et_bloom_optin.et_bloom_optin .et_bloom_form_container p {
   font-family: "Open Sans", sans-serif !important;
   font-size: 1rem !important;
 }
@@ -10294,14 +10294,14 @@ body[data-font="5"][data-buttons="1"] .ctct-form-wrapper.ctct-form-wrapper .ctct
   font-family: "Open Sans", sans-serif;
 }
 
-body[data-font="5"].et_bloom .et_bloom_optin_1 .et_bloom_form_container h2,
-body[data-font="5"].et_bloom .et_bloom_optin_1 .et_bloom_form_container h2 span,
-body[data-font="5"].et_bloom .et_bloom_optin_1 .et_bloom_form_container h2 strong {
+body[data-font="5"] .et_bloom_optin.et_bloom_optin .et_bloom_form_container h2,
+body[data-font="5"] .et_bloom_optin.et_bloom_optin .et_bloom_form_container h2 span,
+body[data-font="5"] .et_bloom_optin.et_bloom_optin .et_bloom_form_container h2 strong {
   font-family: "Open Sans", sans-serif !important;
   font-size: 2rem !important;
 }
 
-body[data-font="5"].et_bloom .et_bloom_optin_1 .et_bloom_form_container p {
+body[data-font="5"] .et_bloom_optin.et_bloom_optin .et_bloom_form_container p {
   font-family: "Libre Baskerville", serif !important;
   font-size: 1rem !important;
 }
@@ -10331,14 +10331,14 @@ body[data-font="6"][data-buttons="1"] .ctct-form-wrapper.ctct-form-wrapper .ctct
   font-family: "Ovo", serif;
 }
 
-body[data-font="6"].et_bloom .et_bloom_optin_1 .et_bloom_form_container h2,
-body[data-font="6"].et_bloom .et_bloom_optin_1 .et_bloom_form_container h2 span,
-body[data-font="6"].et_bloom .et_bloom_optin_1 .et_bloom_form_container h2 strong {
+body[data-font="6"] .et_bloom_optin.et_bloom_optin .et_bloom_form_container h2,
+body[data-font="6"] .et_bloom_optin.et_bloom_optin .et_bloom_form_container h2 span,
+body[data-font="6"] .et_bloom_optin.et_bloom_optin .et_bloom_form_container h2 strong {
   font-family: "Ovo", serif !important;
   font-size: 2rem !important;
 }
 
-body[data-font="6"].et_bloom .et_bloom_optin_1 .et_bloom_form_container p {
+body[data-font="6"] .et_bloom_optin.et_bloom_optin .et_bloom_form_container p {
   font-family: "Muli", sans-serif !important;
   font-size: 1rem !important;
 }
