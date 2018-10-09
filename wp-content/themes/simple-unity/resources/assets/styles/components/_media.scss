@@ -23,6 +23,16 @@
   }
 }
 
+.wp-block-gallery {
+  .blocks-gallery-item {
+    padding-left: 0;
+
+    &::before {
+      display: none;
+    }
+  }
+}
+
 figure.post-thumbnail {
   margin: 1em 0;
 }
