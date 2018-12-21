@@ -2,8 +2,6 @@ import Macy from 'macy/dist/macy.js';
 
 export default {
   init() {
-  },
-  finalize() {
     Macy.init({
       container: '.grid',
       trueOrder: true,
@@ -15,6 +13,8 @@ export default {
       breakAt: {
         767: 1,
       },
-    });    
+    });
+  },
+  finalize() {
   },
 };
