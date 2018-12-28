@@ -40,3 +40,15 @@ a.btn {
     }
   }
 }
+
+.fl-builder-content.fl-builder-content a.fl-button.fl-button {
+  @extend .btn;
+  @extend .btn-primary;
+
+  border: none;
+  font-size: 1em;
+
+  span {
+    color: inherit;
+  }
+}
