@@ -13851,10 +13851,11 @@ abbr[title] {
 .ctct-form-wrapper.ctct-form-wrapper .ctct-submit {
   padding: 10px 2rem;
   height: auto;
+  font-size: 1em;
   font-weight: 700;
 }
 
-/* line 6, resources/assets/styles/components/_buttons.scss */
+/* line 7, resources/assets/styles/components/_buttons.scss */
 
 [data-font="3"] .btn,
 [data-font="3"] .btn-large,
@@ -13866,7 +13867,7 @@ abbr[title] {
   font-weight: 500;
 }
 
-/* line 11, resources/assets/styles/components/_buttons.scss */
+/* line 12, resources/assets/styles/components/_buttons.scss */
 
 a.btn,
 a.btn-large,
@@ -13876,7 +13877,7 @@ a.btn-small,
   color: #FFF;
 }
 
-/* line 17, resources/assets/styles/components/_buttons.scss */
+/* line 18, resources/assets/styles/components/_buttons.scss */
 
 [data-color="bright"] .btn-primary,
 [data-color="bright"] .fl-builder-content.fl-builder-content a.fl-button,
@@ -13884,7 +13885,7 @@ a.btn-small,
   background: #FF9F1C;
 }
 
-/* line 20, resources/assets/styles/components/_buttons.scss */
+/* line 21, resources/assets/styles/components/_buttons.scss */
 
 [data-color="bright"] .btn-primary:hover,
 [data-color="bright"] .fl-builder-content.fl-builder-content a.fl-button:hover,
@@ -13898,13 +13899,13 @@ a.btn-small,
   background: #cf7700;
 }
 
-/* line 25, resources/assets/styles/components/_buttons.scss */
+/* line 26, resources/assets/styles/components/_buttons.scss */
 
 [data-color="bright"] .btn-secondary {
   background: #2E827C;
 }
 
-/* line 28, resources/assets/styles/components/_buttons.scss */
+/* line 29, resources/assets/styles/components/_buttons.scss */
 
 [data-color="bright"] .btn-secondary:hover,
 [data-color="bright"] .btn-secondary:active,
@@ -13912,7 +13913,7 @@ a.btn-small,
   background: #1a4946;
 }
 
-/* line 33, resources/assets/styles/components/_buttons.scss */
+/* line 34, resources/assets/styles/components/_buttons.scss */
 
 [data-color="bright"] .btn-tertiary,
 [data-color="bright"] .ctct-form-wrapper.ctct-form-wrapper .ctct-submit,
@@ -13921,7 +13922,7 @@ a.btn-small,
   color: #000;
 }
 
-/* line 37, resources/assets/styles/components/_buttons.scss */
+/* line 38, resources/assets/styles/components/_buttons.scss */
 
 [data-color="bright"] .btn-tertiary:hover,
 [data-color="bright"] .ctct-form-wrapper.ctct-form-wrapper .ctct-submit:hover,
@@ -13935,7 +13936,7 @@ a.btn-small,
   background: #d9d9d9;
 }
 
-/* line 17, resources/assets/styles/components/_buttons.scss */
+/* line 18, resources/assets/styles/components/_buttons.scss */
 
 [data-color="chrome"] .btn-primary,
 [data-color="chrome"] .fl-builder-content.fl-builder-content a.fl-button,
@@ -13943,7 +13944,7 @@ a.btn-small,
   background: #000;
 }
 
-/* line 20, resources/assets/styles/components/_buttons.scss */
+/* line 21, resources/assets/styles/components/_buttons.scss */
 
 [data-color="chrome"] .btn-primary:hover,
 [data-color="chrome"] .fl-builder-content.fl-builder-content a.fl-button:hover,
@@ -13957,13 +13958,13 @@ a.btn-small,
   background: black;
 }
 
-/* line 25, resources/assets/styles/components/_buttons.scss */
+/* line 26, resources/assets/styles/components/_buttons.scss */
 
 [data-color="chrome"] .btn-secondary {
   background: #66666E;
 }
 
-/* line 28, resources/assets/styles/components/_buttons.scss */
+/* line 29, resources/assets/styles/components/_buttons.scss */
 
 [data-color="chrome"] .btn-secondary:hover,
 [data-color="chrome"] .btn-secondary:active,
@@ -13971,7 +13972,7 @@ a.btn-small,
   background: #414146;
 }
 
-/* line 33, resources/assets/styles/components/_buttons.scss */
+/* line 34, resources/assets/styles/components/_buttons.scss */
 
 [data-color="chrome"] .btn-tertiary,
 [data-color="chrome"] .ctct-form-wrapper.ctct-form-wrapper .ctct-submit,
@@ -13980,7 +13981,7 @@ a.btn-small,
   color: #000;
 }
 
-/* line 37, resources/assets/styles/components/_buttons.scss */
+/* line 38, resources/assets/styles/components/_buttons.scss */
 
 [data-color="chrome"] .btn-tertiary:hover,
 [data-color="chrome"] .ctct-form-wrapper.ctct-form-wrapper .ctct-submit:hover,
@@ -13994,7 +13995,7 @@ a.btn-small,
   background: #c6c6e3;
 }
 
-/* line 17, resources/assets/styles/components/_buttons.scss */
+/* line 18, resources/assets/styles/components/_buttons.scss */
 
 [data-color="executive"] .btn-primary,
 [data-color="executive"] .fl-builder-content.fl-builder-content a.fl-button,
@@ -14002,7 +14003,7 @@ a.btn-small,
   background: #E6AF2E;
 }
 
-/* line 20, resources/assets/styles/components/_buttons.scss */
+/* line 21, resources/assets/styles/components/_buttons.scss */
 
 [data-color="executive"] .btn-primary:hover,
 [data-color="executive"] .fl-builder-content.fl-builder-content a.fl-button:hover,
@@ -14016,13 +14017,13 @@ a.btn-small,
   background: #b28315;
 }
 
-/* line 25, resources/assets/styles/components/_buttons.scss */
+/* line 26, resources/assets/styles/components/_buttons.scss */
 
 [data-color="executive"] .btn-secondary {
   background: #A3320B;
 }
 
-/* line 28, resources/assets/styles/components/_buttons.scss */
+/* line 29, resources/assets/styles/components/_buttons.scss */
 
 [data-color="executive"] .btn-secondary:hover,
 [data-color="executive"] .btn-secondary:active,
@@ -14030,7 +14031,7 @@ a.btn-small,
   background: #5b1c06;
 }
 
-/* line 33, resources/assets/styles/components/_buttons.scss */
+/* line 34, resources/assets/styles/components/_buttons.scss */
 
 [data-color="executive"] .btn-tertiary,
 [data-color="executive"] .ctct-form-wrapper.ctct-form-wrapper .ctct-submit,
@@ -14039,7 +14040,7 @@ a.btn-small,
   color: #000;
 }
 
-/* line 37, resources/assets/styles/components/_buttons.scss */
+/* line 38, resources/assets/styles/components/_buttons.scss */
 
 [data-color="executive"] .btn-tertiary:hover,
 [data-color="executive"] .ctct-form-wrapper.ctct-form-wrapper .ctct-submit:hover,
@@ -14053,7 +14054,7 @@ a.btn-small,
   background: #afffeb;
 }
 
-/* line 17, resources/assets/styles/components/_buttons.scss */
+/* line 18, resources/assets/styles/components/_buttons.scss */
 
 [data-color="grass"] .btn-primary,
 [data-color="grass"] .fl-builder-content.fl-builder-content a.fl-button,
@@ -14061,7 +14062,7 @@ a.btn-small,
   background: #C6DABF;
 }
 
-/* line 20, resources/assets/styles/components/_buttons.scss */
+/* line 21, resources/assets/styles/components/_buttons.scss */
 
 [data-color="grass"] .btn-primary:hover,
 [data-color="grass"] .fl-builder-content.fl-builder-content a.fl-button:hover,
@@ -14075,13 +14076,13 @@ a.btn-small,
   background: #9bbe8f;
 }
 
-/* line 25, resources/assets/styles/components/_buttons.scss */
+/* line 26, resources/assets/styles/components/_buttons.scss */
 
 [data-color="grass"] .btn-secondary {
   background: #114B5F;
 }
 
-/* line 28, resources/assets/styles/components/_buttons.scss */
+/* line 29, resources/assets/styles/components/_buttons.scss */
 
 [data-color="grass"] .btn-secondary:hover,
 [data-color="grass"] .btn-secondary:active,
@@ -14089,7 +14090,7 @@ a.btn-small,
   background: #05181e;
 }
 
-/* line 33, resources/assets/styles/components/_buttons.scss */
+/* line 34, resources/assets/styles/components/_buttons.scss */
 
 [data-color="grass"] .btn-tertiary,
 [data-color="grass"] .ctct-form-wrapper.ctct-form-wrapper .ctct-submit,
@@ -14098,7 +14099,7 @@ a.btn-small,
   color: #000;
 }
 
-/* line 37, resources/assets/styles/components/_buttons.scss */
+/* line 38, resources/assets/styles/components/_buttons.scss */
 
 [data-color="grass"] .btn-tertiary:hover,
 [data-color="grass"] .ctct-form-wrapper.ctct-form-wrapper .ctct-submit:hover,
@@ -14112,7 +14113,7 @@ a.btn-small,
   background: #e3cb96;
 }
 
-/* line 17, resources/assets/styles/components/_buttons.scss */
+/* line 18, resources/assets/styles/components/_buttons.scss */
 
 [data-color="ocean"] .btn-primary,
 [data-color="ocean"] .fl-builder-content.fl-builder-content a.fl-button,
@@ -14120,7 +14121,7 @@ a.btn-small,
   background: #00A8E8;
 }
 
-/* line 20, resources/assets/styles/components/_buttons.scss */
+/* line 21, resources/assets/styles/components/_buttons.scss */
 
 [data-color="ocean"] .btn-primary:hover,
 [data-color="ocean"] .fl-builder-content.fl-builder-content a.fl-button:hover,
@@ -14134,13 +14135,13 @@ a.btn-small,
   background: #00719c;
 }
 
-/* line 25, resources/assets/styles/components/_buttons.scss */
+/* line 26, resources/assets/styles/components/_buttons.scss */
 
 [data-color="ocean"] .btn-secondary {
   background: #003459;
 }
 
-/* line 28, resources/assets/styles/components/_buttons.scss */
+/* line 29, resources/assets/styles/components/_buttons.scss */
 
 [data-color="ocean"] .btn-secondary:hover,
 [data-color="ocean"] .btn-secondary:active,
@@ -14148,7 +14149,7 @@ a.btn-small,
   background: #00070d;
 }
 
-/* line 33, resources/assets/styles/components/_buttons.scss */
+/* line 34, resources/assets/styles/components/_buttons.scss */
 
 [data-color="ocean"] .btn-tertiary,
 [data-color="ocean"] .ctct-form-wrapper.ctct-form-wrapper .ctct-submit,
@@ -14157,7 +14158,7 @@ a.btn-small,
   color: #000;
 }
 
-/* line 37, resources/assets/styles/components/_buttons.scss */
+/* line 38, resources/assets/styles/components/_buttons.scss */
 
 [data-color="ocean"] .btn-tertiary:hover,
 [data-color="ocean"] .ctct-form-wrapper.ctct-form-wrapper .ctct-submit:hover,
@@ -14171,7 +14172,7 @@ a.btn-small,
   background: #d9d9d9;
 }
 
-/* line 17, resources/assets/styles/components/_buttons.scss */
+/* line 18, resources/assets/styles/components/_buttons.scss */
 
 [data-color="sunrise"] .btn-primary,
 [data-color="sunrise"] .fl-builder-content.fl-builder-content a.fl-button,
@@ -14179,7 +14180,7 @@ a.btn-small,
   background: #FFB627;
 }
 
-/* line 20, resources/assets/styles/components/_buttons.scss */
+/* line 21, resources/assets/styles/components/_buttons.scss */
 
 [data-color="sunrise"] .btn-primary:hover,
 [data-color="sunrise"] .fl-builder-content.fl-builder-content a.fl-button:hover,
@@ -14193,13 +14194,13 @@ a.btn-small,
   background: #da9000;
 }
 
-/* line 25, resources/assets/styles/components/_buttons.scss */
+/* line 26, resources/assets/styles/components/_buttons.scss */
 
 [data-color="sunrise"] .btn-secondary {
   background: #CC5803;
 }
 
-/* line 28, resources/assets/styles/components/_buttons.scss */
+/* line 29, resources/assets/styles/components/_buttons.scss */
 
 [data-color="sunrise"] .btn-secondary:hover,
 [data-color="sunrise"] .btn-secondary:active,
@@ -14207,7 +14208,7 @@ a.btn-small,
   background: #813702;
 }
 
-/* line 33, resources/assets/styles/components/_buttons.scss */
+/* line 34, resources/assets/styles/components/_buttons.scss */
 
 [data-color="sunrise"] .btn-tertiary,
 [data-color="sunrise"] .ctct-form-wrapper.ctct-form-wrapper .ctct-submit,
@@ -14216,7 +14217,7 @@ a.btn-small,
   color: #000;
 }
 
-/* line 37, resources/assets/styles/components/_buttons.scss */
+/* line 38, resources/assets/styles/components/_buttons.scss */
 
 [data-color="sunrise"] .btn-tertiary:hover,
 [data-color="sunrise"] .ctct-form-wrapper.ctct-form-wrapper .ctct-submit:hover,
@@ -14230,14 +14231,14 @@ a.btn-small,
   background: #ffd38f;
 }
 
-/* line 44, resources/assets/styles/components/_buttons.scss */
+/* line 45, resources/assets/styles/components/_buttons.scss */
 
 .fl-builder-content.fl-builder-content a.fl-button.fl-button {
   border: none;
   font-size: 1em;
 }
 
-/* line 51, resources/assets/styles/components/_buttons.scss */
+/* line 52, resources/assets/styles/components/_buttons.scss */
 
 .fl-builder-content.fl-builder-content a.fl-button.fl-button span {
   color: inherit;
