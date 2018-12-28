@@ -183,3 +183,10 @@ $em-base: 18px;
 
   @return $emValues;
 }
+
+$asset-base-path: '../images' !default;
+
+// Image relative URL builder
+@function image($file) {
+  @return url($asset-base-path + '/' + $file);
+}

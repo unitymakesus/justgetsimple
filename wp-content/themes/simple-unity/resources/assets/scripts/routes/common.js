@@ -24,7 +24,7 @@ export default {
   },
   finalize() {
     // Media query
-    var smDown = window.matchMedia( "(max-width: 768px)" );
+    var smDown = window.matchMedia( '(max-width: 768px)' );
 
     // Show a11y toolbar
     function showA11yToolbar() {

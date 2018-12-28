@@ -197,7 +197,7 @@
           // background: $color-green-dark;
 
           &::after {
-            background-image: url('../images/icon-contrast-inverse.svg');
+            background-image: image('icon-contrast-inverse.svg');
           }
 
           html[data-contrast="true"] & {
@@ -225,7 +225,7 @@
           content: '';
           top: 0;
           height: 100%;
-          background: url('../images/icon-contrast.svg') no-repeat 50% 50%;
+          background: image('icon-contrast.svg') no-repeat 50% 50%;
         }
       }
     }

@@ -133,27 +133,27 @@ var simpleFont = simple_options.fonts,  // eslint-disable-line no-undef
     fontFamilies = ['Material Icons'];
 
 switch (simpleFont) {
-  case "1":
+  case '1':
     fontFamilies = ['Bitter:700', 'Source Sans Pro:400,400i,700,700i', 'Material Icons'];
     break;
 
-  case "2":
+  case '2':
     fontFamilies = ['Didact Gothic:400', 'Arimo:400,400i,700,700i', 'Material Icons'];
     break;
 
-  case "3":
+  case '3':
     fontFamilies = ['Fjalla One:400', 'Crimson Text:400,400i,700,700i', 'Material Icons'];
     break;
 
-  case "4":
+  case '4':
     fontFamilies = ['Dancing Script:400', 'Open Sans:400,400i,700,700i', 'Material Icons'];
     break;
 
-  case "5":
+  case '5':
     fontFamilies = ['Open Sans:700,700i', 'Libre Baskerville:400,400i,700', 'Material Icons'];
     break;
 
-  case "6":
+  case '6':
     fontFamilies = ['Ovo:400', 'Muli:400,400i,700,700i', 'Material Icons'];
     break;
 }
@@ -217,6 +217,14 @@ var Router = function Router(routes) {
  */
 Router.prototype.fire = function fire (route, event, arg) {
     if ( event === void 0 ) event = 'init';
+
+  document.dispatchEvent(new CustomEvent('routed', {
+    bubbles: true,
+    detail: {
+      route: route,
+      fn: event,
+    },
+  }));
 
   var fire = route !== '' && this.routes[route] && typeof this.routes[route][event] === 'function';
   if (fire) {
@@ -304,7 +312,7 @@ Router.prototype.loadEvents = function loadEvents () {
   },
   finalize: function finalize() {
     // Media query
-    var smDown = window.matchMedia( "(max-width: 768px)" );
+    var smDown = window.matchMedia( '(max-width: 768px)' );
 
     // Show a11y toolbar
     function showA11yToolbar() {
@@ -492,8 +500,6 @@ Router.prototype.loadEvents = function loadEvents () {
 
 /* harmony default export */ __webpack_exports__["a"] = ({
   init: function init() {
-  },
-  finalize: function finalize() {
     __WEBPACK_IMPORTED_MODULE_0_macy_dist_macy_js___default.a.init({
       container: '.grid',
       trueOrder: true,
@@ -505,7 +511,9 @@ Router.prototype.loadEvents = function loadEvents () {
       breakAt: {
         767: 1,
       },
-    });    
+    });
+  },
+  finalize: function finalize() {
   },
 });
 

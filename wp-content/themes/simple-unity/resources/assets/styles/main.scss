@@ -1,7 +1,7 @@
 @import "common/variables";
 
 /** Import everything from autoload */
-@import "./autoload/**/*";
+// @import "./autoload/**/*";
 
 /**
  * Import npm dependencies
@@ -10,7 +10,8 @@
  * @see https://github.com/webpack-contrib/sass-loader#imports
  */
 // Materialize
-@import "~materialize-css/sass/components/color";
+@import "~materialize-css/sass/components/color-variables";
+@import "~materialize-css/sass/components/color-classes";
 @import "~materialize-css/sass/components/variables";
 @import "~materialize-css/sass/components/normalize";
 @import "~materialize-css/sass/components/global";
@@ -23,7 +24,7 @@
 @import "~materialize-css/sass/components/dropdown";
 @import "~materialize-css/sass/components/modal";
 @import "~materialize-css/sass/components/collapsible";
-@import "~materialize-css/sass/components/sideNav";
+@import "~materialize-css/sass/components/sidenav";
 @import "~materialize-css/sass/components/forms/forms";
 @import "~materialize-css/sass/components/preloader";
 

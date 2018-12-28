@@ -52,10 +52,6 @@ function config($key = null, $default = null)
  */
 function template($file, $data = [])
 {
-    if (remove_action('wp_head', 'wp_enqueue_scripts', 1)) {
-        wp_enqueue_scripts();
-    }
-
     return sage('blade')->render($file, $data);
 }
 
@@ -140,7 +136,3 @@ function display_sidebar()
     isset($display) || $display = apply_filters('sage/display_sidebar', false);
     return $display;
 }
-
-/**
- * Excerpt filter
- */
