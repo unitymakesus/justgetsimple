@@ -15047,12 +15047,42 @@ figure.post-thumbnail {
 
 /* line 47, resources/assets/styles/components/_media.scss */
 
+.alignleft {
+  float: left;
+  margin: 0 1em 1em 0;
+}
+
+@media only screen and (min-width: 769px) {
+  /* line 47, resources/assets/styles/components/_media.scss */
+
+  .alignleft {
+    max-width: 50%;
+  }
+}
+
+/* line 56, resources/assets/styles/components/_media.scss */
+
+.alignright {
+  float: right;
+  margin: 0 0 1em 1em;
+}
+
+@media only screen and (min-width: 769px) {
+  /* line 56, resources/assets/styles/components/_media.scss */
+
+  .alignright {
+    max-width: 50%;
+  }
+}
+
+/* line 65, resources/assets/styles/components/_media.scss */
+
 .alignwide {
   margin-left: -80px;
   margin-right: -80px;
 }
 
-/* line 52, resources/assets/styles/components/_media.scss */
+/* line 70, resources/assets/styles/components/_media.scss */
 
 .alignfull {
   margin-left: calc(-100vw / 2 + 100% / 2);
@@ -15061,13 +15091,13 @@ figure.post-thumbnail {
   width: 100vw;
 }
 
-/* line 58, resources/assets/styles/components/_media.scss */
+/* line 76, resources/assets/styles/components/_media.scss */
 
 .alignfull img {
   width: 100vw;
 }
 
-/* line 63, resources/assets/styles/components/_media.scss */
+/* line 81, resources/assets/styles/components/_media.scss */
 
 .entry-content-asset {
   position: relative;
@@ -15077,7 +15107,7 @@ figure.post-thumbnail {
   overflow: hidden;
 }
 
-/* line 70, resources/assets/styles/components/_media.scss */
+/* line 88, resources/assets/styles/components/_media.scss */
 
 .entry-content-asset iframe {
   position: absolute;
