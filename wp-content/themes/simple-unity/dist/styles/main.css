@@ -16011,35 +16011,64 @@ nav ul li.current_page_item a {
   color: #FFF;
 }
 
-/* line 24, resources/assets/styles/layouts/_footer.scss */
+@media only screen and (max-width: 768px) {
+  /* line 24, resources/assets/styles/layouts/_footer.scss */
+
+  .page-footer .footer-content .footer-center {
+    margin: 2em 0;
+  }
+}
+
+/* line 30, resources/assets/styles/layouts/_footer.scss */
 
 .page-footer .footer-copyright {
   padding: 0 1em;
   background-color: rgba(0, 0, 0, 0.6);
   height: 40px;
   margin-bottom: 0;
-  font-size: 0.9em;
+  font-size: 0.8em;
 }
 
-/* line 31, resources/assets/styles/layouts/_footer.scss */
+/* line 37, resources/assets/styles/layouts/_footer.scss */
 
 .page-footer .footer-copyright a {
   color: #FFF;
 }
 
 @media only screen and (max-width: 768px) {
-  /* line 37, resources/assets/styles/layouts/_footer.scss */
+  /* line 30, resources/assets/styles/layouts/_footer.scss */
+
+  .page-footer .footer-copyright {
+    height: auto;
+  }
+
+  /* line 44, resources/assets/styles/layouts/_footer.scss */
+
+  .page-footer .footer-copyright a.unity-link {
+    display: block;
+    margin: 1em auto;
+  }
+}
+
+/* line 52, resources/assets/styles/layouts/_footer.scss */
+
+.page-footer .footer-links li {
+  padding: 0 15px;
+}
+
+/* line 55, resources/assets/styles/layouts/_footer.scss */
+
+.page-footer .footer-links li:first-child {
+  border-right: 1px solid #FFF;
+}
+
+@media only screen and (max-width: 768px) {
+  /* line 62, resources/assets/styles/layouts/_footer.scss */
 
   .page-footer .footer-left,
   .page-footer .footer-center,
   .page-footer .footer-right {
     text-align: center;
-  }
-
-  /* line 41, resources/assets/styles/layouts/_footer.scss */
-
-  .page-footer .footer-center {
-    margin: 2em 0;
   }
 }
 

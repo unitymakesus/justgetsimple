@@ -21,7 +21,7 @@
     </div>
     <div class="footer-center col m4 s12">
       @if (has_nav_menu('footer_links'))
-        {!! wp_nav_menu(['theme_location' => 'footer_links', 'container' => FALSE, 'menu_class' => 'flex flex-center']) !!}
+        {!! wp_nav_menu(['theme_location' => 'footer_links', 'container' => FALSE, 'menu_class' => 'footer-links flex flex-center justify-center']) !!}
       @else
         <a href="{{ get_home_url() }}/privacy-policy/">Privacy Policy</a>
       @endif
