@@ -16,40 +16,33 @@ class Admin extends Security
     /**
      * Admin constructor.
      */
-    function __construct( $plugin )
+    function __construct()
     {
+        // Run parent class constructor first
+        parent::__construct();
+        $this->log( 'running Admin.php' );
+        $this->check_settings();
+        $this->policy_notices();
+        // Display Admin Notices
+        add_action( 'admin_notices', array( $this, 'display_notices' ) );
+        // Load CSS / JS
+        add_action( 'admin_init', array( $this, 'scripts' ) );
+        // Body Class
+        add_filter( 'admin_body_class', array( $this, 'admin_body_class' ) );
+        // Create Admin Menus
+        add_action( 'admin_menu', array( $this, 'admin_menus' ) );
+        // Add Action Links
         
-        if ( is_array( $plugin ) ) {
-            // Run parent class constructor first
-            parent::__construct( $plugin );
-            $this->log( 'running Admin.php' );
-            $this->check_settings();
-            $this->policy_notices();
-            // Display Admin Notices
-            add_action( 'admin_notices', array( $this, 'display_notices' ) );
-            // Load CSS / JS
-            add_action( 'admin_init', array( $this, 'scripts' ) );
-            // Body Class
-            add_filter( 'admin_body_class', array( $this, 'admin_body_class' ) );
-            // Create Admin Menus
-            add_action( 'admin_menu', array( $this, 'admin_menus' ) );
-            // Add Action Links
-            
-            if ( is_network_admin() ) {
-                add_filter( 'network_admin_plugin_action_links_security-safe/security-safe.php', array( $this, 'plugin_action_links' ) );
-            } else {
-                add_filter( 'plugin_action_links_security-safe/security-safe.php', array( $this, 'plugin_action_links' ) );
-            }
-            
-            if ( $this->debug ) {
-                $this->messages[] = array( 'Plugin Debug Mode is on.', 1, 0 );
-            }
-            // $this->debug
+        if ( is_network_admin() ) {
+            add_filter( 'network_admin_plugin_action_links_security-safe/security-safe.php', array( $this, 'plugin_action_links' ) );
         } else {
-            $this->log( 'ERROR: Cannot load plugin. $plugin is not an array in Admin.php' );
+            add_filter( 'plugin_action_links_security-safe/security-safe.php', array( $this, 'plugin_action_links' ) );
         }
         
-        // $plugin
+        if ( $this->debug ) {
+            $this->messages[] = array( 'Plugin Debug Mode is on.', 1, 0 );
+        }
+        // $this->debug
     }
     
     // __construct()
@@ -60,38 +53,36 @@ class Admin extends Security
     {
         
         if ( isset( $_GET['page'] ) ) {
-            // Shorten Code References
-            $plugin = $this->plugin;
             // See if the page is one of ours
-            $local_page = strpos( $_GET['page'], $this->plugin['slug'] );
+            $local_page = strpos( $_GET['page'], SECSAFE_SLUG );
             // Only load CSS and JS for our admin pages.
             
             if ( $local_page !== false ) {
                 // Load CSS
                 wp_register_style(
-                    $plugin['slug'] . '-admin',
-                    $plugin['url'] . 'css/admin.css',
+                    SECSAFE_SLUG . '-admin',
+                    SECSAFE_URL . 'css/admin.css',
                     array(),
-                    $plugin['version'],
+                    SECSAFE_VERSION,
                     'all'
                 );
-                wp_enqueue_style( $plugin['slug'] . '-admin' );
+                wp_enqueue_style( SECSAFE_SLUG . '-admin' );
                 // Load JS
                 wp_enqueue_script( 'common' );
                 wp_enqueue_script( 'wp-lists' );
                 wp_enqueue_script( 'postbox' );
                 wp_enqueue_script(
-                    $plugin['slug'] . '-admin',
-                    $plugin['url'] . 'js/admin.js',
+                    SECSAFE_SLUG . '-admin',
+                    SECSAFE_URL . 'js/admin.js',
                     array( 'jquery' ),
-                    $plugin['version'],
+                    SECSAFE_VERSION,
                     true
                 );
             }
             
             // $local_page
             // Memory Cleanup
-            unset( $plugin, $local_page );
+            unset( $local_page );
         }
         
         // isset()
@@ -104,7 +95,7 @@ class Admin extends Security
      */
     public function admin_body_class( $classes )
     {
-        $classes .= ' ' . $this->plugin['slug'];
+        $classes .= ' ' . SECSAFE_SLUG;
         return $classes;
     }
     
@@ -120,7 +111,7 @@ class Admin extends Security
         $page['menu_title'] = 'Security Safe';
         $page['title'] = $page['menu_title'] . ' Dashboard';
         $page['capability'] = 'activate_plugins';
-        $page['slug'] = $this->plugin['slug'];
+        $page['slug'] = SECSAFE_SLUG;
         $page['function'] = array( $this, 'page_dashboard' );
         $page['icon_url'] = 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAxNS4wLjAsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+DQo8c3ZnIHZlcnNpb249IjEuMSIgaWQ9IkxheWVyXzEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB3aWR0aD0iODMuNDExcHgiIGhlaWdodD0iOTQuMTNweCIgdmlld0JveD0iMC4wMDEgMzQ4LjkzNSA4My40MTEgOTQuMTMiIGVuYWJsZS1iYWNrZ3JvdW5kPSJuZXcgMC4wMDEgMzQ4LjkzNSA4My40MTEgOTQuMTMiDQoJIHhtbDpzcGFjZT0icHJlc2VydmUiPg0KPGc+DQoJPHBhdGggZmlsbD0iI0YyNjQxOSIgZD0iTTgzLjI3MSwzNTYuODk2YzAsMC0yMC41NjItNy45NjEtNDEuNjI4LTcuOTYxYy0yMS4wNjcsMC00MS42MjksNy45NjEtNDEuNjI5LDcuOTYxDQoJCXMtMC43OTUsMzAuMDMsMTAuMDMyLDUxLjgwNGMxMC44MjUsMjEuNzcxLDMyLjA5OSwzNC4zNjUsMzIuMDk5LDM0LjM2NXMyMS4wNzgtMTMuMjI3LDMyLjEtMzYuODU0DQoJCUM4NS4yNjYsMzgyLjU4MSw4My4yNzEsMzU2Ljg5Niw4My4yNzEsMzU2Ljg5NnogTTUuMjksMzYxLjgxNGwwLjAzOC0xLjQ4M2wxLjQwNi0wLjQ4MWMwLjQ0OS0wLjE1NCw3LjQzMS0yLjUwNywxNi45NTktNC4xOQ0KCQljLTIuMTU0LDEuMjcxLTQuMjQ0LDIuNzc1LTUuNjQyLDMuODk5Yy01LjU0OSw0LjQ1NC0xMC4wMTgsOS4wOTktMTIuNDg4LDExLjgzMUM1LjIwMSwzNjUuOTM1LDUuMjgsMzYyLjIwOSw1LjI5LDM2MS44MTR6DQoJCSBNNi4wMTIsMzc2LjYzMWMyLjQ2OCwyLjM1LDYuODU1LDUuNzk1LDEzLjc2Nyw4Ljg2OWMxMS40MDgsNS4wNzIsMjEuODIyLDcuMTc2LDIxLjgyMiw3LjE3NnM4LjgxLTIuNTYxLDE4LjA2MS03LjkyNg0KCQlzMTEuNTI2LTcuNTg4LDExLjUyNi03LjU4OHMtMTMuMjkzLDAuNzA3LTI0LjA4LTEuMTQ5Yy0xMi45MTktMi4yMjQtMTcuMzI1LTUuNDQtMTcuMzI1LTUuNDRzNC40MDYtNC4wNjIsMTAuNDI1LTcuNjY2DQoJCWM2LjMxNC0zLjc3NywxMy45MzctNi43NDIsMTYuNTQ1LTcuNzA5YzEwLjkzOCwxLjY3NiwxOS4yNzMsNC40ODQsMTkuNzY0LDQuNjUzbDEuMzM2LDAuNDU0bDAuMTA0LDEuNDA4DQoJCWMwLjAzMywwLjQ1NSwwLjQxMyw2LjAwMi0wLjMwNCwxMy44NzljLTIuNzUyLDIuNjUtMTMuMzc0LDEyLjAzMS0zMi41OTgsMTkuMTk5Yy0xOC4zNTQsNi44NDQtMjkuOTA2LDguNzU2LTMyLjQ4NCw5LjEyNQ0KCQlDOC42OTUsMzk0Ljk2Myw2Ljg2NiwzODQuNzYsNi4wMTIsMzc2LjYzMXogTTY5LjMyLDQwNi40ODljLTMuODQ4LDIuNDA2LTEyLjA2Nyw3LjA2MS0yMy41MzQsMTAuOTENCgkJYy0xMi41NDYsNC4yMTUtMTguNDY4LDUuMzAxLTIwLjM1OSw1LjU2NmMtMC42OTMtMC43MjktMS4zODUtMS40OTQtMi4wNzUtMi4yODVjMi40MDUtMC41OTIsMTEuNzkzLTIuOTk4LDIzLjkwMy03LjM0Ng0KCQljMTEuMDU4LTMuOTY5LDIwLjU1NS05LjgyNiwyNC42MTctMTIuNTFjLTAuNDczLDEuMTg4LTAuOTc5LDIuMzc3LTEuNTI2LDMuNTU3QzcwLjAxNCw0MDUuMDk4LDY5LjY3LDQwNS43OTcsNjkuMzIsNDA2LjQ4OXoiLz4NCjwvZz4NCjwvc3ZnPg0K';
         $page['position'] = '999';
@@ -246,8 +237,8 @@ class Admin extends Security
             // Format Title
             $title_camel = str_replace( ' ', '', $page_slug );
             // Include Admin Page
-            require_once $this->plugin['dir_admin'] . '/AdminPage.php';
-            require_once $this->plugin['dir_admin'] . '/AdminPage' . $title_camel . '.php';
+            require_once SECSAFE_DIR_ADMIN . '/AdminPage.php';
+            require_once SECSAFE_DIR_ADMIN . '/AdminPage' . $title_camel . '.php';
             // Class For The Page
             $class = __NAMESPACE__ . '\\AdminPage' . $title_camel;
             $page_slug = strtolower( $page_slug );
@@ -349,7 +340,6 @@ class Admin extends Security
      */
     protected function display_page()
     {
-        $plugin = $this->plugin;
         $page = $this->page;
         ?>
         <div class="wrap">
@@ -365,14 +355,14 @@ class Admin extends Security
         ?></p>
             
                 <a href="<?php 
-        echo  $plugin['url_more_info'] ;
+        echo  SECSAFE_URL_MORE_INFO ;
         ?>" target="_blank" class="ss-logo"><img src="<?php 
-        echo  $plugin['url'] ;
+        echo  SECSAFE_URL ;
         ?>/img/logo.svg" alt="<?php 
-        echo  $plugin['name'] ;
+        echo  SECSAFE_NAME ;
         ?>"><br /><span class="version"><?php 
         ?>Version <?php 
-        echo  $plugin['version'] ;
+        echo  SECSAFE_VERSION ;
         ?></span></a>
 
             </div><!-- .intro -->
@@ -403,7 +393,9 @@ class Admin extends Security
                         <div id="sidebar" class="sidebar">
 
                             <div class="follow-us widget">
-                                <p><a href="https://twitter.com/wpsecuritysafe" class="icon-twitter" target="_blank">Follow Security Safe</a></p>
+                                <p><a href="<?php 
+            echo  SECSAFE_URL_TWITTER ;
+            ?>" class="icon-twitter" target="_blank">Follow Security Safe</a></p>
                             </div>
                             <?php 
             
@@ -414,7 +406,7 @@ class Admin extends Security
                                 <h5>Get More Features</h5>
                                 <p>Pro features give you more control and save you time.</p>
                                 <p class="cta"><a href="<?php 
-                echo  $plugin['url_more_info_pro'] ;
+                echo  SECSAFE_URL_MORE_INFO_PRO ;
                 ?>" target="_blank" class="icon-right-open">Upgrade to Pro!</a></p>
                             </div>
                             <?php 
@@ -424,7 +416,9 @@ class Admin extends Security
                             <div class="rate-us widget">
                                 <h5>Like Security Safe?</h5>
                                 <p>Share your positive experience!</p>
-                                <p class="cta ratings"><a href="https://wordpress.org/plugins/security-safe/#reviews" target="_blank" class="rate-stars"><span class="icon-star"></span><span class="icon-star"></span><span class="icon-star"></span><span class="icon-star"></span><span class="icon-star"></span></a></p>
+                                <p class="cta ratings"><a href="<?php 
+            echo  SECSAFE_URL_WP_REVIEWS ;
+            ?>" target="_blank" class="rate-stars"><span class="icon-star"></span><span class="icon-star"></span><span class="icon-star"></span><span class="icon-star"></span><span class="icon-star"></span></a></p>
                             </div>
                         </div>
                     <?php 
@@ -443,21 +437,20 @@ class Admin extends Security
                 <hr />
 
                 <p>If you like <?php 
-        echo  $plugin['name'] ;
-        ?>, please <a href="https://wordpress.org/support/plugin/security-safe/reviews/#new-post" target="_blank">post a review</a>.</p>
+        echo  SECSAFE_NAME ;
+        ?>, please <a href="<?php 
+        echo  SECSAFE_URL_WP_REVIEWS_NEW ;
+        ?>" target="_blank">post a review</a>.</p>
             
-                <p>Need help? Visit the <a href="https://wordpress.org/support/plugin/security-safe/" target="_blank">support forum</a>.</p>
+                <p>Need help? Visit the <a href="<?php 
+        echo  SECSAFE_URL_WP ;
+        ?>" target="_blank">support forum</a>.</p>
             
             </div>
         </div><!-- .wrap -->
         <?php 
         // Memory Cleanup
-        unset(
-            $page,
-            $plugin,
-            $action_url,
-            $enctype
-        );
+        unset( $page, $action_url, $enctype );
     }
     
     // display_page()
@@ -482,14 +475,14 @@ class Admin extends Security
             $class = strtolower( str_replace( ' ', '-', $m ) );
             
             if ( $m == 'Plugin' ) {
-                $href = 'href="admin.php?page=' . $this->plugin['slug'] . '"';
+                $href = 'href="admin.php?page=' . SECSAFE_SLUG . '"';
             } else {
-                $href = ( $disabled ? '' : 'href="admin.php?page=' . $this->plugin['slug'] . '-' . $class . '"' );
+                $href = ( $disabled ? '' : 'href="admin.php?page=' . SECSAFE_SLUG . '-' . $class . '"' );
             }
             
             // Highlight Active Menu
             
-            if ( $_GET['page'] == 'security-safe' && $m == 'Plugin' ) {
+            if ( $_GET['page'] == SECSAFE_SLUG && $m == 'Plugin' ) {
                 $active = ' active';
             } else {
                 $active = ( strpos( $_GET['page'], $class ) !== false ? ' active' : '' );
@@ -590,7 +583,7 @@ class Admin extends Security
         if ( isset( $_POST ) && !empty($_POST) ) {
             $this->log( 'form was submitted' );
             
-            if ( isset( $_GET['page'] ) && strpos( $_GET['page'], $this->plugin['slug'] ) !== false && !in_array( $_GET['page'], array( 'security-safe-pricing', 'security-safe-account' ) ) ) {
+            if ( isset( $_GET['page'] ) && strpos( $_GET['page'], SECSAFE_SLUG ) !== false && !in_array( $_GET['page'], array( 'security-safe-pricing', 'security-safe-account' ) ) ) {
                 $this->log( 'we are on a Security Safe page' );
                 
                 if ( !isset( $_GET['tab'] ) || $_GET['tab'] == 'settings' ) {
@@ -631,7 +624,7 @@ class Admin extends Security
             // isset( $_GET['page'] )
         } else {
             
-            if ( isset( $_GET['page'] ) && $_GET['page'] == $this->plugin['slug'] && isset( $_GET['reset'] ) && $_GET['reset'] == 1 ) {
+            if ( isset( $_GET['page'] ) && $_GET['page'] == SECSAFE_SLUG && isset( $_GET['reset'] ) && $_GET['reset'] == 1 ) {
                 $this->log( 'Reset requested.' );
                 // Reset On Plugin Settings Only
                 $this->reset_settings();
@@ -731,7 +724,7 @@ class Admin extends Security
     function plugin_action_links( $links )
     {
         // Add
-        array_unshift( $links, '<a style="color: #f56e28;" href="https://wordpress.org/plugins/security-safe/#reviews">Rate Us</a>' );
+        array_unshift( $links, '<a style="color: #f56e28;" href="' . SECSAFE_URL_WP_REVIEWS_NEW . '">Rate Us</a>' );
         return $links;
     }
 

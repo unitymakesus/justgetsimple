@@ -19,8 +19,6 @@ class AdminPageFiles extends AdminPage
      */
     protected function set_page()
     {
-        global  $SecuritySafe ;
-        $plugin = $SecuritySafe->plugin;
         // Fix Permissions
         $this->fix_permissions();
         $this->slug = 'security-safe-files';
@@ -64,9 +62,9 @@ class AdminPageFiles extends AdminPage
         $tab_plugins_intro = 'WordPress sets file permissions to minimum safe values by default when you install or update plugins. You will likely find file permission issues after migrating a site from one server to another. The file permissions for a plugin will get fixed when you perform an update on that particular plugin. We would recommend correcting any issues labeled "bad" immediately, versus waiting for an update.';
         
         if ( security_safe()->is_not_paying() ) {
-            $tab_plugins_intro .= '<br /><br /><b>Batch Plugin Permissions</b> (<a href="' . $plugin['url_more_info_pro'] . '">Pro Feature</a>) - You can change all plugin permissions to Standard or Secure permissions with one click.';
-            $tab_plugins_intro .= '<br /><br /><b>Prevent Plugin Version Snooping</b> (<a href="' . $plugin['url_more_info_pro'] . '">Pro Feature</a>) - Prevent access to plugin version files.';
-            $tab_plugins_intro .= '<br /><br /><b>Maintain Secure Permissions</b> (<a href="' . $plugin['url_more_info_pro'] . '">Pro Feature</a>) - WordPress will overwrite your file permissions changes when an update is performed. Security Safe Pro will automatically fix your permissions after an update.';
+            $tab_plugins_intro .= '<br /><br /><b>Batch Plugin Permissions</b> (<a href="' . SECSAFE_URL_MORE_INFO_PRO . '">Pro Feature</a>) - You can change all plugin permissions to Standard or Secure permissions with one click.';
+            $tab_plugins_intro .= '<br /><br /><b>Prevent Plugin Version Snooping</b> (<a href="' . SECSAFE_URL_MORE_INFO_PRO . '">Pro Feature</a>) - Prevent access to plugin version files.';
+            $tab_plugins_intro .= '<br /><br /><b>Maintain Secure Permissions</b> (<a href="' . SECSAFE_URL_MORE_INFO_PRO . '">Pro Feature</a>) - WordPress will overwrite your file permissions changes when an update is performed. Security Safe Pro will automatically fix your permissions after an update.';
         }
         
         $this->tabs[] = array(
@@ -98,9 +96,8 @@ class AdminPageFiles extends AdminPage
      */
     function tab_settings()
     {
-        global  $wp_version, $SecuritySafe ;
+        global  $wp_version ;
         $html = '';
-        $plugin = $SecuritySafe->plugin;
         // Shutoff Switch - All File Policies
         $classes = ( $this->settings['on'] ? '' : 'notice-warning' );
         $rows = $this->form_select(
@@ -206,7 +203,7 @@ class AdminPageFiles extends AdminPage
                 $this->settings,
                 'Plugin Version Files',
                 'version_files_plugins',
-                'Prevent Access (<a href="' . $plugin['url_more_info_pro'] . '">Pro Feature</a>)',
+                'Prevent Access (<a href="' . SECSAFE_URL_MORE_INFO_PRO . '">Pro Feature</a>)',
                 'Prevent access to files that disclose plugin versions.',
                 $classes,
                 true
@@ -215,7 +212,7 @@ class AdminPageFiles extends AdminPage
                 $this->settings,
                 'Theme Version Files',
                 'version_files_themes',
-                'Prevent Access (<a href="' . $plugin['url_more_info_pro'] . '">Pro Feature</a>)',
+                'Prevent Access (<a href="' . SECSAFE_URL_MORE_INFO_PRO . '">Pro Feature</a>)',
                 'Prevent access to files that disclose plugin versions.',
                 $classes,
                 true
@@ -226,12 +223,7 @@ class AdminPageFiles extends AdminPage
         // Save Button
         $html .= $this->button( 'Save Settings' );
         // Memory Cleanup
-        unset(
-            $rows,
-            $plugin,
-            $disabled,
-            $classes
-        );
+        unset( $rows, $disabled, $classes );
         return $html;
     }
     
@@ -332,15 +324,14 @@ class AdminPageFiles extends AdminPage
         $html = '';
         // Latest Versions
         $latest_versions = array();
-        //https://secure.php.net/ChangeLog-7.php
-        //https://secure.php.net/ChangeLog-5.php
+        // https://endoflife.software/programming-languages/server-side-scripting/php
+        // https://secure.php.net/ChangeLog-7.php
         $latest_versions['PHP'] = array(
-            '7.2.0' => '7.2.10',
-            '7.1.0' => '7.1.22',
-            '7.0.0' => '7.0.32',
-            '5.6.0' => '5.6.38',
+            '7.3.0' => '7.3.2',
+            '7.2.0' => '7.2.14',
+            '7.1.0' => '7.1.26',
         );
-        $php_min = '5.6.0';
+        $php_min = '7.1.0';
         $ok = array();
         $ok['php'] = false;
         $bad = array();
@@ -1124,7 +1115,7 @@ class AdminPageFiles extends AdminPage
         // $bad['php']
         
         if ( isset( $bad['php'] ) && is_array( $bad['php'] ) ) {
-            $message = 'You are using PHP version ' . $bad['php'][0] . ', which is no longer supported and has critical vulnerabilities. Immediately contact your hosting company to upgrade PHP to version ' . $bad['php'][1] . ' or higher.';
+            $message = 'You are using PHP version ' . $bad['php'][0] . ', which is no longer supported or has critical vulnerabilities. Immediately contact your hosting company to upgrade PHP to version ' . $bad['php'][1] . ' or higher.';
             $SecuritySafe->messages[] = array( $message, 3, 0 );
         }
         

@@ -1,9 +1,9 @@
 === Security Safe ===
 Contributors: sovstack, freemius
-Tags: security, wp security, privacy, security audit, file permissions, brute force login
+Tags: disable XML-RPC, security, wp security, privacy, security audit, file permissions, brute force login
 Requires at least: 3.5
 Requires PHP: 5.3
-Tested up to: 4.9.8
+Tested up to: 5.1
 Stable tag: trunk
 
 A plugin to quickly implement WordPress hardening and security techniques.
@@ -14,6 +14,7 @@ Security Safe is a free wp security plugin.
 
 Features:
 
+* Disable XML-RPC.php
 * Hide WordPress CMS Version
 * Hide Script Versions
 * Make Website Anonymous During Updates
@@ -22,7 +23,6 @@ Features:
 * Audit & Fix File Permission
 * Audit Hosting Software Versions
 * Login Security
-* Disable XML-RPC.php
 * Brute Force Protection
 * Content Copyright Protection
 * Multi-Site Compatible
@@ -47,8 +47,21 @@ Features:
 
 == Changelog ==
 
+= 1.2.3 (High Priority) = 
+*Release Date - 1 March 2019*
+* Improvement: Updated PHP version checks
+* Improvement: Updated Freemius SDK
+* Tested up to: 5.1
+
+= 1.2.2 (High Priority) = 
+*Release Date - 9 December 2018*
+* NOTE: PHP 5.6 and 7.0 are now identified as no longer supported due to end of life.
+* Improvement: Converted plugin variables to constants for efficiency and updated all references
+* Improvement: Updated PHP version checks
+* Tested up to: 5.0
+
 = 1.2.1 (Medium Priority) =
-*Release Date - 24 September 2018*
+*Release Date - 22 September 2018*
 * Bug Fix: WP-CLI does not properly set variables and causes fatal error when attemptimg to load plugin. Thank you Brian Medlin.
 
 = 1.2.0 (High Priority) =

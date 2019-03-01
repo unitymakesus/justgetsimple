@@ -20,31 +20,23 @@ class Security extends Plugin
     /**
      * Security constructor.
      */
-    function __construct( $plugin )
+    function __construct()
     {
+        // Run parent class constructor first
+        parent::__construct();
+        $this->log( 'running Security.php' );
         
-        if ( is_array( $plugin ) ) {
-            // Run parent class constructor first
-            parent::__construct( $plugin );
-            $this->log( 'running Security.php' );
-            
-            if ( isset( $this->settings['general']['on'] ) && $this->settings['general']['on'] == '1' ) {
-                // Run All Policies
-                $this->privacy();
-                $this->files();
-                $this->content();
-                $this->access();
-                $this->firewall();
-                $this->backups();
-            }
-            
-            // $this->settings['general']['on']
-        } else {
-            $this->log( 'ERROR: Cannot load plugin. $plugin is not an array in Security.php' );
+        if ( isset( $this->settings['general']['on'] ) && $this->settings['general']['on'] == '1' ) {
+            // Run All Policies
+            $this->privacy();
+            $this->files();
+            $this->content();
+            $this->access();
+            $this->firewall();
+            $this->backups();
         }
         
-        // Memory Cleanup
-        unset( $plugin );
+        // $this->settings['general']['on']
     }
     
     // __construct()
@@ -235,7 +227,7 @@ class Security extends Plugin
         
         if ( isset( $settings[$slug] ) && $settings[$slug] ) {
             // Include Policy
-            require_once $this->plugin['dir_policies'] . '/' . $policy . $plan . '.php';
+            require_once SECSAFE_DIR_POLICIES . '/' . $policy . $plan . '.php';
             $policy = __NAMESPACE__ . '\\' . $policy;
             new $policy();
             $this->policies[] = $policy;

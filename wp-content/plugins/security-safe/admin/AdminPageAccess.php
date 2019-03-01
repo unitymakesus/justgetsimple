@@ -77,5 +77,4 @@ class AdminPageAccess extends AdminPage {
     } // tab_settings()
 
 
-
 } // AdminPageAccess()

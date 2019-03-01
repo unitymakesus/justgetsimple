@@ -12,24 +12,10 @@ if ( ! defined( 'ABSPATH' ) ) { die; }
 class Plugin {
 
     /**
-     * Information about the plugin.
-     * @var array
-     */
-    public $plugin = array();
-
-
-    /**
      * Toggle testing mode on/off.
      * @var boolean
      */
-    protected $debug = false;
-
-
-    /**
-     * Security Safe Pro Status
-     * @var boolean
-     */
-    public $pro;
+    public $debug = false;
 
 
     /**
@@ -56,18 +42,15 @@ class Plugin {
      * Plugin constructor.
      * @since  0.1.0
      */
-	function __construct( $plugin = false ) {
+	function __construct() {
 
         // Get value once
         $this->logged_in = is_user_logged_in();
 
-        // Set Plugin Information
-        $this->plugin = $plugin;
-
         $this->log( 'running __construct() plugin.php' );
 
         // Add Text Domain For Translations
-        load_plugin_textdomain( 'security-safe', false, $this->plugin['dir_lang'] );
+        load_plugin_textdomain( SECSAFE_SLUG, false, SECSAFE_DIR_LANG );
 
         // Retrieve Plugin Settings
         $this->settings = ( empty( $this->settings ) ) ? $this->get_settings() : $this->settings;
@@ -76,10 +59,7 @@ class Plugin {
         $this->upgrade_settings();
 
         // Cleanup Settings on Plugin Disable
-        register_deactivation_hook( $this->plugin['file'], array( $this, 'disable_plugin') );
-
-        // Memory Cleanup
-        unset( $plugin );
+        register_deactivation_hook( SECSAFE_FILE, array( $this, 'disable_plugin') );
 
 	} // __construct()
 
@@ -93,7 +73,7 @@ class Plugin {
 
         $this->log( 'running get_settings().' );
 
-        $settings = get_option( $this->plugin['options'] );
+        $settings = get_option( SECSAFE_OPTIONS );
 
         // Set settings initially if they do not exist
         if ( ! isset( $settings['general'] ) ) {
@@ -103,7 +83,7 @@ class Plugin {
             $this->reset_settings( true );
 
             // Get New Initial Settings
-            $settings = get_option( $this->plugin['options'] );
+            $settings = get_option( SECSAFE_OPTIONS );
 
         } 
 
@@ -122,7 +102,7 @@ class Plugin {
         $this->log( 'running delete_settings()' );
 
         // Delete settings
-        return delete_option( $this->plugin['options'] );
+        return delete_option( SECSAFE_OPTIONS );
 
     } // delete_settings()
 
@@ -138,10 +118,14 @@ class Plugin {
 
         if ( is_array( $settings ) && isset( $settings['plugin']['version'] ) ) {
             
-            $results = update_option( $this->plugin['options'], $settings );
+            // Clean settings against the template minimum settings
+            $clean_settings = $this->clean_settings( $settings );
+            
+            // Update DB
+            $results = update_option( SECSAFE_OPTIONS, $clean_settings );
 
             // Memory Cleanup
-            unset( $settings );
+            unset( $settings, $clean_settings );
 
             if ( $results ) {
 
@@ -170,7 +154,7 @@ class Plugin {
 
             if ( ! isset( $settings['plugin']['version'] ) ) {
 
-                $this->log( 'ERROR: Settings variable is formatted properly. Settings not updated.', __FILE__, __LINE__ );
+                $this->log( 'ERROR: Settings variable is not formatted properly. Settings not updated.', __FILE__, __LINE__ );
             
             } else {
 
@@ -197,7 +181,7 @@ class Plugin {
         $this->log( 'running reset_settings()' );
 
         // Keep Plugin Version History
-        $plugin_history = ( isset( $this->settings['plugin']['version_history'] ) && $this->settings['plugin']['version_history'] ) ? $this->settings['plugin']['version_history'] : array( $this->plugin['version'] );
+        $plugin_history = ( isset( $this->settings['plugin']['version_history'] ) && $this->settings['plugin']['version_history'] ) ? $this->settings['plugin']['version_history'] : array( SECSAFE_VERSION );
 
         if ( ! $initial ) {
             
@@ -234,9 +218,56 @@ class Plugin {
         $this->log( 'Settings changed to default.' );
 
         // Memory Cleanup
-        unset( $privacy, $files, $content, $access, $firewall, $backups, $general, $plugin, $settings, $result, $delete, $plugin_history );
+        unset( $privacy, $files, $content, $access, $firewall, $backups, $general, $settings, $result, $delete, $plugin_history );
 
     } // reset_settings()
+
+
+
+    /**
+     * Upgrade settings from an older version
+     * @since  1.2.2
+     */
+    protected function clean_settings( $dirty_settings ){
+
+        // Keep Plugin Version History
+        $plugin_history = ( isset( $dirty_settings['plugin']['version_history'] ) && $dirty_settings['plugin']['version_history'] ) ? $dirty_settings['plugin']['version_history'] : array( SECSAFE_VERSION );
+
+        // Get template for settings
+        $min_settings = $this->get_settings_min( $plugin_history );
+
+        // Filtered Settings
+        $filtered_settings = array();
+
+        // Filter all non settings values
+        foreach ( $min_settings as $key => $value ) {
+
+            foreach ( $value as $k => $v ) {
+
+                if ( isset( $dirty_settings[$key][$k] ) ) {
+                    
+                    $filtered_settings[$key][$k] = $dirty_settings[$key][$k];
+
+                } else {
+
+                    $filtered_settings[$key][$k] = '';
+
+                }
+                
+            } // foreach()
+
+        } // foreach()
+
+        $clean_settings = filter_var_array( $filtered_settings, FILTER_SANITIZE_STRING );
+
+        // Memory Cleanup
+        unset( $dirty_settings, $min_settings, $key, $value, $k, $v, $filtered_settings );
+
+        return $clean_settings;
+
+    } // clean_settings()
+
+
 
     /**
      * Upgrade settings from an older version
@@ -250,9 +281,9 @@ class Plugin {
         $upgrade = false;
 
         // Upgrade Versions
-        if ( $this->plugin['version'] != $settings['plugin']['version'] ) {
+        if ( SECSAFE_VERSION != $settings['plugin']['version'] ) {
 
-            $this->log( 'Upgrading version. ' . $this->plugin['version'] . ' != ' . $settings['plugin']['version'] );
+            $this->log( 'Upgrading version. ' . SECSAFE_VERSION . ' != ' . $settings['plugin']['version'] );
 
             $upgrade = true;
 
@@ -261,9 +292,9 @@ class Plugin {
             $settings['plugin']['version_history'] = array_unique( $settings['plugin']['version_history'] );
             
             // Update DB To New Version
-            $settings['plugin']['version'] = $this->plugin['version'];
+            $settings['plugin']['version'] = SECSAFE_VERSION;
         
-        } // $this->plugin['version']
+        } // SECSAFE_VERSION
 
         // Upgrade to version 1.1.0
         if ( isset( $settings['files']['auto_update_core'] ) ) {
@@ -316,7 +347,8 @@ class Plugin {
     } // upgrade_settings()
 
     /**
-     * Sanitize Data before placing it in the database
+     * Set settings for a particular settings page
+     * @param  $settings_page string of the page posted to
      * @return $settings array of settings in database
      * @since  0.1.0
      */
@@ -326,12 +358,12 @@ class Plugin {
 
         $settings_page = strtolower( $settings_page );
 
-        if ( isset( $_POST ) && ! empty( $_POST ) ) {
+        if ( isset( $_POST ) && ! empty( $_POST ) && $settings_page ) {
 
             $this->log( 'Form was submitted.' );
 
-            // Sanitized Posted Settings
-            $new_settings = filter_var_array( $_POST, FILTER_SANITIZE_STRING );
+            //This is sanitized in clean_settings()
+            $new_settings = $_POST;
 
             // Remove submit value
             unset( $new_settings['submit'] );
@@ -378,14 +410,15 @@ class Plugin {
             // Cleanup Settings
             $settings[ $settings_page ] = $options; // Update page settings
 
-            // Compare New / Old Settings
+            // Compare New / Old Settings to see if anything actually changed
             if ( $settings == $this->settings ) {
 
+                // Tell user that they were updated, but nothing actually changed
                 $this->messages[] = array( 'Settings saved.', 0, 1 );
 
             } else {
 
-                // Update Settings
+                // Actually Update Settings
                 $success = $this->set_settings( $settings ); // Update DB
 
                 if ( $success ) {
@@ -488,7 +521,7 @@ class Plugin {
 
         // Plugin Version Tracking -----------------|
         $plugin = array(
-                        'version' => $this->plugin['version'],
+                        'version' => SECSAFE_VERSION,
                         'version_history' => $plugin_history,
                     );
 
@@ -549,22 +582,24 @@ class Plugin {
             
         } // is_admin()
 
-        // Initialize Plugin
-        $init = __NAMESPACE__ . '\\';
-        $init .= ( $admin_user ) ? 'Admin' : 'Security';
-
         // Load Security Policies
-        require_once( __DIR__ . '/Security.php' );
+        require_once( SECSAFE_DIR_COMMON . '/Security.php' );
 
         if ( $admin_user ) {
 
+            $init = __NAMESPACE__ . '\\Admin';
+
             // Load Admin
-            require_once( dirname( __DIR__ ) . '/admin/Admin.php' );
+            require_once( SECSAFE_DIR_ADMIN . '/Admin.php' );
+
+        } else {
+
+            $init = __NAMESPACE__ . '\\Security';
 
         }
         
         // Pass Plugin Variables
-        $SecuritySafe = new $init( $SecuritySafe );
+        $SecuritySafe = new $init();
 
         // Memory Cleanup
         unset( $init, $admin_user );
@@ -673,7 +708,7 @@ class Plugin {
         $message = ( $message ) ? $message : 'Error: Log Message not defined!';
         $message .= ( $file && $line ) ? ' - ' . 'Occurred on line ' . $line . ' in file ' . $file : '';
 
-        error_log( date( 'Y-M-j h:m:s' ) . " - " . $message . "\n", 3, $this->plugin['dir'] . '/debug.log' );
+        error_log( date( 'Y-M-j h:m:s' ) . " - " . $message . "\n", 3, SECSAFE_DIR . '/debug.log' );
 
         // Memory Cleanup
         unset( $message, $file, $line );
@@ -781,4 +816,4 @@ class Plugin {
 
     } // log_backup()
 
-} // Plugin()
+} // Plugin{}

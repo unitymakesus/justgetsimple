@@ -32,15 +32,9 @@ class PolicyDisableRightClick {
      * Loads JS To Disable Right Click.
      */ 
     function scripts(){
-
-        global $SecuritySafe;
-
-        $plugin = $SecuritySafe->plugin;
         
         // JS File
-        wp_enqueue_script( 'ss-pdrc', $plugin['url'] . 'js/pdrc.js', array( 'jquery' ), $plugin['version'], true );
-
-        unset( $plugin );
+        wp_enqueue_script( 'ss-pdrc', SECSAFE_URL . 'js/pdrc.js', array( 'jquery' ), SECSAFE_VERSION, true );
 
     } // scripts()
 

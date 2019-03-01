@@ -157,13 +157,19 @@ label.setting.smush-stats .smush-wrap,
 	font-size: 11px;
 }
 
+.smush-skipped {
+	display: flex;
+	align-items: center;
+	align-content: center;
+}
+
 .smush-skipped.error {
 	color: #C41921;
 }
 
 .smush-skipped .dashicons-editor-help {
 	cursor: pointer;
-	margin-top: -2px;
+	margin-top: -3px;
 }
 
 /** Help Tip **/
@@ -247,9 +253,14 @@ label.setting.smush-stats .smush-wrap,
 	}
 }
 
+.column-smushit div.smush-status-links,
 .attachment-details .setting div.smush-status-links {
-	float: none;
+	float: left;
 	text-align: left;
+
+	.wp-smush-action {
+		margin-right: 5px;
+	}
 }
 
 div.attachment-details .setting div.smush-status-links.smush-status-links div.smush-stats-wrapper {
@@ -377,11 +388,6 @@ div.wp-smush-dir-limit {
 	margin: 20px 0;
 }
 
-.smush-final-log {
-	margin-left: 0;
-	padding: 10px;
-}
-
 .wp-smush-ajax-error {
 	color: black;
 	font-size: 14px;
@@ -401,24 +407,6 @@ ul.smush-pro-features {
 
 li.smush-pro-feature-row {
 	margin-bottom: 20px;
-}
-
-div.smush-pro-feature-title,
-div.smush-pro-feature-desc {
-	padding-left: 30px;
-	position: relative;
-}
-
-div.smush-pro-feature-title {
-	font-size: 15px;
-	font-weight: 500;
-	line-height: 30px;
-}
-
-div.smush-pro-feature-desc {
-	color: #888888;
-	font-size: 13px;
-	line-height: 22px;
 }
 
 div.smush-pro-link-wrap {
@@ -611,11 +599,6 @@ div.wp-smush-resize-note {
 	font-weight: 400;
 }
 
-.smush-final-log {
-	max-height: 200px;
-	overflow: auto;
-}
-
 /** Override WP Footer Styling, Hide it on WPMU pages only, if we really need to **/
 .wp-admin #wpfooter {
 	display: block;
@@ -652,31 +635,6 @@ div.wp-smush-scan-result div.content {
 	width: 100%;
 }
 
-.smush-pro-feature-title:before {
-	box-shadow: none;
-	content: url("../images/image.svg");
-	font-family: 'WPMU-DEV-App-Icons';
-	font-size: 20px;
-	font-style: normal;
-	font-variant: normal;
-	font-weight: normal;
-	height: 22px;
-	line-height: 22px;
-	margin-left: 1px;
-	margin-top: -11px;
-	opacity: 1;
-	position: absolute;
-	speak: none;
-	transition-duration: 0.2s;
-	transition-property: color, opacity;
-	text-transform: none;
-	top: 50%;
-	vertical-align: middle;
-	width: 22px;
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
-}
-
 div.wp-smush-info.notice {
 	font-size: 15px;
 	letter-spacing: -0.015em;
@@ -685,7 +643,7 @@ div.wp-smush-info.notice {
 }
 
 /* Bulk Smush button*/
-button.wp-smush-all.wp-smush-button {
+button.wp-smush-all {
 	float: right;
 }
 

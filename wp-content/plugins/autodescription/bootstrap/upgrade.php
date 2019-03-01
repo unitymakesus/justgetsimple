@@ -3,9 +3,11 @@
  * @package The_SEO_Framework/Bootstrap
  */
 
+defined( 'THE_SEO_FRAMEWORK_PRESENT' ) or die;
+
 /**
  * The SEO Framework plugin
- * Copyright (C) 2015 - 2018 Sybre Waaijer, CyberWire (https://cyberwire.nl/)
+ * Copyright (C) 2015 - 2019 Sybre Waaijer, CyberWire (https://cyberwire.nl/)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as published
@@ -19,8 +21,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
-defined( 'THE_SEO_FRAMEWORK_PRESENT' ) or die;
 
 /**
  * This file holds functions for upgrading the plugin.
@@ -80,17 +80,27 @@ add_action( 'init', 'the_seo_framework_do_upgrade', 20 );
  *              7. Now checks if The SEO Framework is loaded.
  *              8. Now tries to increase memory limit. This probably isn't needed.
  *              9. Now runs on the front-end, too, via `init`, instead of `admin_init`.
+ * @since 3.1.4 Now flushes object cache before the upgrade settings are called.
  */
 function the_seo_framework_do_upgrade() {
 
 	if ( ! the_seo_framework()->loaded ) return;
 
 	if ( the_seo_framework()->is_seo_settings_page( false ) ) {
-		wp_redirect( self_admin_url() );
+		wp_redirect( self_admin_url() ); // phpcs:ignore -- self_admin_url() is safe.
 		exit;
 	}
 
 	\wp_raise_memory_limit( 'tsf_upgrade' );
+
+	/**
+	 * From WordPress' .../update-core.php
+	 * @since 3.1.4
+	 */
+	// Clear the cache to prevent an update_option() from saving a stale database version to the cache
+	wp_cache_flush();
+	// (Not all cache back ends listen to 'flush')
+	wp_cache_delete( 'alloptions', 'options' );
 
 	$version = the_seo_framework_previous_db_version();
 
@@ -151,9 +161,19 @@ add_action( 'the_seo_framework_upgraded', 'the_seo_framework_upgrade_to_current'
  * This should run once after every plugin update.
  *
  * @since 2.7.0
+ * @since 3.1.4 Now flushes the object cache after the setting's updated.
  */
 function the_seo_framework_upgrade_to_current() {
 	update_option( 'the_seo_framework_upgraded_db_version', THE_SEO_FRAMEWORK_DB_VERSION );
+
+	/**
+	 * From WordPress' .../update-core.php
+	 * @since 3.1.4
+	 */
+	// Clear the cache to prevent a get_option() from retrieving a stale database version to the cache
+	wp_cache_flush();
+	// (Not all cache back ends listen to 'flush')
+	wp_cache_delete( 'alloptions', 'options' );
 }
 
 add_action( 'the_seo_framework_upgraded', 'the_seo_framework_upgrade_reinitialize_rewrite', 99 );
@@ -174,6 +194,7 @@ add_action( 'the_seo_framework_upgraded', 'the_seo_framework_prepare_extension_m
  * Enqueues and outputs an Extension Manager suggestion.
  *
  * @since 3.1.0
+ * @since 3.2.2. No longer suggests when the user is new.
  * @staticvar bool $run
  *
  * @return void Early when already enqueued
@@ -184,6 +205,7 @@ function the_seo_framework_prepare_extension_manager_suggestion() {
 
 	if ( is_admin() ) {
 		add_action( 'admin_init', function() {
+			if ( ! the_seo_framework_previous_db_version() ) return;
 			require THE_SEO_FRAMEWORK_DIR_PATH_FUNCT . 'tsfem-suggestion.php';
 			the_seo_framework_load_extension_manager_suggestion();
 		}, 20 );
@@ -280,7 +302,6 @@ function the_seo_framework_do_upgrade_2802() {
 
 /**
  * Updates Twitter 'photo' card option to 'summary_large_image'.
- * Invalidates object cache if changed.
  *
  * @since 2.9.0
  * @since 3.1.0 Now only sets new options when defaults exists.
@@ -309,7 +330,6 @@ function the_seo_framework_do_upgrade_2900() {
 /**
  * Converts sitemap timestamp settings to global timestamp settings.
  * Adds new character counter settings.
- * Invalidates object cache.
  *
  * @since 3.0.0
  * @since 3.0.6 'display_character_counter' option now correctly defaults to 1.

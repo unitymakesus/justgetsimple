@@ -8,7 +8,7 @@ if ( !defined( 'ABSPATH' ) ) {
 }
 /**
  * @package SecuritySafe
- * @version 1.2.1
+ * @version 1.2.3
  */
 /*
  * Plugin Name: Security Safe
@@ -16,7 +16,7 @@ if ( !defined( 'ABSPATH' ) ) {
  * Description: Security Safe - Security, Hardening, Auditing & Privacy
  * Author: Sovereign Stack, LLC
  * Author URI: https://sovstack.com
- * Version: 1.2.1
+ * Version: 1.2.3
  * Text Domain: security-safe
  * Domain Path:  /languages
  * License: GPLv3 or later
@@ -69,25 +69,10 @@ security_safe();
 do_action( 'security_safe_loaded' );
 
 if ( !function_exists( 'security_safe' ) ) {
+    // Set Plugin Constants
+    securitysafe_set_constants();
     // Base Plugin
-    $SecuritySafe = array(
-        'name'              => 'Security Safe',
-        'version'           => '1.2.1',
-        'slug'              => 'security-safe',
-        'options'           => 'securitysafe_options',
-        'file'              => __FILE__,
-        'dir'               => __DIR__,
-        'dir_admin'         => __DIR__ . '/admin',
-        'dir_common'        => __DIR__ . '/common',
-        'dir_policies'      => __DIR__ . '/common/policies',
-        'dir_lang'          => __DIR__ . '/languages',
-        'url'               => plugin_dir_url( __FILE__ ),
-        'url_author'        => 'https://sovstack.com/',
-        'url_more_info'     => 'https://sovstack.com/security-safe/',
-        'url_more_info_pro' => admin_url( 'admin.php?page=security-safe-pricing' ),
-    );
-    // Base Plugin
-    require_once __DIR__ . '/common/Plugin.php';
+    require_once SECSAFE_DIR_COMMON . '/Plugin.php';
     // Init Plugin
     add_action( 'init', __NAMESPACE__ . '\\Plugin::init' );
     // Clear PHP Cache on Upgrades
@@ -102,3 +87,30 @@ if ( !function_exists( 'security_safe' ) ) {
 }
 
 // function_exists()
+/** 
+ * Set all plugin constants
+ * @since  1.2.2
+ */
+function securitysafe_set_constants()
+{
+    define( 'SECSAFE_VERSION', '1.2.3' );
+    define( 'SECSAFE_NAME', 'Security Safe' );
+    define( 'SECSAFE_SLUG', 'security-safe' );
+    define( 'SECSAFE_OPTIONS', 'securitysafe_options' );
+    define( 'SECSAFE_FILE', __FILE__ );
+    define( 'SECSAFE_DIR', __DIR__ );
+    define( 'SECSAFE_DIR_ADMIN', __DIR__ . '/admin' );
+    define( 'SECSAFE_DIR_COMMON', __DIR__ . '/common' );
+    define( 'SECSAFE_DIR_POLICIES', __DIR__ . '/common/policies' );
+    define( 'SECSAFE_DIR_LANG', __DIR__ . '/languages' );
+    define( 'SECSAFE_URL', plugin_dir_url( __FILE__ ) );
+    define( 'SECSAFE_URL_AUTHOR', 'https://sovstack.com/' );
+    define( 'SECSAFE_URL_MORE_INFO', 'https://wpsecuritysafe.com/' );
+    define( 'SECSAFE_URL_MORE_INFO_PRO', admin_url( 'admin.php?page=security-safe-pricing' ) );
+    define( 'SECSAFE_URL_TWITTER', 'https://twitter.com/wpsecuritysafe' );
+    define( 'SECSAFE_URL_WP', 'https://wordpress.org/plugins/security-safe/' );
+    define( 'SECSAFE_URL_WP_REVIEWS', 'https://wordpress.org/plugins/security-safe/#reviews' );
+    define( 'SECSAFE_URL_WP_REVIEWS_NEW', 'https://wordpress.org/support/plugin/security-safe/reviews/#new-post' );
+}
+
+// securitysafe_set_constants()

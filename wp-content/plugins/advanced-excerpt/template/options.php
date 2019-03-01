@@ -49,6 +49,9 @@
 								<input type="radio" id="finish-none" name="finish" value="exact"<?php echo ( 'exact' == $finish ) ? ' checked="checked"' : ''; ?> />
 								<?php _e( "Exact", 'advanced-excerpt' ); ?>
 								</label><br />
+								<input type="radio" id="finish-exact-2" name="finish" value="exact_w_spaces"<?php echo ( 'exact_w_spaces' == $finish ) ? ' checked="checked"' : ''; ?> />
+								<?php _e( "Exact <small>(count spaces as well)</small>", 'advanced-excerpt' ); ?>
+								</label><br />
 								<label for="finish-word">
 								<input type="radio" id="finish-word" name="finish" value="word"<?php echo ( 'word' == $finish ) ? ' checked="checked"' : ''; ?> />
 								<?php _e( "Word", 'advanced-excerpt' ); ?>

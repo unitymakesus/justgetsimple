@@ -310,8 +310,12 @@ class Advanced_Excerpt {
 				if ( 'words' == $length_type ) { // Count words
 					$w++;
 				} else { // Count/trim characters
-					$chars = trim( $t ); // Remove surrounding space
-					$c = strlen( $chars );
+					if ( $finish == 'exact_w_spaces' ) {
+						$chars = $t;
+					} else {
+						$chars = trim( $t );
+					}
+					$c = mb_strlen( $chars );
 					if ( $c + $w > $length && 'sentence' != $finish ) { // Token is too long
 						$c = ( 'word' == $finish ) ? $c : $length - $w; // Keep token to finish word
 						$t = substr( $t, 0, $c );

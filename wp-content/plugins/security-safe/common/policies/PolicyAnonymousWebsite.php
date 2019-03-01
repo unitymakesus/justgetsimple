@@ -31,7 +31,7 @@ class PolicyAnonymousWebsite {
 
         global $wp_version;
 
-        return 'WordPress/' . $wp_version . '; URL protected by Security Safe.';
+        return 'WordPress/' . $wp_version . '; URL protected by ' . SECSAFE_NAME . '. More info at: ' . SECSAFE_URL_MORE_INFO;
 
     } // make_anonymous()
 
