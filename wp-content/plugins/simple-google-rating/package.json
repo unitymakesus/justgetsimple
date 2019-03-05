@@ -5,7 +5,7 @@
   "author": "Alisa Herr | Unity Digital Agency",
   "license": "GPL2",
   "devDependencies": {
-    "browser-sync": "^2.24.7",
+    "browser-sync": "^2.26.3",
     "gulp": "^3.9.1",
     "gulp-compass": "^2.1.0"
   }
