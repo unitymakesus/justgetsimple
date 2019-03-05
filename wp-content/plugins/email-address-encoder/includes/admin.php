@@ -28,6 +28,11 @@ add_filter( 'plugin_action_links', 'eae_plugin_actions_links', 10, 2 );
 add_action( 'admin_notices', 'eae_page_scanner_notice' );
 
 /**
+ * Register callback to display warnings of incompatible plugins.
+ */
+add_action( 'admin_notices', 'eae_compatibility_warnings' );
+
+/**
  * Register scripts callback.
  */
 add_action( 'wp_enqueue_scripts', 'eae_enqueue_scripts' );
@@ -46,6 +51,11 @@ add_action( 'load-settings_page_email-address-encoder', 'eae_transmit_email' );
  * Register callback to clear page caches.
  */
 add_action( 'load-options.php', 'eae_clear_caches' );
+
+/**
+ * Register callback that cleans responses for the email detector.
+ */
+add_action( 'wp', 'eae_cleanup_response' );
 
 /**
  * Register AJAX callback for "eae_dismiss_notice" action.
@@ -197,7 +207,7 @@ function eae_enqueue_scripts() {
         true
     );
 
-    wp_localize_script( 'email-detector', 'eaeDetectorL10n', array(
+    wp_localize_script( 'email-detector', 'eae_detector', array(
         'one_email' => __( '1 Unprotected Email', 'email-address-encoder' ),
         'many_emails' => __( '{number} Unprotected Emails', 'email-address-encoder' ),
     ) );
@@ -222,7 +232,11 @@ function eae_adminbar_styles() {
 function eae_enqueue_admin_scripts() {
     $screen = get_current_screen();
 
-    if ( ! isset( $screen->id ) || $screen->id !== 'dashboard' ) {
+    if ( ! isset( $screen->id ) ) {
+        return;
+    }
+
+    if ( ! in_array( $screen->id, array( 'dashboard', 'edit-page' ) ) ) {
         return;
     }
 
@@ -261,7 +275,7 @@ function eae_page_scanner_notice() {
         return;
     }
 
-    if ( $screen->id !== 'dashboard' && $screen->id !== 'edit-page' ) {
+    if ( ! in_array( $screen->id, array( 'dashboard', 'edit-page' ) ) ) {
         return;
     }
 
@@ -277,7 +291,7 @@ function eae_page_scanner_notice() {
         return;
     }
 
-    if ( get_user_meta( get_current_user_id(), 'eae_dismissed_automatic_warnings_notice', true ) === '1' ) {
+    if ( get_user_meta( get_current_user_id(), 'eae_dismissed_automatic_warnings_notice', true ) == '1' ) {
         return;
     }
 
@@ -374,6 +388,11 @@ function eae_clear_caches() {
         rocket_clean_domain();
     }
 
+    // WP Super Cache
+    if ( function_exists( 'wp_cache_clear_cache' ) ) {
+        wp_cache_clear_cache();
+    }
+
     // JCH Optimize
     if ( class_exists( 'JchPlatformCache' ) && method_exists( 'JchPlatformCache', 'deleteCache' ) ) {
         JchPlatformCache::deleteCache( true );
@@ -382,5 +401,82 @@ function eae_clear_caches() {
     // LiteSpeed Cache
     if ( class_exists( 'LiteSpeed_Cache_API' ) && method_exists( 'LiteSpeed_Cache_API', 'purge_all' ) ) {
         LiteSpeed_Cache_API::purge_all();
+    }
+
+    // Cachify
+    if ( class_exists( 'Cachify' ) && method_exists( 'Cachify', 'flush_total_cache' ) ) {
+        Cachify::flush_total_cache( true );
+    }
+}
+
+/**
+ * Remove output that might contain email addresses that
+ * would lead to false-positive matches.
+ *
+ * @return void
+ */
+function eae_cleanup_response() {
+    if ( ! isset( $_SERVER[ 'HTTP_X_EMAIL_DETECTOR' ] ) || $_SERVER[ 'HTTP_X_EMAIL_DETECTOR' ] !== 'true' ) {
+        return;
+    }
+
+    // Disable Admin Bar
+    add_filter( 'show_admin_bar', '__return_false' );
+
+    // Disable Debug Bar
+    add_filter( 'debug_bar_enable', '__return_false' );
+
+    // Disable Query Monitor
+    add_filter( 'user_has_cap', function ( $caps ) {
+        $caps[ 'view_query_monitor' ] = false;
+
+        return $caps;
+    } );
+}
+
+/**
+ * Display warnings when incompatible plugins are detected.
+ *
+ * @return void
+ */
+function eae_compatibility_warnings() {
+    $screen = get_current_screen();
+
+    if ( ! isset( $screen->id ) ) {
+        return;
+    }
+
+    $screens = array(
+        'dashboard',
+        'plugins',
+        'edit-page',
+        'settings_page_email-address-encoder'
+    );
+
+    if ( ! in_array( $screen->id, $screens ) ) {
+        return;
+    }
+
+    if ( ! current_user_can( 'manage_options' ) ) {
+        return;
+    }
+
+    $plugins = apply_filters( 'active_plugins', get_option( 'active_plugins' ) );
+
+    foreach ( $plugins as $plugin ) {
+        if ( strpos( $plugin, 'ginger/' ) === 0 ) {
+            $gingerCookieInstalled = true;
+        }
+    }
+
+    if ( isset( $gingerCookieInstalled ) ) {
+        printf(
+            '<div class="notice notice-error"><p><strong>%s</strong> %s</p></div>',
+            __( 'Incompatible plugin detected!', 'email-address-encoder' ),
+            sprintf(
+                __( 'The "Ginger – EU Cookie Law" plugin decodes all HTML entities and thus prevents the Email Address Encoder from working. Please use a different cookie banner plugin, or use the full-page scanner technique of the <a href="%s">Premium version</a>.', 'email-address-encoder' ),
+                admin_url( 'options-general.php?page=email-address-encoder' )
+            )
+        );
     }
 }
