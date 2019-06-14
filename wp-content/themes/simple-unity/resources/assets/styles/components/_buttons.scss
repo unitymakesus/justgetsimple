@@ -1,11 +1,13 @@
 .btn {
-  padding: 10px 2rem;
   height: auto;
-  font-size: 1em;
   font-weight: 700;
 
   [data-font="3"] & {
     font-weight: 500;
+  }
+
+  &:not(.btn-small) {
+    padding: 10px 2rem;
   }
 }
 

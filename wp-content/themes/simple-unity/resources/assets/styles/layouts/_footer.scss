@@ -1,6 +1,10 @@
 .page-footer {
   .footer-center {
     text-align: center;
+
+    @media #{$small-and-down} {
+      margin: 2em 0;
+    }
   }
 
   .footer-right {
@@ -18,12 +22,6 @@
 
     a {
       color: $color-white;
-    }
-
-    @media #{$small-and-down} {
-      .footer-center {
-        margin: 2em 0;
-      }
     }
   }
 

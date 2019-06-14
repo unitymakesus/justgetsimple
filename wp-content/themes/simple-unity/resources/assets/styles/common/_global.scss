@@ -38,6 +38,10 @@ body {
   justify-content: flex-end;
 }
 
+.flex-grow {
+  flex: 1;
+}
+
 .flex-bottom {
   align-items: flex-end;
 }
@@ -72,6 +76,28 @@ body {
 
       @media #{$small-and-up} {
         width: 50%;
+      }
+    }
+  }
+
+  &.m3x {
+    .flex-item {
+      display: flex;
+      position: relative;
+
+      @media #{$small-and-up} {
+        width: 33.33%;
+      }
+    }
+  }
+
+  &.l4x {
+    .flex-item {
+      display: flex;
+      position: relative;
+
+      @media #{$medium-and-up} {
+        width: 25%;
       }
     }
   }
