@@ -9,7 +9,7 @@ add_shortcode('team', function($atts) {
     extract( shortcode_atts([
       'type' => false
     ], $atts ) );
-    
+
    if ($type) {
      $people = new \WP_Query([
 		'post_type' => 'simple-team',
@@ -71,7 +71,6 @@ add_shortcode('team', function($atts) {
 					}
 					if (!empty(get_field('longer_bio'))) {
             echo '<p><a href="' . get_permalink() . '">Read more about ' . get_the_title() . '</a></p>';
-            echo '<p><a target="_blank" href="' . get_permalink() . '">Read more about ' . get_the_title() . '</a></p>';
           }
         ?>
       </div>
