@@ -6,12 +6,32 @@ namespace App;
  * Staff list shortcode
  */
 add_shortcode('team', function($atts) {
-	$people = new \WP_Query([
+    extract( shortcode_atts([
+      'type' => false
+    ], $atts ) );
+    
+   if ($type) {
+     $people = new \WP_Query([
+		'post_type' => 'simple-team',
+		'posts_per_page' => -1,
+		'orderby' => 'menu_order',
+		'order' => 'ASC',
+        'tax_query' => array(
+            array(
+                'taxonomy' => 'simple-team-category',
+                'field'    => 'slug',
+                'terms'    => $type,
+            ),
+        ),
+	 ]);
+   } else {
+    $people = new \WP_Query([
 		'post_type' => 'simple-team',
 		'posts_per_page' => -1,
 		'orderby' => 'menu_order',
 		'order' => 'ASC',
 	]);
+   }
 
 	ob_start();
 
@@ -50,7 +70,7 @@ add_shortcode('team', function($atts) {
             echo $short_bio;
 					}
 					if (!empty(get_field('longer_bio'))) {
-            echo '<p><a href="' . get_permalink() . '">Read more about ' . get_the_title() . '</a></p>';
+            echo '<p><a target="_blank" href="' . get_permalink() . '">Read more about ' . get_the_title() . '</a></p>';
           }
         ?>
       </div>
