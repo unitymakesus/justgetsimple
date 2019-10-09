@@ -10,6 +10,10 @@
  * @copyright (c) 2016, Incsub (http://incsub.com)
  */
 
+if ( ! defined( 'WPINC' ) ) {
+	die;
+}
+
 /**
  * Class WP_Smush_Resize
  */
@@ -129,12 +133,6 @@ class WP_Smush_Resize extends WP_Smush_Module {
 			return false;
 		}
 
-		// Check if already resized.
-		$resize_meta = get_post_meta( $id, WP_SMUSH_PREFIX . 'resize_savings', true );
-		if ( ! empty( $resize_meta ) ) {
-			return false;
-		}
-
 		// Get attachment metadata.
 		$meta = empty( $meta ) ? wp_get_attachment_metadata( $id ) : $meta;
 
@@ -231,7 +229,7 @@ class WP_Smush_Resize extends WP_Smush_Module {
 			$savings['size_before'] = $original_file_size;
 			$savings['size_after']  = $u_file_size;
 
-			// Store savings in meta data.
+			// Store savings in metadata.
 			if ( ! empty( $savings ) ) {
 				update_post_meta( $id, WP_SMUSH_PREFIX . 'resize_savings', $savings );
 			}
@@ -346,7 +344,7 @@ class WP_Smush_Resize extends WP_Smush_Module {
 	 *
 	 * @return mixed
 	 */
-	function file_name( $filename ) {
+	public function file_name( $filename ) {
 		if ( empty( $filename ) ) {
 			return $filename;
 		}

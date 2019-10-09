@@ -117,7 +117,7 @@ class FLPostGridModule extends FLBuilderModule {
 		if ( FLBuilderModel::is_builder_active() || 'grid' == $this->settings->layout ) {
 			$this->add_js( 'imagesloaded' );
 			$this->add_js( 'jquery-masonry' );
-
+			$this->add_js( 'jquery-throttle' );
 		}
 		if ( FLBuilderModel::is_builder_active() || 'gallery' == $this->settings->layout ) {
 			$this->add_js( 'fl-gallery-grid' );
@@ -163,12 +163,14 @@ class FLPostGridModule extends FLBuilderModule {
 	 * @return void
 	 */
 	public function render_post_class() {
-		$settings   = $this->settings;
-		$layout     = $this->get_layout_slug();
-		$show_image = has_post_thumbnail() && $settings->show_image;
-		$classes    = array( 'fl-post-' . $layout . '-post' );
+		$settings      = $this->settings;
+		$layout        = $this->get_layout_slug();
+		$show_image    = $settings->show_image;
+		$has_thumbnail = has_post_thumbnail();
+		$has_fallback  = ! $has_thumbnail && '' !== $settings->image_fallback && $settings->show_image ? true : false;
+		$classes       = array( 'fl-post-' . $layout . '-post' );
 
-		if ( $show_image ) {
+		if ( $show_image && $has_thumbnail ) {
 			if ( 'feed' == $layout ) {
 				$classes[] = 'fl-post-feed-image-' . $settings->image_position;
 			}
@@ -177,6 +179,13 @@ class FLPostGridModule extends FLBuilderModule {
 			}
 			if ( 'columns' == $settings->layout ) {
 				$classes[] = 'fl-post-columns-post';
+			}
+		}
+
+		if ( $show_image && $has_fallback ) {
+			if ( 'feed' == $layout ) {
+				$classes[] = 'fl-post-feed-image-' . $settings->image_position;
+				$classes[] = 'fl-post-feed-image-fallback';
 			}
 		}
 
@@ -204,8 +213,13 @@ class FLPostGridModule extends FLBuilderModule {
 		$render   = false;
 		$position = ! is_array( $position ) ? array( $position ) : $position;
 		$layout   = $this->get_layout_slug();
-
-		if ( has_post_thumbnail() && $settings->show_image ) {
+		/**
+		 * @since 2.2.5
+		 * @see fl_render_featured_image_fallback
+		 */
+		$fallback_image = apply_filters( 'fl_render_featured_image_fallback', $settings->image_fallback, $settings );
+		$fallback       = ! has_post_thumbnail() && '' !== $fallback_image && $settings->show_image ? true : false;
+		if ( ( has_post_thumbnail() || $fallback ) && $settings->show_image ) {
 
 			if ( 'feed' == $settings->layout && in_array( $settings->image_position, $position ) ) {
 				$render = true;
@@ -214,9 +228,12 @@ class FLPostGridModule extends FLBuilderModule {
 			} elseif ( 'grid' == $settings->layout && in_array( $settings->grid_image_position, $position ) ) {
 				$render = true;
 			}
-
 			if ( $render ) {
-				include $this->dir . 'includes/featured-image.php';
+				if ( $fallback ) {
+					include $this->dir . 'includes/featured-image-fallback.php';
+				} else {
+					include $this->dir . 'includes/featured-image.php';
+				}
 			}
 		}
 	}
@@ -233,7 +250,7 @@ class FLPostGridModule extends FLBuilderModule {
 		$result   = false;
 		$position = ! is_array( $position ) ? array( $position ) : $position;
 
-		if ( has_post_thumbnail() && $settings->show_image ) {
+		if ( ( has_post_thumbnail() && $settings->show_image ) || ( $settings->image_fallback && $settings->show_image ) ) {
 
 			if ( 'feed' == $settings->layout && in_array( $settings->image_position, $position ) ) {
 				$result = true;
@@ -254,6 +271,11 @@ class FLPostGridModule extends FLBuilderModule {
 	 * @return void
 	 */
 	public function render_content() {
+
+		if ( ! has_filter( 'the_content', 'wpautop' ) && empty( $this->settings->content_length ) ) {
+			add_filter( 'the_content', 'wpautop' );
+		}
+
 		ob_start();
 		the_content();
 		$content = ob_get_clean();
@@ -326,6 +348,56 @@ class FLPostGridModule extends FLBuilderModule {
 	}
 
 	/**
+	 * prints schema if enabled.
+	 * @since 2.2.2
+	 */
+	static public function print_schema( $schema ) {
+
+		if ( self::schema_enabled() ) {
+			echo $schema;
+		}
+	}
+
+	/**
+	 * Renders the schema itemtype for the collection
+	 *
+	 * @since 2.2.5
+	 * @return string
+	 */
+	static public function schema_collection_type( $data_source = 'custom_query', $post_type = 'post' ) {
+		$schema = '';
+
+		if ( ! self::schema_enabled() ) {
+			return $schema;
+		}
+
+		if ( is_archive() && 'main_query' === $data_source ) {
+			$schema = is_post_type_archive( 'post' ) ? 'https://schema.org/Blog' : 'https://schema.org/Collection';
+		} else {
+			$schema = ( 'post' === $post_type ) ? 'https://schema.org/Blog' : 'https://schema.org/Collection';
+		}
+
+		return $schema;
+	}
+
+	/**
+	 * Is schema enabled
+	 * @since 2.2.2
+	 */
+	static public function schema_enabled() {
+
+		/**
+		 * Disable all post-grid schema markup
+		 * @see fl_post_grid_disable_schema
+		 */
+		if ( false !== apply_filters( 'fl_post_grid_disable_schema', false ) ) {
+			return false;
+		} else {
+			return FLBuilder::is_schema_enabled();
+		}
+	}
+
+	/**
 	 * Renders the schema structured data for the current
 	 * post in the loop.
 	 *
@@ -334,6 +406,13 @@ class FLPostGridModule extends FLBuilderModule {
 	 */
 	static public function schema_meta() {
 
+		/**
+		 * Disable all post-grid schema markup
+		 * @see fl_post_grid_disable_schema
+		 */
+		if ( ! self::schema_enabled() ) {
+			return false;
+		}
 		/**
 		 * Before schema meta
 		 * @see fl_before_schema_meta
@@ -404,11 +483,17 @@ class FLPostGridModule extends FLBuilderModule {
 
 			$image = wp_get_attachment_image_src( get_post_thumbnail_id( get_the_ID() ), 'full' );
 			if ( is_array( $image ) ) {
+				ob_start();
 				echo '<div itemscope itemprop="image" itemtype="https://schema.org/ImageObject">';
 				echo '<meta itemprop="url" content="' . $image[0] . '" />';
 				echo '<meta itemprop="width" content="' . $image[1] . '" />';
 				echo '<meta itemprop="height" content="' . $image[2] . '" />';
 				echo '</div>';
+				/**
+				 * Image meta.
+				 * @see fl_schema_meta_thumbnail
+				 */
+				echo apply_filters( 'fl_schema_meta_thumbnail', ob_get_clean() );
 			}
 		}
 
@@ -441,11 +526,16 @@ class FLPostGridModule extends FLBuilderModule {
 	static public function schema_itemtype() {
 		global $post;
 
-		if ( ! is_object( $post ) || ! isset( $post->post_type ) || 'post' != $post->post_type ) {
-			echo 'https://schema.org/CreativeWork';
-		} else {
-			echo 'https://schema.org/BlogPosting';
+		if ( ! self::schema_enabled() ) {
+			return false;
 		}
+
+		$schema = 'https://schema.org/BlogPosting';
+		if ( ! is_object( $post ) || ! isset( $post->post_type ) || 'post' != $post->post_type ) {
+			$schema = 'https://schema.org/CreativeWork';
+		}
+
+		return $schema;
 	}
 
 	/**
@@ -499,18 +589,19 @@ FLBuilder::register_module('FLPostGridModule', array(
 						'toggle'  => array(
 							'columns' => array(
 								'sections' => array( 'posts', 'image', 'content', 'terms', 'post_style', 'text_style' ),
-								'fields'   => array( 'match_height', 'post_columns', 'post_spacing', 'post_padding', 'grid_image_position', 'grid_image_spacing', 'show_author', 'show_comments_grid', 'info_separator' ),
+								'fields'   => array( 'match_height', 'post_columns', 'post_spacing', 'post_padding', 'image', 'grid_image_position', 'grid_image_spacing', 'show_author', 'show_comments_grid', 'info_separator', 'image_size', 'image_fallback', 'show_image' ),
 							),
 							'grid'    => array(
 								'sections' => array( 'posts', 'image', 'content', 'terms', 'post_style', 'text_style' ),
-								'fields'   => array( 'match_height', 'post_width', 'post_spacing', 'post_padding', 'grid_image_position', 'grid_image_spacing', 'show_author', 'show_comments_grid', 'info_separator' ),
+								'fields'   => array( 'match_height', 'post_width', 'post_spacing', 'post_padding', 'grid_image_position', 'grid_image_spacing', 'show_author', 'show_comments_grid', 'info_separator', 'image_fallback', 'image_size', 'show_image' ),
 							),
 							'gallery' => array(
-								'sections' => array( 'gallery_general', 'overlay_style', 'icons' ),
+								'sections' => array( 'gallery_general', 'overlay_style', 'icons', 'image' ),
+								'fields'   => array( 'image_fallback' ),
 							),
 							'feed'    => array(
 								'sections' => array( 'posts', 'image', 'content', 'terms', 'post_style', 'text_style' ),
-								'fields'   => array( 'feed_post_spacing', 'feed_post_padding', 'image_position', 'image_spacing', 'image_width', 'show_author', 'show_comments', 'info_separator', 'content_type' ),
+								'fields'   => array( 'feed_post_spacing', 'feed_post_padding', 'image_position', 'image_spacing', 'image_width', 'show_author', 'show_comments', 'info_separator', 'content_type', 'image_fallback', 'image_size', 'show_image' ),
 							),
 						),
 					),
@@ -520,13 +611,14 @@ FLBuilder::register_module('FLPostGridModule', array(
 				'title'  => __( 'Posts', 'fl-builder' ),
 				'fields' => array(
 					'match_height'             => array(
-						'type'    => 'select',
-						'label'   => __( 'Equal Heights', 'fl-builder' ),
-						'default' => '0',
-						'options' => array(
+						'type'       => 'select',
+						'label'      => __( 'Equal Heights', 'fl-builder' ),
+						'default'    => '0',
+						'options'    => array(
 							'1' => __( 'Yes', 'fl-builder' ),
 							'0' => __( 'No', 'fl-builder' ),
 						),
+						'responsive' => true,
 					),
 					'post_width'               => array(
 						'type'    => 'unit',
@@ -691,6 +783,12 @@ FLBuilder::register_module('FLPostGridModule', array(
 						'default' => '33',
 						'units'   => array( '%' ),
 						'slider'  => true,
+					),
+					'image_fallback'      => array(
+						'default'     => '',
+						'type'        => 'photo',
+						'show_remove' => true,
+						'label'       => __( 'Fallback Image', 'fl-builder' ),
 					),
 				),
 			),

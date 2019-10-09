@@ -11,6 +11,10 @@
  * @copyright (c) 2016, Incsub (http://incsub.com)
  */
 
+if ( ! defined( 'WPINC' ) ) {
+	die;
+}
+
 /**
  * Class WP_Smush_Nextgen
  */
@@ -46,10 +50,9 @@ class WP_Smush_Nextgen extends WP_Smush_Integration {
 	 * WP_Smush_Nextgen constructor.
 	 */
 	public function __construct() {
-		$this->module   = 'nextgen';
-		$this->class    = 'pro';
-		$this->priority = 10;
-		$this->enabled  = class_exists( 'C_NextGEN_Bootstrap' );
+		$this->module  = 'nextgen';
+		$this->class   = 'pro';
+		$this->enabled = class_exists( 'C_NextGEN_Bootstrap' );
 
 		parent::__construct();
 
@@ -297,8 +300,6 @@ class WP_Smush_Nextgen extends WP_Smush_Integration {
 	 * @return mixed Stats / Status / Error
 	 */
 	public function smush_image( $pid = '', $image = '', $echo = true, $is_bulk = false ) {
-		WP_Smush::get_instance()->core()->initialise();
-
 		// Get image, if we have image id.
 		if ( ! empty( $pid ) ) {
 			$image = $this->get_nextgen_image_from_id( $pid );
@@ -549,6 +550,7 @@ class WP_Smush_Nextgen extends WP_Smush_Integration {
 				}
 			}
 		}
+
 		// If any of the image is restored, we count it as success.
 		if ( in_array( true, $restored ) ) {
 			// Update the global Stats.
@@ -669,7 +671,7 @@ class WP_Smush_Nextgen extends WP_Smush_Integration {
 	}
 
 	/**
-	 * Read the image paths from an attachment's meta data and process each image
+	 * Read the image paths from an attachment's metadata and process each image
 	 * with wp_smushit().
 	 *
 	 * @param $image
@@ -705,7 +707,7 @@ class WP_Smush_Nextgen extends WP_Smush_Integration {
 		if ( ! empty( $sizes ) ) {
 			foreach ( $sizes as $size ) {
 				// Skip Full size, if smush original is not checked.
-				if ( 'full' === $size && ! $smush->smush_original ) {
+				if ( 'full' === $size && ! $this->settings->get( 'original' ) && ! WP_Smush::is_pro() ) {
 					continue;
 				}
 
@@ -936,7 +938,7 @@ class WP_Smush_Nextgen extends WP_Smush_Integration {
 			$savings['size_before'] = $original_file_size;
 			$savings['size_after']  = $u_file_size;
 
-			// Store savings in meta data.
+			// Store savings in metadata.
 			if ( ! empty( $savings ) ) {
 				$meta['wp_smush_resize_savings'] = $savings;
 			}

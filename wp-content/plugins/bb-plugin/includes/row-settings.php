@@ -73,7 +73,7 @@ $row_settings = array(
 								'full'    => __( 'Full Height', 'fl-builder' ),
 								'custom'  => __( 'Minimum Height', 'fl-builder' ),
 							),
-							'help'    => __( 'Full height rows fill the height of the browser window. Minimum height rows are no taller than the value entered.', 'fl-builder' ),
+							'help'    => __( 'Full height rows fill the height of the browser window. Minimum height rows are at least as tall as the value entered.', 'fl-builder' ),
 							'toggle'  => array(
 								'full'   => array(
 									'fields' => array( 'content_alignment' ),
@@ -326,7 +326,7 @@ $row_settings = array(
 									'fields' => array( 'bg_video_url_mp4', 'bg_video_url_webm' ),
 								),
 								'video_service' => array(
-									'fields' => array( 'bg_video_service_url', 'bg_video_audio' ),
+									'fields' => array( 'bg_video_service_url' ),
 								),
 							),
 							'preview' => array(
@@ -388,6 +388,19 @@ $row_settings = array(
 							),
 							'preview' => array(
 								'type' => 'refresh',
+							),
+						),
+						'bg_video_mobile'      => array(
+							'type'    => 'select',
+							'label'   => __( 'Enable Video in Mobile', 'fl-builder' ),
+							'help'    => __( 'If set to "Yes", audio is disabled on mobile devices.', 'fl-builder' ),
+							'default' => 'no',
+							'options' => array(
+								'no'  => __( 'No', 'fl-builder' ),
+								'yes' => __( 'Yes', 'fl-builder' ),
+							),
+							'preview' => array(
+								'type' => 'none',
 							),
 						),
 						'bg_video_fallback'    => array(
@@ -718,6 +731,7 @@ $row_settings = array(
 						'visibility_user_capability' => array(
 							'type'        => 'text',
 							'label'       => __( 'User Capability', 'fl-builder' ),
+							/* translators: %s: wporg docs link */
 							'description' => sprintf( __( 'Optional. Set the <a%s>capability</a> required for users to view this row.', 'fl-builder' ), ' href="http://codex.wordpress.org/Roles_and_Capabilities#Capability_vs._Role_Table" target="_blank"' ),
 							'preview'     => array(
 								'type' => 'none',
@@ -745,6 +759,10 @@ $row_settings = array(
 							'type'    => 'select',
 							'label'   => __( 'Container Element', 'fl-builder' ),
 							'default' => apply_filters( 'fl_builder_row_container_element_default', 'div' ),
+							/**
+							 * Filter to add/remove container types.
+							 * @see fl_builder_node_container_element_options
+							 */
 							'options' => apply_filters( 'fl_builder_node_container_element_options', array(
 								'div'     => '&lt;div&gt;',
 								'section' => '&lt;section&gt;',

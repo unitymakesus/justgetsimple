@@ -67,8 +67,8 @@ final class FLBuilder {
 	 * Font awesome urls.
 	 * @since 2.1
 	 */
-	static public $fa4_url     = 'https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css';
-	static public $fa5_pro_url = 'https://pro.fontawesome.com/releases/v5.7.1/css/all.css';
+	static public $fa4_url     = '';
+	static public $fa5_pro_url = 'https://pro.fontawesome.com/releases/v5.9.0/css/all.css';
 
 	/**
 	 * Initializes hooks.
@@ -100,6 +100,7 @@ final class FLBuilder {
 		add_filter( 'tiny_mce_before_init', __CLASS__ . '::editor_font_sizes' );
 		add_filter( 'the_content', __CLASS__ . '::render_content' );
 		add_filter( 'wp_handle_upload_prefilter', __CLASS__ . '::wp_handle_upload_prefilter_filter' );
+		add_filter( 'wp_link_query_args', __CLASS__ . '::wp_link_query_args_filter' );
 	}
 
 	/**
@@ -119,6 +120,13 @@ final class FLBuilder {
 		} else {
 			$locale = apply_filters( 'plugin_locale', get_locale(), 'fl-builder' );
 		}
+
+		/**
+		 * Allow users to overide the locale.
+		 * @see fl_set_ui_locale
+		 * @since 2.2.4
+		 */
+		$locale = apply_filters( 'fl_set_ui_locale', $locale );
 
 		//Setup paths to current locale file
 		$mofile_global = trailingslashit( WP_LANG_DIR ) . 'plugins/bb-plugin/' . $locale . '.mo';
@@ -389,21 +397,23 @@ final class FLBuilder {
 		wp_register_style( 'yui3', $css_url . 'yui3.css', array(), $ver );
 
 		// Register icon CDN CSS
-		wp_register_style( 'font-awesome', self::$fa4_url, array(), $ver );
 		wp_register_style( 'font-awesome-5', self::get_fa5_url(), array(), $ver );
+		wp_register_style( 'font-awesome', plugins_url( '/fonts/fontawesome/css/v4-shims.min.css', FL_BUILDER_FILE ), array( 'font-awesome-5' ), $ver );
+
 		wp_register_style( 'foundation-icons', 'https://cdnjs.cloudflare.com/ajax/libs/foundicons/3.0.0/foundation-icons.css', array(), $ver );
 
 		// Register additional JS
 		wp_register_script( 'fl-slideshow', $js_url . 'fl-slideshow' . $min . '.js', array( 'yui3' ), $ver, true );
 		wp_register_script( 'fl-gallery-grid', $js_url . 'fl-gallery-grid.js', array( 'jquery' ), $ver, true );
-		wp_register_script( 'jquery-bxslider', $js_url . 'jquery.bxslider.js', array( 'jquery-easing', 'jquery-fitvids' ), $ver, true );
+		wp_register_script( 'jquery-bxslider', $js_url . 'jquery.bxslider' . $min . '.js', array( 'jquery-easing', 'jquery-fitvids' ), $ver, true );
 		wp_register_script( 'jquery-easing', $js_url . 'jquery.easing.min.js', array( 'jquery' ), '1.4', true );
 		wp_register_script( 'jquery-fitvids', $js_url . 'jquery.fitvids.min.js', array( 'jquery' ), '1.2', true );
 		wp_register_script( 'jquery-infinitescroll', $js_url . 'jquery.infinitescroll.min.js', array( 'jquery' ), $ver, true );
-		wp_register_script( 'jquery-magnificpopup', $js_url . 'jquery.magnificpopup.min.js', array( 'jquery' ), $ver, true );
-		wp_register_script( 'jquery-mosaicflow', $js_url . 'jquery.mosaicflow.min.js', array( 'jquery' ), $ver, true );
+		wp_register_script( 'jquery-magnificpopup', $js_url . 'jquery.magnificpopup' . $min . '.js', array( 'jquery' ), $ver, true );
+		wp_register_script( 'jquery-mosaicflow', $js_url . 'jquery.mosaicflow' . $min . '.js', array( 'jquery' ), $ver, true );
 		wp_register_script( 'jquery-waypoints', $js_url . 'jquery.waypoints.min.js', array( 'jquery' ), $ver, true );
 		wp_register_script( 'jquery-wookmark', $js_url . 'jquery.wookmark.min.js', array( 'jquery' ), $ver, true );
+		wp_register_script( 'jquery-throttle', $js_url . 'jquery.ba-throttle-debounce.min.js', array( 'jquery' ), $ver, true );
 		wp_register_script( 'yui3', $js_url . 'yui3.min.js', array(), $ver, true );
 		wp_register_script( 'youtube-player', 'https://www.youtube.com/iframe_api', array(), $ver, true );
 		wp_register_script( 'vimeo-player', 'https://player.vimeo.com/api/player.js', array(), $ver, true );
@@ -475,7 +485,7 @@ final class FLBuilder {
 					wp_enqueue_script( 'imagesloaded' );
 					if ( 'video_service' == $row->settings->bg_video_source ) {
 
-						$video_data = FLBuilderUtils::get_video_data( $row->settings->bg_video_service_url );
+						$video_data = FLBuilderUtils::get_video_data( do_shortcode( $row->settings->bg_video_service_url ) );
 
 						if ( 'youtube' == $video_data['type'] ) {
 							wp_enqueue_script( 'youtube-player' );
@@ -658,13 +668,6 @@ final class FLBuilder {
 
 			/* Frontend builder styles */
 			wp_enqueue_style( 'dashicons' );
-
-			/**
-			 * FA4 css and FA5 css do not mix well and actually break some of the icvons in the selector.
-			 */
-			if ( in_array( 'font-awesome', FLBuilderModel::get_enabled_icons() ) ) {
-				wp_enqueue_style( 'font-awesome' );
-			}
 			wp_enqueue_style( 'font-awesome-5' );
 			wp_enqueue_style( 'foundation-icons' );
 			wp_enqueue_style( 'jquery-nanoscroller', $css_url . 'jquery.nanoscroller.css', array(), $ver );
@@ -738,7 +741,8 @@ final class FLBuilder {
 				wp_enqueue_script( 'fl-lightbox', $js_url . 'fl-lightbox.js', array(), $ver );
 				wp_enqueue_script( 'fl-icon-selector', $js_url . 'fl-icon-selector.js', array(), $ver );
 				wp_enqueue_script( 'fl-stylesheet', $js_url . 'fl-stylesheet.js', array(), $ver );
-				wp_enqueue_script( 'fl-builder', $js_url . 'fl-builder.js', array(), $ver );
+				wp_enqueue_script( 'fl-builder', $js_url . 'fl-builder.js', array( 'jquery' ), $ver );
+				wp_enqueue_script( 'fl-builder-libs', $js_url . 'fl-builder-libs.js', array( 'fl-builder' ), $ver );
 				wp_enqueue_script( 'fl-builder-ajax-layout', $js_url . 'fl-builder-ajax-layout.js', array(), $ver );
 				wp_enqueue_script( 'fl-builder-preview', $js_url . 'fl-builder-preview.js', array(), $ver );
 				wp_enqueue_script( 'fl-builder-simulate-media-query', $js_url . 'fl-builder-simulate-media-query.js', array(), $ver );
@@ -774,6 +778,23 @@ final class FLBuilder {
 			}
 		}
 		wp_add_inline_style( 'admin-bar', '#wp-admin-bar-fl-builder-frontend-edit-link .ab-icon:before { content: "\f116" !important; top: 2px; margin-right: 3px; }' );
+		$args = array(
+			'product'     => FLBuilderModel::get_branding(),
+			'white_label' => FLBuilderModel::is_white_labeled(),
+			/**
+			 * Custom info text for crash popup.
+			 * @see fl_builder_crash_white_label_text
+			 */
+			'labeled_txt' => apply_filters( 'fl_builder_crash_white_label_text', '' ),
+			'vars'        => array(
+				'PHP Version'    => phpversion(),
+				'Memory Limit'   => FL_Debug::safe_ini_get( 'memory_limit' ),
+				'max_input_vars' => FL_Debug::safe_ini_get( 'max_input_vars' ),
+				'modsecfix'      => ( defined( 'FL_BUILDER_MODSEC_FIX' ) && FL_BUILDER_MODSEC_FIX ) ? 'Enabled' : 'Disabled',
+			),
+		);
+		wp_localize_script( 'fl-builder-min', 'crash_vars', $args );
+		wp_localize_script( 'fl-builder', 'crash_vars', $args );
 	}
 
 	/**
@@ -1323,10 +1344,16 @@ final class FLBuilder {
 		if ( '' == $icon_url ) {
 			$wrapper_classes[] = 'fl-builder-bar-title-no-icon';
 		}
+		$type = FLBuilderModel::get_user_template_type( $post->ID );
+		if ( $type && 'layout' !== $type ) {
+			$edited_object_label = ucfirst( $type );
+		} else {
+			$edited_object_label = get_post_type_object( $post->post_type )->labels->singular_name;
+		}
 
-		$edited_object_label = get_post_type_object( $post->post_type )->labels->singular_name;
-		$pretitle            = sprintf( _x( 'Currently Editing %s', 'Currently editing message', 'fl-builder' ), $edited_object_label );
-		$pretitle            = apply_filters( 'fl_builder_ui_bar_pretitle', $pretitle );
+		/* translators: %s: post label */
+		$pretitle = sprintf( _x( 'Currently Editing %s', 'Currently editing message', 'fl-builder' ), $edited_object_label );
+		$pretitle = apply_filters( 'fl_builder_ui_bar_pretitle', $pretitle );
 
 		// Render the bar title.
 		include FL_BUILDER_DIR . 'includes/ui-bar-title-area.php';
@@ -1476,7 +1503,7 @@ final class FLBuilder {
 				self::enqueue_layout_styles_scripts_by_id( $query_post->ID );
 
 				// Print the styles if we are outside of the head tag.
-				if ( did_action( 'wp_enqueue_scripts' ) && 'wp_enqueue_scripts' !== current_filter() ) {
+				if ( did_action( 'wp_enqueue_scripts' ) && ! doing_filter( 'wp_enqueue_scripts' ) ) {
 					wp_print_styles();
 				}
 
@@ -1513,6 +1540,11 @@ final class FLBuilder {
 
 		// Build the attributes string.
 		$attr_string = '';
+		/**
+		 * Change attributes for container.
+		 * @see fl_render_content_by_id_attrs
+		 */
+		$attrs = apply_filters( 'fl_render_content_by_id_attrs', $attrs, $post_id );
 
 		foreach ( $attrs as $attr_key => $attr_value ) {
 			$attr_string .= ' ' . $attr_key . '="' . $attr_value . '"';
@@ -1555,6 +1587,12 @@ final class FLBuilder {
 			$content = preg_replace_callback( "/$pattern/s", 'FLBuilder::double_escape_shortcodes', $content );
 			$content = $wp_embed->run_shortcode( $content );
 			$content = do_shortcode( $content );
+			/**
+			 * Allow content to be filtered after shortcodes are processed.
+			 * @see fl_builder_after_render_shortcodes
+			 * @since 2.2.4
+			 */
+			$content = apply_filters( 'fl_builder_after_render_shortcodes', $content );
 		}
 
 		// Add srcset attrs to images with the class wp-image-<ID>.
@@ -1920,6 +1958,12 @@ final class FLBuilder {
 			 * @see fl_builder_after_render_row
 			 */
 			do_action( 'fl_builder_after_render_row', $row, $groups );
+		} else {
+			/**
+			 * Fires in place of a hidden row.
+			 * @see fl_builder_hidden_node
+			 */
+			do_action( 'fl_builder_hidden_node', $row );
 		}
 	}
 
@@ -1960,6 +2004,10 @@ final class FLBuilder {
 			if ( isset( $row->settings->content_alignment ) ) {
 				$attrs['class'][] = 'fl-row-align-' . $row->settings->content_alignment;
 			}
+
+			if ( isset( $row->settings->margin_top ) && (int) $row->settings->margin_top < 0 ) {
+				$attrs['class'][] = 'fl-row-overlap-top';
+			}
 		}
 		if ( ! empty( $row->settings->full_height ) && 'custom' == $row->settings->full_height ) {
 
@@ -1967,6 +2015,10 @@ final class FLBuilder {
 
 			if ( isset( $row->settings->content_alignment ) ) {
 				$attrs['class'][] = 'fl-row-align-' . $row->settings->content_alignment;
+			}
+
+			if ( isset( $row->settings->margin_top ) && (int) $row->settings->margin_top < 0 ) {
+				$attrs['class'][] = 'fl-row-overlap-top';
 			}
 		}
 		if ( in_array( $row->settings->bg_type, $overlay_bgs ) ) {
@@ -2109,7 +2161,7 @@ final class FLBuilder {
 			'data-node' => $group->node,
 		);
 
-		if ( 'column' == $parent->type ) {
+		if ( isset( $parent->type ) && 'column' == $parent->type ) {
 			$attrs['class'][] = 'fl-col-group-nested';
 		}
 
@@ -2157,6 +2209,12 @@ final class FLBuilder {
 
 		if ( $active || $visible ) {
 			include FL_BUILDER_DIR . 'includes/column.php';
+		} else {
+			/**
+			 * Fires in place of a hidden column.
+			 * @see fl_builder_hidden_node
+			 */
+			do_action( 'fl_builder_hidden_node', $col );
 		}
 	}
 
@@ -2173,13 +2231,13 @@ final class FLBuilder {
 		 * @see fl_builder_column_custom_class
 		 * @link https://kb.wpbeaverbuilder.com/article/117-plugin-filter-reference
 		 */
-		$custom_class = apply_filters( 'fl_builder_column_custom_class', $col->settings->class, $col );
-		$overlay_bgs  = array( 'photo' );
-		$nested       = FLBuilderModel::get_nodes( 'column-group', $col );
-		$active       = FLBuilderModel::is_builder_active();
-		$visible      = FLBuilderModel::is_node_visible( $col );
-		$has_rules    = FLBuilderModel::node_has_visibility_rules( $col );
-		$attrs        = array(
+		$custom_class    = apply_filters( 'fl_builder_column_custom_class', $col->settings->class, $col );
+		$overlay_bgs     = array( 'photo' );
+		$nested          = FLBuilderModel::get_nodes( 'column-group', $col );
+		$active          = FLBuilderModel::is_builder_active();
+		$visible         = FLBuilderModel::is_node_visible( $col );
+		$has_rules       = FLBuilderModel::node_has_visibility_rules( $col );
+		$attrs           = array(
 			'id'        => $col->settings->id,
 			'class'     => array(
 				'fl-col',
@@ -2188,10 +2246,15 @@ final class FLBuilder {
 			'data-node' => $col->node,
 			'style'     => array(),
 		);
+		$global_settings = FLBuilderModel::get_global_settings();
 
 		// Classes
 		if ( $col->settings->size <= 50 ) {
 			$attrs['class'][] = 'fl-col-small';
+
+			if ( $global_settings->responsive_enabled && ! $global_settings->responsive_col_max_width ) {
+				$attrs['class'][] = 'fl-col-small-full-width';
+			}
 		}
 		if ( count( $nested ) > 0 ) {
 			$attrs['class'][] = 'fl-col-has-cols';
@@ -2305,6 +2368,12 @@ final class FLBuilder {
 			 * @see fl_builder_after_render_module
 			 */
 			do_action( 'fl_builder_after_render_module', $module );
+		} else {
+			/**
+			 * Fires in place of a hidden module.
+			 * @see fl_builder_hidden_node
+			 */
+			do_action( 'fl_builder_hidden_node', $module );
 		}
 	}
 
@@ -2497,6 +2566,8 @@ final class FLBuilder {
 	 */
 
 	static public function render_css( $include_global = true ) {
+		global $wp_the_query;
+
 		$active          = FLBuilderModel::is_builder_active();
 		$nodes           = FLBuilderModel::get_categorized_nodes();
 		$node_status     = FLBuilderModel::get_node_status();
@@ -2619,7 +2690,7 @@ final class FLBuilder {
 		$css .= self::render_global_nodes_custom_code( 'css' );
 
 		// Custom Layout CSS
-		if ( 'published' == $node_status ) {
+		if ( 'published' == $node_status || $post_id !== $wp_the_query->post->ID ) {
 			$css .= FLBuilderModel::get_layout_settings()->css;
 		}
 
@@ -3089,8 +3160,8 @@ final class FLBuilder {
 
 		// Add the layout settings JS.
 		if ( ! isset( $_GET['safemode'] ) ) {
-			$js .= self::render_global_nodes_custom_code( 'js' );
-			$js .= ( is_array( $layout_settings->js ) || is_object( $layout_settings->js ) ) ? json_encode( $layout_settings->js ) : $layout_settings->js;
+			$js .= self::js_comment( 'Global Node Custom JS', self::render_global_nodes_custom_code( 'js' ) );
+			$js .= ( is_array( $layout_settings->js ) || is_object( $layout_settings->js ) ) ? self::js_comment( 'Layout Custom JS', json_encode( $layout_settings->js ) ) : self::js_comment( 'Layout Custom JS', $layout_settings->js );
 		}
 
 		// Call the FLBuilder._renderLayoutComplete method if we're currently editing.
@@ -3163,8 +3234,14 @@ final class FLBuilder {
 		$js .= fl_builder_filesystem()->file_get_contents( FL_BUILDER_DIR . 'js/fl-builder-layout.js' );
 
 		// Add the global settings JS.
-		$js .= $global_settings->js;
+		$js .= self::js_comment( 'Global JS', $global_settings->js );
 
+		return $js;
+	}
+
+	static public function js_comment( $comment, $js ) {
+
+		$js = sprintf( "\n/* Start %s */\n%s\n/* End %s */\n\n", $comment, $js, $comment );
 		return $js;
 	}
 
@@ -3390,6 +3467,7 @@ final class FLBuilder {
 		$regex = apply_filters( 'fl_module_upload_regex', $regex, $type, $ext, $file );
 
 		if ( ! preg_match( $regex[ $type ], $ext ) ) {
+			/* translators: %s: extension type */
 			$file['error'] = sprintf( __( 'The uploaded file is not a valid %s extension.', 'fl-builder' ), $type );
 		}
 
@@ -3441,6 +3519,47 @@ final class FLBuilder {
 		 * @since 2.2.1
 		 */
 		return apply_filters( 'fl_get_fa5_url', $url );
+	}
+
+	/**
+	 * Remove template type from wp-link suggestions.
+	 * @since 2.2.2
+	 */
+	static public function wp_link_query_args_filter( $query ) {
+
+		if ( array_search( 'fl-builder-template', $query['post_type'] ) ) {
+			unset( $query['post_type'][ array_search( 'fl-builder-template', $query['post_type'] ) ] );
+		}
+		return $query;
+	}
+
+	/**
+	 * @since 2.2.3
+	 */
+	static public function is_schema_enabled() {
+
+		/**
+		 * Disable all schema.
+		 * @see fl_builder_disable_schema
+		 */
+		if ( false !== apply_filters( 'fl_builder_disable_schema', false ) ) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+
+	/**
+	 * @since 2.2.3
+	 */
+	static public function print_schema( $schema, $echo = true ) {
+		if ( self::is_schema_enabled() ) {
+			if ( $echo ) {
+				echo $schema;
+			} else {
+				return $schema;
+			}
+		}
 	}
 
 	/**

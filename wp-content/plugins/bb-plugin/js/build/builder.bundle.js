@@ -20692,6 +20692,8 @@ var InlineEditor = function (_Component) {
 					inline: true,
 					menubar: false,
 					paste_as_text: true,
+					relative_urls: false,
+					convert_urls: false,
 					skin: FLBuilder ? false : 'lightgray',
 					skin_url: FLBuilder ? false : tinyMCEPreInit.baseURL + '/skins/lightgray/',
 					theme: 'modern',
@@ -20813,6 +20815,7 @@ var InlineEditor = function (_Component) {
 	}, {
 		key: 'onEditorChange',
 		value: function onEditorChange(e) {
+
 			var target = e.target.bodyElement ? e.target.bodyElement : e.target;
 
 			var _getEditorEventVars = this.getEditorEventVars(target),

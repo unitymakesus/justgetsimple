@@ -5,6 +5,10 @@
  * @package WP_Smush
  */
 
+if ( ! defined( 'WPINC' ) ) {
+	die;
+}
+
 /**
  * Class WP_Smush_Backup
  */
@@ -18,13 +22,6 @@ class WP_Smush_Backup extends WP_Smush_Module {
 	private $smush;
 
 	/**
-	 * Whether to backup images or not.
-	 *
-	 * @var bool
-	 */
-	private $backup_enabled = false;
-
-	/**
 	 * Key for storing file path for image backup
 	 *
 	 * @var string
@@ -35,19 +32,12 @@ class WP_Smush_Backup extends WP_Smush_Module {
 	 * WP_Smush_Backup constructor.
 	 */
 	public function init() {
-		// Initialize Variables and perform other operations.
-		add_action( 'admin_init', array( $this, 'initialize' ) );
-
 		// Handle Restore operation.
 		add_action( 'wp_ajax_smush_restore_image', array( $this, 'restore_image' ) );
-	}
 
-	/**
-	 * Init actions.
-	 */
-	public function initialize() {
-		// Whether backup is enabled or not.
-		$this->backup_enabled = $this->settings->get( 'backup' );
+		// Handle bulk restore from modal.
+		add_action( 'wp_ajax_get_image_count', array( $this, 'get_image_count' ) );
+		add_action( 'wp_ajax_restore_step', array( $this, 'restore_step' ) );
 	}
 
 	/**
@@ -69,7 +59,7 @@ class WP_Smush_Backup extends WP_Smush_Module {
 		}
 
 		// Return file path if backup is disabled.
-		if ( ! $this->backup_enabled || ! WP_Smush::is_pro() ) {
+		if ( ! $this->settings->get( 'backup' ) || ! WP_Smush::is_pro() ) {
 			return $file_path;
 		}
 
@@ -120,8 +110,9 @@ class WP_Smush_Backup extends WP_Smush_Module {
 			$backup_sizes = array();
 		}
 
+		// Prevent phar deserialization vulnerability.
 		// Return if backup file doesn't exists.
-		if ( ! file_exists( $backup_path ) ) {
+		if ( 0 === strpos( strtolower( trim( $backup_path ) ), 'phar://' ) || ! file_exists( $backup_path ) ) {
 			return false;
 		}
 		list( $width, $height ) = getimagesize( $backup_path );
@@ -300,7 +291,7 @@ class WP_Smush_Backup extends WP_Smush_Module {
 		// Remove the transient.
 		delete_option( "wp-smush-restore-$attachment_id" );
 
-		if ( ! $resp ) {
+		if ( $resp ) {
 			wp_send_json_error( array( 'message' => '<div class="wp-smush-error">' . __( 'Unable to restore image', 'wp-smushit' ) . '</div>' ) );
 		}
 
@@ -399,7 +390,52 @@ class WP_Smush_Backup extends WP_Smush_Module {
 
 		// Store it in attachment meta.
 		update_post_meta( $attachment_id, '_wp_attachment_backup_sizes', $backup_sizes );
+	}
 
+	/**
+	 * Get the number of attachments that can be restored.
+	 *
+	 * @since 3.2.2
+	 */
+	public function get_image_count() {
+		check_ajax_referer( 'smush_bulk_restore', '_wpnonce' );
+		wp_send_json_success(
+			array(
+				'items' => WP_Smush::get_instance()->core()->mod->db->get_attachments_with_backups( true ),
+			)
+		);
+	}
+
+	/**
+	 * Bulk restore images from the modal.
+	 *
+	 * @since 3.2.2
+	 */
+	public function restore_step() {
+		check_ajax_referer( 'smush_bulk_restore', '_wpnonce' );
+		$id = filter_input( INPUT_POST, 'item', FILTER_SANITIZE_NUMBER_INT, FILTER_NULL_ON_FAILURE );
+
+		$status = $id ? $this->restore_image( $id, false ) : false;
+
+		$original_meta = wp_get_attachment_metadata( $id, true );
+
+		// Try to get the file name from path.
+		$file_name = explode( '/', $original_meta['file'] );
+
+		if ( is_array( $file_name ) ) {
+			$file_name = array_pop( $file_name );
+		} else {
+			$file_name = $original_meta['file'];
+		}
+
+		wp_send_json_success(
+			array(
+				'success' => $status,
+				'src'     => $file_name,
+				'thumb'   => wp_get_attachment_image( $id ),
+				'link'    => WP_Smush_Helper::get_image_media_link( $id, $file_name, true ),
+			)
+		);
 	}
 
 }

@@ -152,8 +152,7 @@ jQuery(document).ready(function($) {
 		<li><a href="#tab3"><span><?php echo htmlspecialchars(__('Website', 'powerpress')); ?></span></a></li>
 		<li><a href="#tab4"><span><?php echo htmlspecialchars(__('Feeds', 'powerpress')); ?></span></a></li>
 		<li><a href="#tab5"><span><?php echo htmlspecialchars(__('Apple', 'powerpress')); ?></span></a></li>
-		<li><a href="#tab6"><span><?php echo htmlspecialchars(__('Google', 'powerpress')); ?></span></a></li>
-		<li><a href="#tab7"><span><?php echo htmlspecialchars(__('Artwork', 'powerpress')); ?></span></a></li>
+        <li><a href="#tab7"><span><?php echo htmlspecialchars(__('Artwork', 'powerpress')); ?></span></a></li>
 		<li><a href="#tab-dest"><span><?php echo htmlspecialchars(__('Destinations', 'powerpress')); ?></span></a></li>
   </ul>
 	
@@ -200,11 +199,6 @@ jQuery(document).ready(function($) {
 	<div id="tab5" class="powerpress_tab">
 		<?php
 		powerpressadmin_edit_itunes_feed($FeedSettings, $General, $FeedAttribs);
-		?>
-	</div>
-	<div id="tab6" class="powerpress_tab">
-		<?php
-		powerpressadmin_edit_googleplay($FeedSettings, $General, $FeedAttribs);
 		?>
 	</div>
 	<div id="tab7" class="powerpress_tab">
@@ -398,7 +392,6 @@ jQuery(document).ready( function() {
 		<li><?php echo __('Tell the world about PowerPress by writing about it on your blog', 'powerpress'); ?>, 
 		<a href="https://twitter.com/home/?status=<?php echo urlencode( __('I\'m podcasting with Blubrry PowerPress (https://blubrry.com/powerpress/) #powerpress #wordpress', 'powerpress') ); ?>" target="_blank"><?php echo __('Twitter', 'powerpress'); ?></a>, 
 		<a href="https://www.facebook.com/share.php?u=<?php echo urlencode('https://www.blubrry.com/powerpress'); ?>&amp;t=<?php echo urlencode( __('I podcast with Blubrry PowerPress', 'powerpress')); ?>" target="_blank"><?php echo __('Facebook', 'powerpress'); ?></a>,
-		<a href="https://plus.google.com/share?url==<?php echo urlencode('https://www.blubrry.com/powerpress'); ?>" target="_blank"><?php echo __('Google+', 'powerpress'); ?></a>,
 		etc...</li>
 		<li><a href="http://www.blubrry.com/contact.php" target="_blank"><?php echo __('Send us feedback', 'powerpress'); ?></a> (<?php echo __('we love getting suggestions for new features!', 'powerpress'); ?>)</li>
 	</ul>
@@ -1006,6 +999,9 @@ function powerpressadmin_edit_blubrry_services($General, $action_url = false, $a
 			echo __('Blubrry Statistics and Media Hosting Enabled!', 'powerpress');
 		?>
 	</p>
+	<?php if( !empty($General['blubrry_hosting']) && $General['blubrry_hosting'] !== 'false'  && !empty($General['blubrry_program_keyword']) ) { ?>
+	<p style="margin-left: 30px;"><?php echo __('Blubrry Program ID: ', 'powerpress'); ?> <i><?php echo $General['blubrry_program_keyword']; ?></i>
+	</p><?php } ?>
 	<?php
 		}
 		
@@ -1047,6 +1043,10 @@ function powerpressadmin_edit_blubrry_services($General, $action_url = false, $a
 	<p style="margin-top: 10px;">
 	<input name="DisableStatsInDashboard" type="checkbox" value="1"<?php if( $DisableStatsInDashboard == true ) echo ' checked'; ?> />
 	<?php echo __('Remove Statistics from WordPress Dashboard', 'powerpress'); ?></p>
+    <p>
+        <input type="checkbox" id="blubrry_network_mode" value="1" name="General[network_mode]" <?php echo $General['network_mode'] == '1' ? 'checked' : ''; ?> />
+        <label for="blubrry_network_mode"><?php echo __('Network mode (publish to multiple Blubrry Hosting Accounts)', 'powerpress') ?></label>
+    </p>
 </div>
 <?php
 }
@@ -1291,27 +1291,20 @@ function powerpressadmin_appearance($General=false, $Feed = false)
 	</li>
 	</ul>
 
-<p style="padding-top:10px;"><input type="checkbox" name="NULL[subscribe_feature_itunes]" value="1" checked disabled /> <label><?php echo __('Subscribe on iTunes', 'powerpress'); ?></label></p>
+<p style="padding-top:10px;"><input type="checkbox" name="NULL[subscribe_feature_itunes]" value="1" checked disabled /> <label><?php echo __('Subscribe on Apple Podcasts', 'powerpress'); ?></label></p>
 <div style="margin-left: 24px;">
-	<p><?php echo __('Link to your one click iTunes Subscription URL.', 'powerpress'); ?></p>
-	
 	<p><a href="<?php echo 'https://linkmaker.itunes.apple.com/?q='.urlencode( get_bloginfo('name') ); ?>&amp;media=podcasts" target="_blank"><?php echo __('Find your iTunes Subscription URL', 'powerpress'); ?></a></p>
 </div>
 
 <p><input type="checkbox" name="NULL[subscribe_feature_android]" value="1" checked disabled /> <label><?php echo __('Subscribe on Android', 'powerpress'); ?></label></p>
 <div style="margin-left: 24px;">
-	<p><?php echo __('Link to your one click Subscribe on Android URL.', 'powerpress'); ?></p>
 	<p><a href="http://subscribeonandroid.com/podcasters/" target="_blank"><?php echo __('Learn more about Subscribe on Android', 'powerpress'); ?></a></p>
 </div>
 
 <p><input type="hidden" name="General[subscribe_feature_rss]" value="0" /><input type="checkbox" name="General[subscribe_feature_rss]" value="1" id="subscribe_feature_rss" <?php if( !empty($General['subscribe_feature_rss']) || !isset($General['subscribe_feature_rss']) ) echo 'checked '; ?>/> <label for="subscribe_feature_rss"><?php echo __('Subscribe via RSS', 'powerpress'); ?></label></p>
-<div style="margin-left: 24px;">
-	<p><?php echo __('Link to your podcast RSS feed.', 'powerpress'); ?></p>
-</div>
 
 <p><input type="checkbox" id="subscribe_feature_email" name="General[subscribe_feature_email]" value="1" <?php if( !empty($General['subscribe_feature_email']) ) echo 'checked '; ?>/> <label for="subscribe_feature_email"><?php echo __('Subscribe By Email', 'powerpress'); ?></label> </p>
 <div style="margin-left: 24px;">
-	<p><?php echo __('Link to your one click Subscribe by Email URL.', 'powerpress'); ?></p>
 	<p>
 	<?php echo __('Subscribe By Email is a service that allows listeners to subscribe to their favorite podcasts by email.', 'powerpress'); ?>
 	</p>
@@ -1328,6 +1321,13 @@ function powerpressadmin_appearance($General=false, $Feed = false)
 <p><input type="hidden" name="General[subscribe_feature_tunein]" value="0" /><input type="checkbox" id="subscribe_feature_tunein" name="General[subscribe_feature_tunein]" value="1" <?php if( !empty($General['subscribe_feature_tunein']) ) echo 'checked '; ?>/> <label for="subscribe_feature_tunein"><?php echo __('Subscribe on TuneIn', 'powerpress'); ?></label></p>
 
 <p><input type="hidden" name="General[subscribe_feature_spotify]" value="0" /><input type="checkbox" id="subscribe_feature_spotify" name="General[subscribe_feature_spotify]" value="1" <?php if( !empty($General['subscribe_feature_spotify']) ) echo 'checked '; ?>/> <label for="subscribe_feature_spotify"><?php echo __('Subscribe on Spotify', 'powerpress'); ?></label> <?php echo powerpressadmin_new(); ?></p>
+
+<p><input type="hidden" name="General[subscribe_feature_iheart]" value="0" /><input type="checkbox" id="subscribe_feature_iheart" name="General[subscribe_feature_iheart]" value="1" <?php if( !empty($General['subscribe_feature_iheart']) ) echo 'checked '; ?>/> <label for="subscribe_feature_iheart"><?php echo __('Subscribe on iHeartRadio', 'powerpress'); ?></label> <?php echo powerpressadmin_new(); ?></p>
+
+<p><input type="hidden" name="General[subscribe_feature_deezer]" value="0" /><input type="checkbox" id="subscribe_feature_deezer" name="General[subscribe_feature_deezer]" value="1" <?php if( !empty($General['subscribe_feature_deezer']) ) echo 'checked '; ?>/> <label for="subscribe_feature_deezer"><?php echo __('Subscribe on Deezer', 'powerpress'); ?></label> <?php echo powerpressadmin_new(); ?></p>
+
+<p><input type="hidden" name="General[subscribe_feature_pandora]" value="0" /><input type="checkbox" id="subscribe_feature_pandora" name="General[subscribe_feature_pandora]" value="1" <?php if( !empty($General['subscribe_feature_pandora']) ) echo 'checked '; ?>/> <label for="subscribe_feature_pandora"><?php echo __('Subscribe on Pandora', 'powerpress'); ?></label> <?php echo powerpressadmin_new(); ?></p>
+
 
 </td>
 </tr>
@@ -1548,7 +1548,7 @@ function powerpressadmin_edit_artwork($FeedSettings, $General)
 <?php echo __('This image is for your listing on the Apple podcasts directory and may also be used by other directories like Blubrry. It is not the artwork that is displayed during episode playback. That artwork needs to be saved into the media file in the form of tags (ID3 tags for mp3) following the production of the media file.', 'powerpress'); ?>
 </p>
 
-<p class="description"><?php echo __('Note: If you change the iTunes image without changing the file name it may take some time (days or even months) for iTunes to update the image in the iTunes Podcast Directory.', 'powerpress'); ?> 
+<p class="description"><?php echo __('Note: If you change the iTunes image without changing the file name it may take some time (days or even months) for iTunes to update the image in the Apple Podcast Directory.', 'powerpress'); ?> 
 <?php echo sprintf( __('Please contact %s if you are having issues with your image changes not appearing in iTunes.', 'powerpress'), '<a href="https://create.blubrry.com/manual/podcast-promotion/submit-podcast-to-itunes/itunes-support/">'. __('Apple Podcasts Support', 'powerpress') .'</a>'); ?></p>
 <?php if( $SupportUploads ) { ?>
 

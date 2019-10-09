@@ -30,6 +30,8 @@ require( './modules/bulk-smush' );
 require( './modules/onboarding' );
 require( './modules/directory-smush' );
 require( './smush/cdn' );
+require( './smush/lazy-load' );
+require( './modules/bulk-restore' );
 
 /**
  * Notice scripts.

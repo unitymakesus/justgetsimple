@@ -441,6 +441,7 @@ FLBuilder::register_settings_form('col', array(
 						'visibility_user_capability' => array(
 							'type'        => 'text',
 							'label'       => __( 'User Capability', 'fl-builder' ),
+							/* translators: %s: wporg docs link */
 							'description' => sprintf( __( 'Optional. Set the <a%s>capability</a> required for users to view this column.', 'fl-builder' ), ' href="http://codex.wordpress.org/Roles_and_Capabilities#Capability_vs._Role_Table" target="_blank"' ),
 							'preview'     => array(
 								'type' => 'none',
@@ -468,6 +469,10 @@ FLBuilder::register_settings_form('col', array(
 							'type'    => 'select',
 							'label'   => __( 'Container Element', 'fl-builder' ),
 							'default' => 'div',
+							/**
+							 * Filter to add/remove container types.
+							 * @see fl_builder_node_container_element_options
+							 */
 							'options' => apply_filters( 'fl_builder_node_container_element_options', array(
 								'div'     => '&lt;div&gt;',
 								'section' => '&lt;section&gt;',

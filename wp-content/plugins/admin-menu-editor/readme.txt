@@ -3,8 +3,8 @@ Contributors: whiteshadow
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=A6P9S6CE3SRSW
 Tags: admin, dashboard, menu, security, wpmu
 Requires at least: 4.1
-Tested up to: 5.0
-Stable tag: 1.8.7
+Tested up to: 5.2
+Stable tag: 1.9.1
 
 Lets you edit the WordPress admin menu. You can re-order, hide or rename menus, add custom menus and more. 
 
@@ -62,6 +62,29 @@ Plugins installed in the `mu-plugins` directory are treated as "always on", so y
 3. Re-ordering menu items via drag and drop
 
 == Changelog ==
+
+= 1.9.1 =
+* Fixed a minor conflict with Toolset Types.
+* Fixed a conflict with the MailPoet plugin where it was not possible to change the plugin's menu icon. 
+* Fixed a bug where the plugin could misidentify certain core menus that have different URLs for different roles.
+* Fixed a bug where the plugin could generate incorrect URLs for submenu items where the parent menu URL contained HTML entities like "&amp;".
+* Fixed an issue where certain vulnerability scanners showed a warning about one of the plugin files because it used the eval() function. This particular instance of eval() was not a security flaw, but it has been now been removed to prevent false positives.
+* Fixed a bug where the plugin could show an incorrect error message when a menu item was hidden due to there being another hidden menu item with the same URL.
+* Fixed a minor issue with field alignment in menu properties.
+* The "Site Health" menu will no longer be highlighted as new because it's part of WordPress core.
+
+= 1.9 =
+* Added an option to automatically hide new plugins. It was already possible, but previously this option was tied to the "show all plugins" checkbox. Now there is a separate "New plugins" checkbox.
+* Fixed a bug where trying to change the icon of the Jetpack menu caused a JavaScript error that prevented the icon selector from being displayed.
+* Tested up to WP 5.2.
+
+= 1.8.8 =
+* Added the ability to edit more plugin details like author name, site URL and version number. Note that this feature only changes how plugins are displayed. It doesn't actually modify plugin files.
+* Fixed a PHP deprecation notice: "strpos(): Non-string needles will be interpreted as strings in the future". Hopefully this time it's been fixed for good.
+* Fixed a couple of HTML validation errors.
+* Fixed an inefficiency where the plugin would reinitialise the media frame every time the user tried to select an image from the media library. 
+* Added a partial workaround for situations where menu icons that were more than 32 pixels wide would be displayed incorrectly. 
+* Tested up to WP 5.1.1.
 
 = 1.8.7 =
 * Fixed a bug introcuded in 1.8.6 that caused a PHP warning "strpos(): Empty needle".

@@ -224,7 +224,7 @@ final class FLBuilderFonts {
 		foreach ( $fields as $name => $field ) {
 			if ( 'font' == $field['type'] && isset( $module->settings->$name ) ) {
 				self::add_font( $module->settings->$name );
-			} elseif ( 'typography' == $field['type'] && ! empty( $module->settings->$name ) && isset( $module->settings->{ $name }['font_family'] ) ) {
+			} elseif ( 'typography' == $field['type'] && ! empty( $module->settings->$name ) && isset( $module->settings->{ $name }['font_family'] ) && isset( $module->settings->{ $name }['font_weight'] ) ) {
 				$fname  = $module->settings->{ $name }['font_family'];
 				$weight = $module->settings->{ $name }['font_weight'];
 
@@ -372,7 +372,7 @@ final class FLBuilderFonts {
 		// Check for any enqueued `fonts.googleapis.com` from BB theme or plugin
 		if ( isset( $wp_styles->queue ) ) {
 
-			$google_fonts_domain   = 'https://fonts.googleapis.com/css';
+			$google_fonts_domain   = apply_filters( 'fl_builder_google_fonts_domain', '//fonts.googleapis.com/css' );
 			$enqueued_google_fonts = array();
 			$families              = array();
 			$subsets               = array();
@@ -449,6 +449,8 @@ final class FLBuilderFonts {
 					if ( ! empty( $subsets ) ) {
 						$font_args['subset'] = implode( ',', $subsets );
 					}
+
+					$font_args = apply_filters( 'fl_builder_google_font_args', $font_args );
 
 					$src = add_query_arg( $font_args, $google_fonts_domain );
 

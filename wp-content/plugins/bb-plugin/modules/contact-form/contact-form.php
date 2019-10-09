@@ -714,7 +714,7 @@ FLBuilder::register_module('FLContactFormModule', array(
 							'normal'    => __( '"I\'m not a robot" checkbox', 'fl-builder' ),
 							'invisible' => __( 'Invisible', 'fl-builder' ),
 						),
-						'help'    => __( 'Validate users with checkbox or in the background.<br />Note: Checkbox and Invisible types use seperate API keys.', 'fl-builder' ),
+						'help'    => __( 'Validate users with checkbox or in the background.<br />Note: Checkbox and Invisible types use separate API keys.', 'fl-builder' ),
 						'preview' => array(
 							'type' => 'none',
 						),
@@ -734,6 +734,7 @@ FLBuilder::register_module('FLContactFormModule', array(
 				),
 			),
 		),
+		/* translators: %s: url to google admin */
 		'description' => sprintf( __( 'Please register keys for your website at the <a%s>Google Admin Console</a>.', 'fl-builder' ), ' href="https://www.google.com/recaptcha/admin" target="_blank"' ),
 	),
 ));

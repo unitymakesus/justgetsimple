@@ -51,8 +51,10 @@
 					<i class="fl-block-copy fl-block-col-copy far fa-clone fl-tip" title="<?php _e( 'Duplicate', 'fl-builder' ); ?>"></i>
 					<# } #>
 				<# } #>
+				<?php endif; ?>
 				<span class="fl-builder-has-submenu">
 					<i class="fl-block-settings fas fa-columns fl-tip" title="<?php _e( 'Edit Column', 'fl-builder' ); ?>"></i>
+					<?php if ( ! $simple_ui ) : ?>
 					<# if ( ! data.global || ( data.global && FLBuilderConfig.userTemplateType ) ) { #>
 					<ul class="fl-builder-submenu fl-block-col-submenu">
 						<li><a class="fl-block-col-edit" href="javascript:void(0);"><?php _e( 'Column Settings', 'fl-builder' ); ?></a></li>
@@ -71,7 +73,9 @@
 						<# } #>
 					</ul>
 					<# } #>
+					<?php endif; ?>
 				</span>
+				<?php if ( ! $simple_ui ) : ?>
 				<# if ( ! data.isRootCol ) { #>
 				<i class="fl-block-remove fas fa-times fl-tip" title="<?php _e( 'Remove', 'fl-builder' ); ?>"></i>
 				<# } #>
@@ -139,6 +143,7 @@
 				<?php if ( ! FLBuilderModel::is_post_user_template( 'module' ) && ! $simple_ui ) : ?>
 				<i class="fl-block-move fas fa-arrows-alt fl-tip" title="<?php _e( 'Move', 'fl-builder' ); ?>"></i>
 				<?php endif; ?>
+				<?php /* translators: %s: module name */ ?>
 				<i class="fl-block-settings fas fa-wrench fl-tip" title="<?php printf( __( '%s Settings', 'fl-builder' ), '{{data.moduleName}}' ); ?>"></i>
 				<?php if ( ! FLBuilderModel::is_post_user_template( 'module' ) && ! $simple_ui ) : ?>
 				<i class="fl-block-copy far fa-clone fl-tip" title="<?php _e( 'Duplicate', 'fl-builder' ); ?>"></i>
@@ -261,6 +266,18 @@
 	</div>
 </script>
 <!-- #tmpl-fl-alert-lightbox -->
+
+<script type="text/html" id="tmpl-fl-crash-lightbox">
+	<div class="fl-lightbox-message">{{{data.message}}}</div>
+	<# if ( data.debug ) { #>
+		<div class="fl-lightbox-message-info">Here is the message reported in your browser’s JavaScript console.<pre>{{{data.debug}}}</pre></div>
+	<# } #>
+	<div class="fl-lightbox-message-info">{{{data.info}}}</div>
+	<div class="fl-lightbox-footer">
+		<span class="fl-builder-alert-close fl-builder-button fl-builder-button-large fl-builder-button-primary" href="javascript:void(0);"><?php _e( 'OK', 'fl-builder' ); ?></span>
+	</div>
+</script>
+<!-- #tmpl-fl-crash-lightbox -->
 
 <script type="text/html" id="tmpl-fl-confirm-lightbox">
 	<div class="fl-lightbox-message">{{{data.message}}}</div>
@@ -401,15 +418,28 @@
 
 		<div class="fl-builder--menu">
 			<# for (var key in data.items) {
-				var item = data.items[key];
-
+				var item  = data.items[key];
+				var extra = '';
+				if ( 'revisions' === item.view && FLBuilderConfig.revisions_count > 0 ) {
+					extra = '[' + FLBuilderConfig.revisions_count + ']';
+				}
+				if ( 'event' === item.type && 'showLayoutSettings' === item.eventName ) {
+					if( FLBuilderConfig.layout_css_js ) {
+						extra = '&bull;';
+					}
+				}
+				if ( 'event' === item.type && 'showGlobalSettings' === item.eventName ) {
+					if( '' !== FLBuilderConfig.global.css || '' !== FLBuilderConfig.global.js ) {
+						extra = '&bull;';
+					}
+				}
 				switch(item.type) {
 					case "separator":
 						#><hr><#
 						break;
 					case "event":
 						#>
-						<button class="fl-builder--menu-item" data-type="event" data-event="{{item.eventName}}">{{{item.label}}} <span class="fl-builder--menu-item-accessory">{{{item.accessory}}}</span></button>
+						<button class="fl-builder--menu-item" data-type="event" data-event="{{item.eventName}}">{{{item.label}}}<span class="menu-event event-{{item.eventName}}">{{{extra}}}</span><span class="fl-builder--menu-item-accessory">{{{item.accessory}}}</span></button>
 						<#
 						break;
 					case "link":
@@ -419,7 +449,7 @@
 						break;
 					case "view":
 						#>
-						<button class="fl-builder--menu-item" data-type="view" data-view="{{item.view}}">{{item.label}} <span class="fl-builder--menu-item-accessory">&rarr;</span></button>
+						<button class="fl-builder--menu-item" data-type="view" data-view="{{item.view}}">{{item.label}}<span class="menu-view view-{{item.view}}">{{extra}}</span><span class="fl-builder--menu-item-accessory">&rarr;</span></button>
 						<#
 						break;
 					case "video":
@@ -782,7 +812,7 @@
 	<# if (FLBuilderConfig.lite) { #>
 	<div class="fl-builder--panel-message">
 		<p><?php _ex( 'Save and reuse your layouts or kick-start your creativity with dozens of professionally designed templates.', 'Upgrade message that displays in the templates tab in lite installs.', 'fl-builder' ); ?></p>
-		<a class="fl-builder-upgrade-button fl-builder-button" href="{{FLBuilderConfig.upgradeUrl}}" target="_blank"><?php _ex( 'Learn More', 'Link to learn more about premium page builder', 'fl-builder' ); ?> <i class="fas fa-external-link-alt"></i></a>
+		<a class="fl-builder-upgrade-button fl-builder-button" href="{{FLBuilderConfig.upgradeUrl}}" target="_blank"><?php _ex( 'Learn More', 'Link to learn more about premium Beaver Builder', 'fl-builder' ); ?> <i class="fas fa-external-link-alt"></i></a>
 	</div>
 	<# } #>
 	<#
@@ -966,7 +996,7 @@
 <script type="text/html" id="tmpl-fl-content-lite-templates-upgrade-view">
 	<div class="fl-builder--panel-message">
 		<p><?php _ex( 'Save and reuse your layouts or kick-start your creativity with dozens of professionally designed templates.', 'Upgrade message that displays in the templates tab in lite installs.', 'fl-builder' ); ?></p>
-		<a class="fl-builder-upgrade-button fl-builder-button" href="{{FLBuilderConfig.upgradeUrl}}" target="_blank"><?php _ex( 'Learn More', 'Link to learn more about premium page builder', 'fl-builder' ); ?> <i class="fas fa-external-link-alt"></i></a>
+		<a class="fl-builder-upgrade-button fl-builder-button" href="{{FLBuilderConfig.upgradeUrl}}" target="_blank"><?php _ex( 'Learn More', 'Link to learn more about premium Beaver Builder', 'fl-builder' ); ?> <i class="fas fa-external-link-alt"></i></a>
 	</div>
 </script>
 <!-- #tmpl-fl-content-lite-templates-upgrade-view -->

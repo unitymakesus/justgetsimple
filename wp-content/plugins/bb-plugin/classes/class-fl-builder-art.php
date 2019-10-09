@@ -135,6 +135,12 @@ class FLBuilderArt {
 		);
 
 		$args = wp_parse_args( $args, $defaults );
+		/**
+		 * Filter shape args during shape_register()
+		 * @see fl_builder_art_register_shape
+		 * @since 2.2.5
+		 */
+		$args = apply_filters( 'fl_builder_art_register_shape', $args );
 		$key  = $args['name'];
 
 		/**
@@ -337,6 +343,7 @@ class FLBuilderArt {
 
 			// Preset & Shape Section
 			$sections[ $prefix . 'shape' ] = array(
+				/* translators: %s: position label */
 				'title'  => sprintf( __( '%s Shape', 'fl-builder' ), $position_label ),
 				'fields' => array(
 					$prefix . 'shape' => array(
@@ -463,6 +470,7 @@ class FLBuilderArt {
 
 			// Shape Styles
 			$sections[ $prefix . 'style' ] = array(
+				/* translators: %s: position label */
 				'title'  => sprintf( __( '%s Shape Style', 'fl-builder' ), $position_label ),
 				'fields' => array(
 					$prefix . 'fill_style'    => array(

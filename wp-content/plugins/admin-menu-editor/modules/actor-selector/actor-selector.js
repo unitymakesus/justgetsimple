@@ -3,8 +3,8 @@
 /// <reference path="../../js/actor-manager.ts" />
 var AmeActorSelector = /** @class */ (function () {
     function AmeActorSelector(actorManager, isProVersion, allOptionEnabled) {
-        if (allOptionEnabled === void 0) { allOptionEnabled = true; }
         var _this = this;
+        if (allOptionEnabled === void 0) { allOptionEnabled = true; }
         this.selectedActor = null;
         this.selectedDisplayName = 'All';
         this.visibleUsers = [];
@@ -208,4 +208,3 @@ var AmeActorSelector = /** @class */ (function () {
     AmeActorSelector._ = wsAmeLodash;
     return AmeActorSelector;
 }());
-//# sourceMappingURL=actor-selector.js.map

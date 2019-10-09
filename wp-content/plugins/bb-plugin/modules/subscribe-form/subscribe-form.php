@@ -50,7 +50,7 @@ class FLSubscribeFormModule extends FLBuilderModule {
 			'btn_align_responsive'   => 'align_responsive',
 			'btn_font_size'          => 'font_size',
 			'btn_font_size_unit'     => 'font_size_unit',
-			'ography'                => 'typography',
+			'btn_typography'         => 'typography',
 			'btn_bg_color'           => 'bg_color',
 			'btn_bg_hover_color'     => 'bg_hover_color',
 			'btn_bg_opacity'         => 'bg_opacity',
@@ -107,6 +107,8 @@ class FLSubscribeFormModule extends FLBuilderModule {
 	public function submit() {
 		$name             = isset( $_POST['name'] ) ? sanitize_text_field( $_POST['name'] ) : false;
 		$email            = isset( $_POST['email'] ) ? sanitize_email( $_POST['email'] ) : false;
+		$success_message  = isset( $_POST['success_message'] ) ? sanitize_text_field( $_POST['success_message'] ) : false;
+		$success_url      = isset( $_POST['success_url'] ) ? sanitize_text_field( $_POST['success_url'] ) : false;
 		$terms_checked    = isset( $_POST['terms_checked'] ) && 1 == $_POST['terms_checked'] ? true : false;
 		$recaptcha        = isset( $_POST['recaptcha'] ) ? $_POST['recaptcha'] : false;
 		$post_id          = isset( $_POST['post_id'] ) ? $_POST['post_id'] : false;
@@ -167,9 +169,11 @@ class FLSubscribeFormModule extends FLBuilderModule {
 					$result['action'] = $settings->success_action;
 
 					if ( 'message' == $settings->success_action ) {
-						$result['message'] = $settings->success_message;
-					} else {
-						$result['url'] = $settings->success_url;
+						$result['message'] = $success_message;
+					}
+
+					if ( 'redirect' == $settings->success_action ) {
+						$result['url'] = $success_url;
 					}
 				}
 
@@ -243,6 +247,21 @@ FLBuilder::register_module( 'FLSubscribeFormModule', array(
 							'show' => __( 'Show', 'fl-builder' ),
 							'hide' => __( 'Hide', 'fl-builder' ),
 						),
+						'toggle'  => array(
+							'show' => array(
+								'fields' => array( 'name_field_text' ),
+							),
+						),
+					),
+					'name_field_text'     => array(
+						'type'    => 'text',
+						'label'   => __( 'Name Field Text', 'fl-builder' ),
+						'default' => __( 'Name', 'fl-builder' ),
+					),
+					'email_field_text'    => array(
+						'type'    => 'text',
+						'label'   => __( 'Email Field Text', 'fl-builder' ),
+						'default' => __( 'Email Address', 'fl-builder' ),
 					),
 					'terms_checkbox'      => array(
 						'type'    => 'select',
@@ -574,6 +593,7 @@ FLBuilder::register_module( 'FLSubscribeFormModule', array(
 				),
 			),
 		),
+		/* translators: %s: Google admin url */
 		'description' => sprintf( __( 'Please register keys for your website at the <a%s>Google Admin Console</a>', 'fl-builder' ), ' href="https://www.google.com/recaptcha/admin" target="_blank" rel="noopener"' ),
 	),
 ));

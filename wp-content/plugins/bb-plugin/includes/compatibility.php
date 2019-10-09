@@ -355,7 +355,9 @@ function fl_imember_shortcode_fix( $content ) {
 add_action( 'plugins_loaded', 'fl_fix_nextgen_gallery' );
 function fl_fix_nextgen_gallery() {
 	if ( isset( $_GET['fl_builder'] ) || isset( $_POST['fl_builder_data'] ) || FLBuilderAJAX::doing_ajax() ) {
-		define( 'NGG_DISABLE_RESOURCE_MANAGER', true );
+		if ( ! defined( 'NGG_DISABLE_RESOURCE_MANAGER' ) ) {
+			define( 'NGG_DISABLE_RESOURCE_MANAGER', true );
+		}
 	}
 }
 
@@ -397,37 +399,6 @@ function fl_render_ninja_forms_js( $response ) {
 	}
 	return $response;
 }
-
-/**
- * Reorder font awesome css.
- * @since 2.1
- */
-function fl_builder_fa_fix() {
-
-	global $wp_styles;
-
-	$queue = $wp_styles->queue;
-
-	$fa4 = array_search( 'font-awesome', $queue );
-	$fa5 = array_search( 'font-awesome-5', $queue );
-
-	// if fa4 is disabled and both are detected, load fa4 FIRST.
-	if ( false !== $fa4 && false !== $fa5 && $fa4 > $fa5 && ! in_array( 'font-awesome', FLBuilderModel::get_enabled_icons() ) ) {
-		unset( $wp_styles->queue[ $fa4 ] );
-		array_unshift( $wp_styles->queue, 'font-awesome' );
-	}
-	// If fa4 is detected, add a compatibility layer in the footer.
-	// This fixes various theme/themer issues.
-	if ( false !== $fa4 ) {
-			add_action( 'wp_footer', 'fl_builder_fa_fix_callback' );
-	}
-}
-add_action( 'wp_enqueue_scripts', 'fl_builder_fa_fix', 99999 );
-
-function fl_builder_fa_fix_callback() {
-	echo '<style>[class*="fa fa-"]{font-family: FontAwesome !important;}</style>';
-}
-
 
 /**
  * Turn off Hummingbird minification
@@ -573,12 +544,12 @@ function fl_fix_woo_short_description( $content ) {
 	global $post, $fl_woo_description_fix;
 
 	// if there is a short description no need to carry on.
-	if ( '' != $content ) {
+	if ( '' !== $content ) {
 		return $content;
 	}
 
 	// if the product content contains a layout shortcode then extract any css to add to footer later.
-	if ( false !== strpos( $post->post_content, '[fl_builder_insert_layout' ) ) {
+	if ( isset( $post->post_content ) && false !== strpos( $post->post_content, '[fl_builder_insert_layout' ) ) {
 		$dummy   = do_shortcode( $post->post_content );
 		$scripts = preg_match_all( "#<link rel='stylesheet'.*#", $dummy, $out );
 		if ( is_array( $out ) ) {
@@ -659,4 +630,246 @@ function fl_set_curl_safe_opts( $handle ) {
 	curl_setopt( $handle, CURLOPT_SSL_VERIFYHOST, 2 );
 	curl_setopt( $handle, CURLOPT_CAINFO, ABSPATH . WPINC . '/certificates/ca-bundle.crt' );
 	return $handle;
+}
+
+/**
+ * Remove Sumo JS when builder is open.
+ * @since 2.2.1
+ */
+add_filter( 'option_sumome_site_id', 'fl_fix_sumo' );
+function fl_fix_sumo( $option ) {
+	if ( isset( $_GET['fl_builder'] ) ) {
+		return false;
+	}
+	return $option;
+}
+
+/**
+ * Fix icon issues with Frontend Dashboard version 1.3.4+
+ * @since 2.2.3
+ */
+add_action( 'template_redirect', 'fix_frontend_dashboard_plugin', 1000 );
+function fix_frontend_dashboard_plugin() {
+	if ( FLBuilderModel::is_builder_active() ) {
+		remove_action( 'wp_enqueue_scripts', 'fed_script_front_end', 99 );
+	}
+}
+
+/**
+ * Add data-no-lazy to photo modules in themer header area.
+ * Fixes wp-rocket lazy load issue with shrink header.
+ * @since 2.2.3
+ */
+add_action( 'fl_theme_builder_before_render_header', 'fix_lazyload_header_start' );
+function fix_lazyload_header_start() {
+	add_filter( 'fl_builder_photo_attributes', 'fix_lazyload_header_attributes' );
+}
+function fix_lazyload_header_attributes( $attrs ) {
+	return $attrs . ' data-no-lazy="1"';
+}
+add_action( 'fl_theme_builder_after_render_header', 'fix_lazyload_header_end' );
+function fix_lazyload_header_end() {
+	remove_filter( 'fl_builder_photo_attributes', 'fix_lazyload_header_attributes' );
+}
+
+/**
+ * Fix JS error caused by UM-Switcher plugin
+ * @since 2.2.3
+ */
+add_action( 'template_redirect', 'fl_fix_um_switcher' );
+function fl_fix_um_switcher() {
+	if ( isset( $_GET['fl_builder'] ) ) {
+		remove_action( 'wp_footer', 'umswitcher_profile_subscription_expiration_footer' );
+	}
+}
+
+/**
+ * Fix pipedrive chat popup
+ * @since 2.2.4
+ */
+add_action( 'template_redirect', 'fl_fix_pipedrive' );
+function fl_fix_pipedrive() {
+	if ( isset( $_GET['fl_builder'] ) ) {
+		remove_action( 'wp_head', 'pipedrive_add_embed_code' );
+	}
+}
+
+/**
+ * Fix post type switcher
+ * @since 2.2.4
+ */
+add_action( 'admin_init', 'fl_fix_posttypeswitcher' );
+function fl_fix_posttypeswitcher() {
+	global $pagenow;
+	$disable = false;
+	if ( 'edit.php' === $pagenow && isset( $_GET['post_type'] ) && 'fl-theme-layout' === $_GET['post_type'] ) {
+		$disable = true;
+	}
+	if ( 'post.php' === $pagenow && isset( $_GET['post'] ) && ( 'fl-theme-layout' === get_post_type( $_GET['post'] ) || 'fl-builder-template' === get_post_type( $_GET['post'] ) ) ) {
+		$disable = true;
+	}
+	if ( $disable ) {
+		add_filter( 'pts_allowed_pages', '__return_empty_array' );
+	}
+}
+
+/**
+ * Fixes for Google Reviews Business Plugin widget
+ * @since 2.2.4
+ */
+add_action( 'widgets_init', 'fix_google_reviews_business_widget', 11 );
+function fix_google_reviews_business_widget() {
+	if ( isset( $_GET['fl_builder'] ) ) {
+		unregister_widget( 'Goog_Reviews_Pro' );
+	}
+}
+/**
+ * Fixes for Google Reviews Business Plugin shortcode
+ * @since 2.2.4
+ */
+add_action( 'init', 'fix_google_reviews_business_shortcode' );
+function fix_google_reviews_business_shortcode() {
+	if ( isset( $_GET['fl_builder'] ) ) {
+		remove_shortcode( 'google-reviews-pro' );
+	}
+}
+
+/**
+ * Fix pagination on category archive layout.
+ * @since 2.2.4
+ */
+function fl_theme_builder_cat_archive_post_grid( $query ) {
+	if ( ! $query ) {
+		return;
+	}
+
+	if ( ! class_exists( 'FLThemeBuilder' ) ) {
+		return;
+	}
+
+	if ( is_admin() || ! $query->is_main_query() ) {
+		return;
+	}
+
+	if ( ! $query->is_archive || ! $query->is_category ) {
+		return;
+	}
+
+	$args       = array(
+		'post_type'   => 'fl-theme-layout',
+		'post_status' => 'publish',
+		'fields'      => 'ids',
+		'meta_query'  => array(
+			'relation' => 'OR',
+			array(
+				'key'     => '_fl_theme_builder_locations',
+				'value'   => 'general:site',
+				'compare' => 'LIKE',
+			),
+			array(
+				'key'     => '_fl_theme_builder_locations',
+				'value'   => 'taxonomy:category',
+				'compare' => 'LIKE',
+			),
+			array(
+				'key'     => '_fl_theme_builder_locations',
+				'value'   => 'general:archive',
+				'compare' => 'LIKE',
+			),
+		),
+	);
+	$post_grid  = null;
+	$object     = null;
+	$exclusions = array();
+
+	if ( $query->get( 'cat' ) ) {
+		$term = get_term( $query->get( 'cat' ), 'category' );
+	} elseif ( $query->get( 'category_name' ) ) {
+		$term = get_term_by( 'slug', $query->get( 'category_name' ), 'category' );
+	}
+
+	if ( ! empty( $term ) && ! is_wp_error( $term ) ) {
+		$term_id              = (int) $term->term_id;
+		$object               = 'taxonomy:category:' . $term_id;
+		$args['meta_query'][] = array(
+			'key'     => '_fl_theme_builder_locations',
+			'value'   => $object,
+			'compare' => 'LIKE',
+		);
+	}
+
+	$layout_query = new WP_Query( $args );
+	if ( $layout_query->post_count > 0 ) {
+
+		foreach ( $layout_query->posts as $i => $post_id ) {
+			$exclusions = FLThemeBuilderRulesLocation::get_saved_exclusions( $post_id );
+			$exclude    = false;
+
+			if ( $object && in_array( $object, $exclusions ) ) {
+				$exclude = true;
+			} elseif ( in_array( 'taxonomy:category', $exclusions ) ) {
+				$exclude = true;
+			} elseif ( in_array( 'general:archive', $exclusions ) ) {
+				$exclude = true;
+			}
+
+			if ( ! $exclude ) {
+				$data = FLBuilderModel::get_layout_data( 'published', $post_id );
+				if ( ! empty( $data ) ) {
+
+					foreach ( $data as $node_id => $node ) {
+
+						if ( 'module' != $node->type ) {
+							continue;
+						}
+
+						if ( ! isset( $node->settings->type ) || 'post-grid' != $node->settings->type ) {
+							continue;
+						}
+
+						// Check for `post-grid` with custom query source.
+						if ( 'custom_query' == $node->settings->data_source ) {
+							$post_grid = FLBuilderLoop::custom_query( $node->settings );
+							break;
+						}
+					}
+				}
+			}
+
+			if ( $post_grid ) {
+				break;
+			}
+		}
+	}
+
+	return $post_grid;
+}
+
+/**
+ * Remove sorting from download type if EDD is active.
+ * @since 2.2.5
+ */
+add_filter( 'fl_builder_admin_edit_sort_blocklist', 'fl_builder_admin_edit_sort_blocklist_edd' );
+function fl_builder_admin_edit_sort_blocklist_edd( $blocklist ) {
+	$types = FLBuilderModel::get_post_types();
+	if ( in_array( 'download', $types ) && class_exists( 'Easy_Digital_Downloads' ) ) {
+		$blocklist[] = 'download';
+	}
+	return $blocklist;
+}
+
+/**
+	* Remove BB Template types from Gute Editor suggested urls
+	* @since 2.2.5
+	*/
+add_action( 'pre_get_posts', 'fl_gute_links_fix' );
+function fl_gute_links_fix( $query ) {
+	if ( defined( 'REST_REQUEST' ) && $query->is_search() ) {
+		$types = (array) $query->get( 'post_type' );
+		$key   = array_search( 'fl-builder-template', $types, true );
+		if ( $key ) {
+			unset( $types[ $key ] );
+			$query->set( 'post_type', $types );
+		}
+	}
 }

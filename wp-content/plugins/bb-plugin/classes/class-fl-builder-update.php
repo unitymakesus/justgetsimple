@@ -36,6 +36,11 @@ final class FLBuilderUpdate {
 			return;
 		}
 
+		// Only run on the main site for multisite installs.
+		if ( is_multisite() && ! is_main_site() ) {
+			return;
+		}
+
 		// Get the saved version.
 		$saved_version = get_site_option( '_fl_builder_version' );
 
@@ -50,6 +55,8 @@ final class FLBuilderUpdate {
 			} else {
 				self::run( $saved_version );
 			}
+
+			do_action( 'fl_builder_cache_cleared' );
 
 			update_site_option( '_fl_builder_version', FL_BUILDER_VERSION );
 
@@ -86,6 +93,11 @@ final class FLBuilderUpdate {
 		// Update to 1.10 or greater.
 		if ( version_compare( $saved_version, '1.10', '<' ) ) {
 			self::v_1_10();
+		}
+
+		// Update to 1.10 or greater.
+		if ( version_compare( $saved_version, '2.2.2.6', '<' ) ) {
+			self::v_2226();
 		}
 
 		// Clear all asset cache.
@@ -559,6 +571,15 @@ final class FLBuilderUpdate {
 		}
 
 		return $data;
+	}
+
+	static private function v_2226() {
+
+		if ( false !== get_option( 'fl_debug_mode', false ) ) {
+			$current = get_option( 'fl_debug_mode' );
+			set_transient( 'fl_debug_mode', $current, 172800 ); // 48 hours
+			delete_option( 'fl_debug_mode' );
+		}
 	}
 }
 

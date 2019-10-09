@@ -77,9 +77,10 @@ function ga_google_analytics_universal() {
 	extract(ga_google_analytics_options());
 	
 	$custom_code = ga_google_analytics_custom($custom_code);
+	$custom_code = explode(PHP_EOL, $custom_code);
 	
 	$ga_display = "ga('require', 'displayfeatures');";
-	$ga_link    = "ga('require', 'linkid', 'linkid.js');";
+	$ga_link    = "ga('require', 'linkid');";
 	$ga_anon    = "ga('set', 'anonymizeIp', true);";
 	$ga_ssl     = "ga('set', 'forceSSL', true);";
 	
@@ -91,12 +92,16 @@ function ga_google_analytics_universal() {
 			m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
 			})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
 			ga('create', '<?php echo $tracking_id; ?>', 'auto'<?php if ($tracker_object) echo ', '. $tracker_object; ?>);
+<?php 
+			if ($custom_code) {
+				foreach ($custom_code as $c) echo "\t\t\t" . trim($c) . "\n";
+			}
+?>
 			<?php 
-				if ($display_ads) echo $ga_display  . "\n\t\t\t";
-				if ($link_attr)   echo $ga_link     . "\n\t\t\t";
-				if ($anonymize)   echo $ga_anon     . "\n\t\t\t";
-				if ($force_ssl)   echo $ga_ssl      . "\n\t\t\t";
-				if ($custom_code) echo $custom_code . "\n\t\t\t";
+				if ($display_ads) echo $ga_display . "\n\t\t\t";
+				if ($link_attr)   echo $ga_link    . "\n\t\t\t";
+				if ($anonymize)   echo $ga_anon    . "\n\t\t\t";
+				if ($force_ssl)   echo $ga_ssl     . "\n\t\t\t";
 			?>ga('send', 'pageview');
 		</script>
 
@@ -109,6 +114,7 @@ function ga_google_analytics_global() {
 	extract(ga_google_analytics_options());
 	
 	$custom_code = ga_google_analytics_custom($custom_code);
+	$custom_code = explode(PHP_EOL, $custom_code);
 	
 	?>
 
@@ -117,9 +123,12 @@ function ga_google_analytics_global() {
 			window.dataLayer = window.dataLayer || [];
 			function gtag(){dataLayer.push(arguments);}
 			gtag('js', new Date());
+<?php 
+			if ($custom_code) {
+				foreach ($custom_code as $c) echo "\t\t\t" . trim($c) . "\n";
+			}
+?>
 			gtag('config', '<?php echo $tracking_id; ?>'<?php if ($tracker_object) echo ', '. $tracker_object; ?>);
-			<?php if ($custom_code) echo $custom_code; ?>
-
 		</script>
 
 	<?php

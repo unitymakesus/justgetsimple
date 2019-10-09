@@ -2,8 +2,8 @@
 Contributors: 99robots, charliepatel
 Tags: header, footer, code manager, snippet, functions.php, tracking, google analytics, adsense, verification, pixel
 Requires at least: 4.0
-Tested up to: 5.0.2
-Stable tag: 1.1.2
+Tested up to: 5.2.3
+Stable tag: 1.1.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Donate link: https://99robots.com
@@ -96,6 +96,9 @@ http://www.99robots.com/docs/header-footer-code-manager
 = Q. Where are this plugin’s Settings located? =
 A. After activating the plugin, you can click on settings link under the plugin name OR you can click the HFCM tab on the left side navigation. From there, you can add, edit, remove, and review code snippets.
 
+= Q. How do I add code snippets to all my posts/pages? =
+A. With the version 1.1.4 of the HFCM plugin, we have replaced the Specific Custom Post Types with the ability to add code to All Post Types which include posts, pages, attachments and custom post types.
+
 = Q. I have a question =
 A. Since this is a free plugin, please ask all questions on the support forum here on WordPress.org. We will try to respond to every question within 48 hours.
 
@@ -107,8 +110,23 @@ A. If your script is not supported, just let us know and we'll look into it imme
 
 == Changelog ==
 
+= 1.1.6 = 2019-09-22
+* FIXED: Specific Pages targeting Blog index page, even when it is not selected.
+
+= 1.1.5 = 2019-08-29
+* FIXED: Unable to target Blog index page
+
+= 1.1.4 = 2019-08-15
+* UPDATED: All snippets list now shows 20 snippets in the first page instead of 10
+* ADDED: Replaced Specific Custom Post Types under Site Display to include the functionality to add code snippets to all post types, including posts, pages, custom post types & attachments
+* UPDATED: Compatibility with WordPress 5.2.2
+
+= 1.1.3 = 2019-05-03
+* UPDATED: Compatibility with WordPress 5.1.1
+
 = 1.1.2 = 2019-01-07
-* FIXED: Warning - Unexpected Output - headers already sent
+* FIXED: Blank page on dismissing notice when on a few admin pages
+* UPDATED: Admin notice will now only show on the HFCM plugin admin pages
 
 = 1.1.1 = 2018-12-31
 * FIXED: Warning - Unexpected Output - headers already sent

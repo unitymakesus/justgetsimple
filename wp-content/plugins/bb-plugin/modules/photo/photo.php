@@ -317,7 +317,7 @@ class FLPhotoModule extends FLBuilderModule {
 
 		if ( is_object( $photo ) && isset( $photo->sizes ) ) {
 			foreach ( $photo->sizes as $size ) {
-				if ( $size->url == $this->settings->photo_src ) {
+				if ( $size->url == $this->settings->photo_src && isset( $size->width ) && isset( $size->height ) ) {
 					$attrs .= 'height="' . $size->height . '" width="' . $size->width . '" ';
 				}
 			}
@@ -331,7 +331,12 @@ class FLPhotoModule extends FLBuilderModule {
 			$attrs .= 'onerror="this.style.display=\'none\'" ';
 		}
 
-		return $attrs;
+		/**
+		 * Filter image attributes as a string.
+		 * @since 2.2.3
+		 * @see fl_builder_photo_attributes
+		 */
+		return apply_filters( 'fl_builder_photo_attributes', $attrs );
 	}
 
 	/**

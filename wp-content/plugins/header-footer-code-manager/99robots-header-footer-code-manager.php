@@ -3,7 +3,7 @@
  * Plugin Name: Header Footer Code Manager
  * Plugin URI: https://99robots.com/products
  * Description: Header Footer Code Manager by 99 Robots is a quick and simple way for you to add tracking code snippets, conversion pixels, or other scripts required by third party services for analytics, tracking, marketing, or chat functions. For detailed documentation, please visit the plugin's <a href="https://99robots.com/"> official page</a>.
- * Version: 1.1.2
+ * Version: 1.1.6
  * Author: 99robots
  * Author URI: https://99robots.com/
  * Disclaimer: Use at your own risk. No warranty expressed or implied is provided.
@@ -22,6 +22,10 @@ $hfcm_db_version = '1.1';
 
 // function to create the DB / Options / Defaults
 function hfcm_options_install() {
+
+	$hfcm_now = strtotime( "now" );
+  add_option( 'hfcm_activation_date', $hfcm_now );
+	update_option( 'hfcm_activation_date', $hfcm_now );
 
 	global $wpdb;
 	global $hfcm_db_version;
@@ -55,6 +59,7 @@ function hfcm_options_install() {
 	require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 	dbDelta( $sql );
 	add_option( 'hfcm_db_version', $hfcm_db_version );
+
 }
 register_activation_hook( __FILE__, 'hfcm_options_install' );
 
@@ -197,6 +202,21 @@ function hfcm_add_plugin_page_settings_link( $links ) {
 	return $links;
 }
 
+//Check Installation Date
+function hfcm_check_installation_date() {
+
+    $install_date = get_option( 'hfcm_activation_date' );
+    $past_date = strtotime( '-7 days' );
+
+    if ( $past_date >= $install_date ) {
+
+        add_action( 'admin_notices', 'hfcm_review_push_notice' );
+
+    }
+
+}
+add_action( 'admin_init', 'hfcm_check_installation_date' );
+
 // Create the Admin Notice
 function hfcm_review_push_notice() {
 
@@ -209,7 +229,7 @@ function hfcm_review_push_notice() {
 
 	$user_id = get_current_user_id();
 	// Check if current user has already dismissed it
-
+	$install_date = get_option( 'hfcm_activation_date' );
   if ( !get_user_meta( $user_id, 'hfcm_plugin_notice_dismissed') && in_array($screen, $allowed_pages_notices)) {
     ?>
     <div id="hfcm-message" class="notice notice-success">
@@ -219,7 +239,6 @@ function hfcm_review_push_notice() {
     <?php
 	}
 }
-add_action( 'admin_notices', 'hfcm_review_push_notice' );
 
 // Check if current user has already dismissed it
 function hfcm_plugin_notice_dismissed() {
@@ -353,8 +372,17 @@ function hfcm_add_snippets( $location = '', $content = '' ) {
 					}
 					break;
 				case 's_pages':
-					if ( hfcm_not_empty( $scriptdata, 's_pages' ) && is_page( json_decode( $scriptdata->s_pages ) ) ) {
-						$out = hfcm_render_snippet( $scriptdata );
+					if ( hfcm_not_empty( $scriptdata, 's_pages' ) ) {
+						// Gets the page ID of the blog page
+						$blog_page = get_option('page_for_posts');
+						// Checks if the blog page is present in the array of selected pages
+						if (in_array($blog_page, json_decode($scriptdata->s_pages))){
+							if( is_page(json_decode($scriptdata->s_pages)) || (!is_front_page() && is_home())  ){
+									$out = hfcm_render_snippet( $scriptdata );
+							}
+						}elseif(is_page(json_decode($scriptdata->s_pages))) {
+								$out = hfcm_render_snippet( $scriptdata );
+						}
 					}
 					break;
 				case 's_tags':

@@ -555,6 +555,28 @@ class URE_Editor {
 
    
     /**
+     * if existing user was not added to the current blog - add him
+     * @global type $blog_id
+     * @param type $user
+     * @return bool
+     */
+    protected function check_blog_user( $user ) {
+        global $blog_id;
+        
+        $result = true;
+        if ( is_network_admin() ) {
+            if (!array_key_exists( $blog_id, get_blogs_of_user( $user->ID ) ) ) {
+                $result = add_existing_user_to_blog( array( 'user_id' => $user->ID, 'role' => 'subscriber' ) );
+            }
+        }
+
+        return $result;
+    }
+    // end of check_blog_user()
+
+    
+    
+    /**
      * Update user roles and capabilities
      * 
      * @global WP_Roles $wp_roles
@@ -921,7 +943,7 @@ class URE_Editor {
                 $roles_can_delete[$key] = $role['name'] . ' (' . $key . ')';
             }
         }
-
+        
         return $roles_can_delete;
     }
     // end of get_roles_can_delete()
@@ -1162,8 +1184,9 @@ class URE_Editor {
     protected function get_last_role_id() {
         
         // get the key of the last element in roles array
-        $keys = array_keys($this->roles);
-        $last_role_id = array_pop($keys);
+        $keys = array_keys( $this->roles );
+        asort( $keys );
+        $last_role_id = array_pop( $keys );
         
         return $last_role_id;
     }

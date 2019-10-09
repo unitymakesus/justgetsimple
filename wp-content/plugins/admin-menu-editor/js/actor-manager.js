@@ -6,7 +6,7 @@ var __extends = (this && this.__extends) || (function () {
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
             function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
         return extendStatics(d, b);
-    }
+    };
     return function (d, b) {
         extendStatics(d, b);
         function __() { this.constructor = d; }
@@ -132,9 +132,9 @@ var AmeSuperAdmin = /** @class */ (function (_super) {
 }(AmeBaseActor));
 var AmeActorManager = /** @class */ (function () {
     function AmeActorManager(roles, users, isMultisite, suspectedMetaCaps) {
+        var _this = this;
         if (isMultisite === void 0) { isMultisite = false; }
         if (suspectedMetaCaps === void 0) { suspectedMetaCaps = {}; }
-        var _this = this;
         this.roles = {};
         this.users = {};
         this.grantedCapabilities = {};
@@ -502,4 +502,3 @@ if (typeof wsAmeActorData !== 'undefined') {
         AmeActors.generateCapabilitySuggestions(wsAmeActorData['capPower']);
     }
 }
-//# sourceMappingURL=actor-manager.js.map

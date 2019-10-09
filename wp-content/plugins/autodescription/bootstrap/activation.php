@@ -1,8 +1,9 @@
 <?php
 /**
-* @package The_SEO_Framework
-*/
-namespace The_SEO_Framework;
+ * @package The_SEO_Framework\Bootstrap\Install
+ */
+
+namespace The_SEO_Framework\Bootstrap;
 
 defined( 'THE_SEO_FRAMEWORK_PRESENT' ) or die;
 
@@ -23,10 +24,13 @@ defined( 'THE_SEO_FRAMEWORK_PRESENT' ) or die;
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @since 3.2.4 Applied namspacing to this file. All method names have changed.
+ */
+
 //! @php7+ convert to IIFE
-\The_SEO_Framework\_activation_setup_sitemap();
-\The_SEO_Framework\_activation_set_options_autoload();
-\The_SEO_Framework\_activation_set_plugin_check_caches();
+_activation_set_options_autoload();
+_activation_set_plugin_check_caches();
 
 /**
  * Nudges the plugin to check for conflicting SEO plugins.
@@ -42,26 +46,6 @@ function _activation_set_plugin_check_caches() {
 
 	if ( $tsf->loaded ) {
 		$tsf->set_plugin_check_caches();
-	}
-}
-
-/**
- * Add and Flush rewrite rules on plugin activation.
- *
- * @since 2.6.6
- * @since 2.7.1: 1. Now no longer reinitializes global $wp_rewrite.
- *               2. Now always listens to the preconditions of the sitemap addition.
- *               3. Now flushes the rules on shutdown.
- * @since 2.8.0: Added namespace and renamed function.
- * @access private
- */
-function _activation_setup_sitemap() {
-
-	$tsf = \the_seo_framework();
-
-	if ( $tsf->loaded ) {
-		$tsf->rewrite_rule_sitemap();
-		\add_action( 'shutdown', 'flush_rewrite_rules' );
 	}
 }
 

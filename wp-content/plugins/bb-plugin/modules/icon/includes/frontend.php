@@ -14,9 +14,8 @@ $text_link_class = 'fl-icon-text-link';
 if ( ! empty( $settings->link ) ) {
 	$text_link_class .= ' fl-icon-text-wrap';
 }
-
 ?>
-<?php if ( ! isset( $settings->exclude_wrapper ) ) : ?>
+<?php if ( ! isset( $settings->exclude_wrapper ) || ( isset( $settings->exclude_wrapper ) && ! $settings->exclude_wrapper ) ) : ?>
 <div class="fl-icon-wrap">
 <?php endif; ?>
 
@@ -33,19 +32,18 @@ if ( ! empty( $settings->link ) ) {
 		</a>
 		<?php endif; ?>
 	</span>
-
-	<?php if ( ! isset( $settings->exclude_wrapper ) ) : ?>
-	<div id="fl-icon-text-<?php echo $module->node; ?>" class="<?php echo $text_class; ?>">
-		<?php if ( ! empty( $settings->link ) ) : ?>
-		<a href="<?php echo $settings->link; ?>" target="<?php echo $settings->link_target; ?>" class="<?php echo $text_link_class; ?>"<?php echo $module->get_rel(); ?>>
-		<?php endif; ?>
-		<?php echo $settings->text; ?>
-		<?php if ( ! empty( $settings->link ) ) : ?>
-		</a>
-		<?php endif; ?>
-	</div>
+	<?php if ( isset( $settings->text ) && false !== $settings->text ) : ?>
+		<div id="fl-icon-text-<?php echo $module->node; ?>" class="<?php echo $text_class; ?>">
+			<?php if ( ! empty( $settings->link ) ) : ?>
+			<a href="<?php echo $settings->link; ?>" target="<?php echo $settings->link_target; ?>" class="<?php echo $text_link_class; ?>"<?php echo $module->get_rel(); ?>>
+			<?php endif; ?>
+			<?php echo $settings->text; ?>
+			<?php if ( ! empty( $settings->link ) ) : ?>
+			</a>
+			<?php endif; ?>
+		</div>
 	<?php endif; ?>
 
-<?php if ( ! isset( $settings->exclude_wrapper ) ) : ?>
+<?php if ( ! isset( $settings->exclude_wrapper ) || ( isset( $settings->exclude_wrapper ) && ! $settings->exclude_wrapper ) ) : ?>
 </div>
 <?php endif; ?>

@@ -3,8 +3,8 @@ Contributors: amandato, blubrry
 Tags: podcasting, podcast, podcaster, powerpress, itunes, apple, apple podcasts, google podcasts, google play, enclosure, professional, apple, apple tv, ipad, iphone, soundcloud, squarespace, youtube, viddler, ustream, podcasting, audio, video, rss2, feed, player, media, rss, mp3, music, embed, feedburner, statistics, stats, flv, flash, id3, episodes, blubrry, mp4, m4v, wordpressmu, mu, wordpress mu, multisite, multi site, mediacaster, post, plugin, posts, simple, social, dashboard, TSG, Buzzsprout, MTR, WP-boxCast, CastMyBlog, tgs podcasting,  simple podcasting, seriously simple podcasting, seriously-simple-podcasting, serious, seriously, ssp, podlove, podcast.de, clammr, clammr radio, audio player, stitcher, tunein, show, shows, series, docs, documentation, support, free, add-ons, extensions, addons, libsyn, libsyn-podcasting, podbean, podomatic, spreaker
 Requires at least: 3.6
 Requires PHP: 5.2
-Tested up to: 4.9.9
-Stable tag: 7.4
+Tested up to: 5.2.3
+Stable tag: 8.0
 Donate link: https://create.blubrry.com/resources/podcast-media-hosting/
 License: GPLv2 or later
 
@@ -229,10 +229,99 @@ To install Blubrry PowerPress manually, follow these steps:
 == Changelog ==
 
 = Next Major Release Announcements =
-* We are looking for beta testers! If you would like to beta test future versions of PowerPress, please [contact us](http://www.blubrry.com/contact.php#feedback) with your name and email.
+* We are looking for beta testers! If you would like to beta test future versions of PowerPress, please [contact us](http://blubrry.com/contact.php#feedback) with your name and email.
+
+* PowerPress 8.1 beta 1 will be available in mid October, 2019! Please visit the [PowerPress Beta]https://create.blubrry.com/resources/powerpress/powerpress-beta/) page for more information.
 
 = Fan of PowerPress and want to show your support? =
 If you are a fan of PowerPress, we would greatly appreciate it if you could take a moment and [leave us a review on WordPress.org](https://wordpress.org/support/plugin/powerpress/reviews/?rate=5#new-post). Your support is greatly appreciated!
+
+
+= 8.0 =
+* Released on 10/7/2019
+* New Subscribe Destinations added: 
+** Deezer - Anyone can now submit their podcast to Deezer with just a blubrry.com account. [Learn more](https://powerpresspodcast.com/2019/08/07/blubrry-podcasts-coming-deezer/)
+** Pandora - [Submit your podcast to Pandora](https://create.blubrry.com/manual/podcast-promotion/submit-podcast-to-pandora/)
+** iHeart - [Submit your podcast to iHeart radio](https://create.blubrry.com/manual/podcast-promotion/submit-podcast-to-iheartradio/).
+* New *Subscribe* button styling options!!!
+** Buttons now use an SVG sprite, providing a small footprint while being optimized for retina displays. Subscribe buttons have never been so crisp!
+** There is a new "Modern" color scheme, with the traditional square or new rounded corners.
+** Subscribe Widget can now be configured horizontally for use in horizontal widget areas.
+* Added an option to remove !important and text-align left styling to subscribe buttons.
+* Switched the `plugin_action_links` filter to use `array_push` function call to avoid notice messages when another plugin or theme converts the links array to a string.
+* Fixed bug since recent update to WordPress where the default feed had the word feed in the URL twice. (Thanks Daniel for pointing out the issue!)
+
+
+= 7.5.4 =
+* Released on 8/30/2019
+* Apple category "After Shows" updated.
+* Now using the https version for (castfeedvalidator.com)[https://castfeedlivadator.com] when clicking validate for feeds.
+* CastFeedValidator diagnoses problems with your feed that could be preventing your episodes from reaching listeners. There are four phases of testing, performing more than 100 checks on your feedï¿½s various components.
+* Added class .blubrryplayer to the iframe for the Blubrry Player, for styling purposes.
+
+
+= 7.5.3 =
+* Released on 7/31/2019
+* Fixed bug for older versions of PHP with WebSub, service to notify Google Podcasts of new episodes.
+
+
+= 7.5.2 =
+* Released on 7/25/2019
+* Fixed logic bug introduced in 7.5 for sites using versions of PHP 5.4 or older.
+* Added code changes to Blubrry Hosting's Post to Social from PowerPress feature. (Last beta release of this feature!)
+
+
+= 7.5.1 =
+* Released on 7/23/2019
+* Added library for PubSubHubbub. Missed it when merging latest git release into wordpress.org svn. Sorry about that! 
+
+
+= 7.5 =
+* Released on 7/23/2019
+* Added new Apple categories announced in July. The new Apple Categories will be made available on Apple Podcasts mid August, 2019.
+* Added Multi-program Blubrry Podcast Hosting, perfect for Category podcasting.
+* Added *Update Google PubSubHubbub*, lets Google Podcasts and other podcast directory services when your podcast publishes new episodes.
+* Added support for various languages to podcast as including "Thai" and "Vietnamese".
+
+
+= 7.4.4 =
+* Releasd on 6/21/2019
+* Fixed bug introduced in last update that calculated the total number of episodes when viewing podcasts in channels and post types in PowerPress admin. (Thanks @edzila60610 for bringing to our attention!)
+* Removed all mentions of Google+. (Thanks @k_abel for bringing to our attention!)
+* Fixed notice message getting cut off for the "Clear Plugins Update Cache" option under "Tools". (Thanks @k_abel for bringing to our attention!)
+* Added option `archive`="true" for the `powerpress_subscribe` shortcode to allow for the shortcode to be added to archive/category pages.
+
+
+= 7.4.3 =
+* Released on 6/12/2019
+* Updated labels for Subscribe buttons and links in admin.
+* Note: Apple has announced the end of life for iTunes desktop (except for Windows). PowerPress will be removing iTunes desktop specific features where they conflict with the Apple Podcasts iOS app.
+* Enhanced iTunes summary updated, optimized for latest iOS podcasts app. It is now designed for Apple Podcasts iOS app rather than for iTunes desktop. (Thanks Robin for your assistance!)
+* Force feed discovery on homepage only to use default podcast feed for Google Search.
+* Fixed bug with deleting media files hosted on Blubrry Podcast hosting.
+* Fixed bug with posts with revisions being part of the total number of episodes when viewing podcast feeds in PowerPress settings.
+* Fixed bug with skipto position time not getting included in feed show notes. (Thanks @tszt for bringing to our attention!)
+
+
+= 7.4.2 =
+* Released on 4/26/2019
+* Fixed `T_FUNCTION` bug for PHP 5.2 (not an issue if you have PHP 5.3 or newer)
+
+
+= 7.4.1 =
+* Released on 4/10/2019
+* Added logic to authentication email addresses differently for premium password protected podcasts.
+* Added support for YoastSEO and Google Podcasts (Thanks @sunkast for bringing to our attention!) 
+* Removed use of `create_function` to fix damaged serialized data created by the old PodPress plugin. (Thanks @oilmanmag and Dimitris for bringing to our attention!)
+* Fixed `esc_attr()`bug with podpress import.
+* Added Tamil (ta) as a podcast feed language option. Thanks KT for requesting! If you do not see your language pelase contact us we will add it!
+* Changed feed join query to solve conflict with the Affiliate Disclosure Pro plugin. (Thanks @ndnakashima for bringing to our attention!)
+* New functionality for Taxonomy podcasting and the `powerpress_subscribe` shortcode (Thanks @tristanmason for testing!)
+* Fixed taxonomy bugs with the playlist player shortcodes (Thanks @tristanmason for the code and helping us test!)
+* PowerPress playlist player can now be ordered in ascending order with attribute order="asc" (Thanks @tristanmason for the code and helping us test!)
+* Fixed bug with skipto shortcode leaving a blank value in feeds. (Thanks @tszt for bringing to our attention!)
+* Skipto timestamp now uses the timestamp exactly as you entered it as the label as long as it has at least one colon to separate minutes from seconds.
+* Fixed bug for post type podcasting in the situation where there can be multiple post types for blog posts or pages. (Thanks @shawnogordo for the bug fix!)
 
 
 = 7.4 =
@@ -413,12 +502,14 @@ Darcy Fiander, [Rooty Radio](http://rootyradio.com) - Fixed bug with category li
 
 Joel Haasnoot, [Personal Blog](http://waarisdetrein.nl/joelhaasnoot/) - Developed PodPress archive statistics.
 
-Nicolas Bouliane, [Personal Blog](http://nicolasbouliane.com/) - contributed code for `get_the_powerpress_all_players()` function.
+Nicolas Bouliane, [Personal Blog](http://nicolasbouliane.com/) - Contributed code for `get_the_powerpress_all_players()` function.
+
+Isiah Lloyd - Developed features in PowerPress 7.5, 7.6 and part of 8.0
 
 
 == Translators ==
 * Danish translation for v1.0.11+ by [Team Blogos](http://wordpress.blogos.dk/s%C3%B8g-efter-downloads/?did=280) - Latest translation available [here](http://wordpress.blogos.dk/s%C3%B8g-efter-downloads/?did=280)
-* French translation for v1.0.11+ by [Aurélien Denis](http://wpchannel.com/) - Aurélien is looking for assistance maintaining the French translation, email wpchannel [at] gmail.com if interested.
+* French translation for v1.0.11+ by [Aurï¿½lien Denis](http://wpchannel.com/) - Aurï¿½lien is looking for assistance maintaining the French translation, email wpchannel [at] gmail.com if interested.
 * Simplified Chinese for v1.0.12+ by [webmote](http://codeex.cn) - From webmote: Welcome to use the plugin. Very good! and then hope you to access my site.
 * Italian translation for v2.0.4+ by [Umberto Sartori](http://veneziadoc.net/)
 * Romanian translation for v2.0.4+ by Alexander Ovsov (Web Geek Sciense: http://webhostinggeeks.com/science/)
@@ -430,7 +521,7 @@ Nicolas Bouliane, [Personal Blog](http://nicolasbouliane.com/) - contributed cod
 * [Using PowerPress outside the Loop](http://blog.nicolasbouliane.com/?p=1695) - by [Nicolas Bouliane](http://blog.nicolasbouliane.com/)
 * [The PowerPress Podcast](http://www.powerpresspodcast.com/) - by [Blubrry](http://www.blubrry.com/)
 
-Please [contact blubrry](http://www.blubrry.com/contact.php) with the link to your tips or tutorial for PowerPress and we'll add them to the list above.
+Please [contact blubrry](http://blubrry.com/contact/) with the link to your tips or tutorial for PowerPress and we'll add them to the list above.
 
 == Feedback == 
  [http://create.blubrry.com/resources/powerpress/](http://create.blubrry.com/resources/powerpress/)
@@ -440,4 +531,4 @@ Please [contact blubrry](http://www.blubrry.com/contact.php) with the link to yo
 
 == Blubrry Social == 
  
- [Twitter](https://twitter.com/blubrry) - [Facebook](https://www.facebook.com/blubrry) - [Google+](https://plus.google.com/u/0/104806426850567631953/posts)
+ [Twitter](https://twitter.com/blubrry) - [Facebook](https://www.facebook.com/blubrry) - [YouTube](https://www.youtube.com/channel/UC9sE1Yz2deZiGAP67xYx9Xg)

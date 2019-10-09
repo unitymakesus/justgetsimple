@@ -2,15 +2,18 @@
 
 	<?php if ( 'show' == $settings->show_name ) : ?>
 	<div class="fl-form-field">
-		<input type="text" name="fl-subscribe-form-name" placeholder="<?php _ex( 'Name', 'First and last name.', 'fl-builder' ); ?>" aria-label="name" />
+		<input type="text" name="fl-subscribe-form-name" placeholder="<?php echo esc_attr( $settings->name_field_text ); ?>" aria-label="name" />
 		<div class="fl-form-error-message"><?php _e( 'Please enter your name.', 'fl-builder' ); ?></div>
 	</div>
 	<?php endif; ?>
 
 	<div class="fl-form-field">
-		<input type="email" name="fl-subscribe-form-email" placeholder="<?php _e( 'Email Address', 'fl-builder' ); ?>" aria-label="email address" />
+		<input type="email" name="fl-subscribe-form-email" placeholder="<?php echo esc_attr( $settings->email_field_text ); ?>" aria-label="email address" />
 		<div class="fl-form-error-message"><?php _e( 'Please enter a valid email address.', 'fl-builder' ); ?></div>
 	</div>
+
+	<input type="hidden" name="fl-success-message" value="<?php echo esc_attr( do_shortcode( $settings->success_message ) ); ?>">
+	<input type="hidden" name="fl-success-url" value="<?php echo esc_attr( do_shortcode( $settings->success_url ) ); ?>">
 
 	<?php if ( 'stacked' == $settings->layout ) : ?>
 		<?php if ( 'show' == $settings->terms_checkbox ) : ?>

@@ -681,6 +681,12 @@
 			// Abort an existing preview request.
 			this._cancelPreview();
 
+			settings      = FLBuilder._inputVarsCheck( settings );
+
+			if ( 'error' === settings  ) {
+				return 0;
+			}
+
 			// Make a new preview request.
 			this._xhr = FLBuilder.ajax({
 				action          : 'render_layout',
@@ -1752,7 +1758,7 @@
 		 */
 		_initDefaultFieldPreviews: function( fields )
 		{
-			var fields      = ! _.isUndefined( fields ) ? fields : this.elements.settings.find('.fl-field'),
+			var fields      = ! FLBuilder.isUndefined(fields) ? fields : this.elements.settings.find('.fl-field'),
 				field       = null,
 				fieldType   = null,
 				preview     = null,
@@ -1886,7 +1892,7 @@
 						args.unitSelect = field.find( '.fl-field-unit-select' );
 						args.getValues = function() {
 							var inputVal = args.input.val(),
-								unitVal = args.input.val(),
+								unitVal = args.unitSelect.val(),
 								values = {
 									value: inputVal,
 									unit: unitVal,
@@ -2323,14 +2329,23 @@
 				weight     = parent.find( '.fl-font-field-weight' ),
 				uniqueID   = preview.id + '-' + this.nodeId,
 				selector = this._getPreviewSelector( this.classes.node, preview.selector ),
-				important = preview.important ? ' !important' : '';
+				important = preview.important ? ' !important' : '',
+				val = ''
 
 			// If the selected font is a Google Font, build the font stylesheet
 			if( fontGroup == 'Google' ){
 				this._buildFontStylesheet( uniqueID, font.val(), weight.val() );
 			}
 
-			this.updateCSSRule( selector, 'font-family', 'Default' === font.val() ? '' : font.val() + important );
+			val = font.val();
+
+			// Some google fonts that end with numbers need to be wrapped in quotes.
+			var checkNum = new RegExp('[0-9]');
+			if( checkNum.test( font.val() ) ){
+				val = '"' + font.val() + '"';
+			}
+
+			this.updateCSSRule( selector, 'font-family', 'Default' === font.val() ? '' : val + important );
 			this.updateCSSRule( selector, 'font-weight', 'default' === weight.val() ? '' : weight.val() + important );
 		},
 
@@ -2878,9 +2893,13 @@
 			} else {
 
 				if ( unit.length && '' !== value ) {
-					value += 'SELECT' === unit.prop( 'tagName' ) ? unit.val() : 'px';
+					if ( 'vw' === unit.val() ) {
+						// calc(14px + 5vw);
+						value = 'calc(' + FLBuilderConfig.global.responsive_base_fontsize + 'px + ' + value + 'vw)'
+					} else {
+						value += 'SELECT' === unit.prop( 'tagName' ) ? unit.val() : 'px';
+					}
 				}
-
 				this.updateCSSRule( selector, property, value + important, responsive );
 			}
 		},
