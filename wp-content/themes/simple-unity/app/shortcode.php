@@ -70,6 +70,7 @@ add_shortcode('team', function($atts) {
             echo $short_bio;
 					}
 					if (!empty(get_field('longer_bio'))) {
+            echo '<p><a href="' . get_permalink() . '">Read more about ' . get_the_title() . '</a></p>';
             echo '<p><a target="_blank" href="' . get_permalink() . '">Read more about ' . get_the_title() . '</a></p>';
           }
         ?>
