@@ -169,5 +169,51 @@ export default {
         $input.parent().addClass('active');
       })
     });
+
+    /**
+     * Show back to top if past first window
+     */
+   const scrollToTopButton = document.getElementById('back-to-top');
+   const scrollFunc = () => {
+      let y = window.scrollY;
+      const h = window.innerHeight;
+
+      if (y > h) {
+        scrollToTopButton.className = 'back-to-top show';
+      } else {
+        scrollToTopButton.className = 'back-to-top';
+      }
+    };
+    window.addEventListener('scroll', scrollFunc);
+
+    /**
+     * Scroll to top of window if person clicks back to top button
+     */
+    const scrollToTop = () => {
+      // Let's set a variable for the number of pixels we are from the top of the document.
+      const c = document.documentElement.scrollTop || document.body.scrollTop;
+
+      // If that number is greater than 0, we'll scroll back to 0, or the top of the document.
+      if (c > 0) {
+        window.requestAnimationFrame(scrollToTop);
+        window.scrollTo(0, c - c / 10);
+      }
+    };
+
+    scrollToTopButton.onclick = function(e) {
+      e.preventDefault();
+      scrollToTop();
+
+      // Set proper focus after scrolling to top
+      var $target = $('body');
+      $target.focus(); // Setting focus
+      if ($target.is(':focus')){ // Checking if the target was focused
+        return false;
+      } else {
+        $target.attr('tabindex','-1'); // Adding tabindex for elements not focusable
+        $target.focus(); // Setting focus
+      }
+      return false;
+    }
   },
 };

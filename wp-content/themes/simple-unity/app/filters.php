@@ -212,3 +212,16 @@ if ( ! is_admin() ) { // Don't touch anything inside of the WordPress Dashboard,
     return $title;
   }, 10, 2 );
 }
+
+/**
+ * Prevent certain pages loading WP External Link plugin
+ */
+add_action( 'wpel_apply_settings', function () {
+
+  // Exclude Beaver Builder editor pages
+  if ( strpos($_SERVER['REQUEST_URI'], '?fl_builder') !== false ) {
+    return false;
+  }
+
+  return true;
+}, 10 );

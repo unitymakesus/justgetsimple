@@ -93,6 +93,23 @@ add_action('customize_register', function (\WP_Customize_Manager $wp_customize) 
     'capability'  => 'edit_theme_options',
   ) );
 
+  $wp_customize->add_setting( 'back_to_top', array(
+    'default'     => false,
+    'type'        => 'theme_mod',
+    'transport'   => 'refresh'
+  ) );
+
+  $wp_customize->add_control(
+    'simple_back_to_top',
+    array(
+      'label'     => __( 'Show back to top button?', 'simple' ),
+      'section'   => 'simple_settings',
+      'settings'  => 'back_to_top',
+      'priority'  => 10,
+      'type'      => 'checkbox'
+    )
+  );
+
   $wp_customize->add_setting( 'theme_color', //No need to use a SERIALIZED name, as `theme_mod` settings already live under one db record
     array(
       'default'    => 'bright', //Default setting/value to save

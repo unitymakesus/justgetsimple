@@ -1,0 +1,33 @@
+.back-to-top {
+  opacity: 0;
+  visibility: hidden;
+  position: fixed;
+  bottom: 60px;
+  right: 30px;
+  width: 50px;
+  height: 50px;
+  background: $color-grey-light;
+  border-radius: 4px;
+  color: $color-black;
+  z-index: 999;
+  transition: all 0.3s ease;
+
+  @extend .z-depth-1;
+
+  &.show {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  &::before {
+    content: '\2191';
+    display: inline-block;
+    text-align: center;
+    width: 100%;
+    line-height: 50px;
+  }
+
+  &:hover, &:active, &:focus {
+    @extend .z-depth-2;
+  }
+}
