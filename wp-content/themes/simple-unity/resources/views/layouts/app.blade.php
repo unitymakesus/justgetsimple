@@ -7,7 +7,7 @@
   $button_font = get_theme_mod('button_font');
   $back_to_top = get_theme_mod('back_to_top');
 @endphp
-<html {!! language_attributes() !!} data-text-size="{{ $text_size }}" data-contrast="{{ $contrast }}">
+<html {!! language_attributes() !!} data-text-size="{{ $text_size }}" data-contrast="{{ $contrast }}" class="wf-loading">
   @include('partials.head')
   <body {!! body_class() !!} data-font="{{ $simple_fonts }}" data-color="{{ $simple_color }}" data-buttons="{{ $button_font }}">
     @if (!is_user_logged_in())
