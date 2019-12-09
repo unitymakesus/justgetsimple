@@ -17,7 +17,7 @@
 
   <div class="footer-copyright row flex space-between">
     <div class="footer-left col m4 s12">
-      <p class="copyright">&copy; {!! current_time('Y') !!} {{ get_bloginfo('name', 'display') }}</p>
+      <p class="copyright">&copy; {!! current_time('Y') !!} {!! get_bloginfo('name', 'display') !!}</p>
     </div>
     <div class="footer-center col m4 s12">
       @if (has_nav_menu('footer_links'))

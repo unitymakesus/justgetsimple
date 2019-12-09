@@ -35,7 +35,7 @@
               @endphp
               <img src="{{ $logo[0] }}"
                    srcset="{{ $logo[0] }} 1x, {{ $logo_2x[0] }} 2x"
-                   alt="{{ get_bloginfo('name', 'display') }}"
+                   alt="{!! get_bloginfo('name', 'display') !!}"
                    width="{{ $logo[1] }}" height="{{ $logo[2] }}" />
             @else
               {{ get_bloginfo('name', 'display') }}
