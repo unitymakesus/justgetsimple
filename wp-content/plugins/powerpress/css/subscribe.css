@@ -29,13 +29,13 @@
 }
 .pp-sub-widget div.pp-sub-t {
 	font-weight: bold;
-	margin: -15px 10px 0 10px;
+	margin: 10px 10px 0 10px;
 	padding: 0;
 	font-size: 200%;
 	color: rgb(0, 51, 102);
 }
 .pp-sub-widget-include div.pp-sub-t {
-	margin: -15px 10px 0 10px !important;
+	margin: 15px 10px 0 10px !important;
 	padding: 0 !important;
 	font-size: 200% !important;
 	color: rgb(0, 51, 102) !important;
@@ -81,7 +81,7 @@
 .pp-sub-widget-modern.pp-sub-widget-include a.pp-sub-btn-sq {
 	font-size: 80% !important;
 }
-.pp-sub-widget-classic a.pp-sub-btn-sq {
+.pp-sub-widget-classic a.pp-sub-btn-sq, .pp-sub-widget-dark a.pp-sub-btn-sq {
 	color: #FFFFFF;
 	padding: 0px 0px 0px 0px;
 	margin: 10px 0 10px 0;
@@ -90,7 +90,7 @@
 	font-size: 90%;
 	font-weight: bold;
 }
-.pp-sub-widget-classic.pp-sub-widget-include a.pp-sub-btn-sq {
+.pp-sub-widget-classic.pp-sub-widget-include a.pp-sub-btn-sq, .pp-sub-widget-dark.pp-sub-widget-include a.pp-sub-btn-sq {
 	font-size: 90% !important;
 	font-weight: bold !important;
 }
@@ -121,7 +121,7 @@
 .pp-sub-widget-modern.pp-sub-widget-include a.pp-sub-btn {
 	font-size: 80% !important;
 }
-.pp-sub-widget-classic a.pp-sub-btn {
+.pp-sub-widget-classic a.pp-sub-btn, .pp-sub-widget-dark a.pp-sub-btn {
 	color: #FFFFFF;
 	padding: 0px 0px 0px 0px;
 	margin: 10px 0 10px 0;
@@ -129,7 +129,7 @@
 	font-size: 90%;
 	font-weight: bold;
 }
-.pp-sub-widget-classic.pp-sub-widget-include a.pp-sub-btn {
+.pp-sub-widget-classic.pp-sub-widget-include a.pp-sub-btn, .pp-sub-widget-dark.pp-sub-widget-include a.pp-sub-btn {
 	font-size: 90% !important;
 	font-weight: bold !important;
 }
@@ -172,6 +172,26 @@ body .pp-sub-widget-classic.pp-sub-widget-include a:link,
 body .pp-sub-widget-classic.pp-sub-widget-include a:visited,
 body .pp-sub-widget-classic.pp-sub-widget-include a:active,
 body .pp-sub-widget-classic.pp-sub-widget-include a:hover {
+	color: #FFFFFF !important;
+}
+body .entry-content .pp-sub-widget-dark a:link,
+body .entry-content .pp-sub-widget-dark a:visited,
+body .entry-content .pp-sub-widget-dark a:active,
+body .entry-content .pp-sub-widget-dark a:hover,
+body .pp-sub-widget-dark a:link,
+body .pp-sub-widget-dark a:visited,
+body .pp-sub-widget-dark a:active,
+body .pp-sub-widget-dark a:hover {
+	color: #FFFFFF;
+}
+body .entry-content .pp-sub-widget-dark.pp-sub-widget-include a:link,
+body .entry-content .pp-sub-widget-dark.pp-sub-widget-include a:visited,
+body .entry-content .pp-sub-widget-dark.pp-sub-widget-include a:active,
+body .entry-content .pp-sub-widget-dark.pp-sub-widget-include a:hover,
+body .pp-sub-widget-dark.pp-sub-widget-include a:link,
+body .pp-sub-widget-dark.pp-sub-widget-include a:visited,
+body .pp-sub-widget-dark.pp-sub-widget-include a:active,
+body .pp-sub-widget-dark.pp-sub-widget-include a:hover {
 	color: #FFFFFF !important;
 }
 /* Ripple effects for horizontal modern buttons */
@@ -360,7 +380,7 @@ body .pp-sub-widget-classic.pp-sub-widget-include a:hover {
 	padding-left: 15px;
 	background-image: url('../images/modern_icon_sprite.svg');
 }
-.pp-sub-widget-classic .pp-sub-ic {
+.pp-sub-widget-classic .pp-sub-ic, .pp-sub-widget-dark .pp-sub-ic {
 	background-image: url('../images/white_logos.svg');
 }
 @media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
@@ -368,7 +388,7 @@ body .pp-sub-widget-classic.pp-sub-widget-include a:hover {
 	.pp-sub-widget-modern a .pp-sub-ic {
 		background-image: url('../images/modern-icon-sprite.png');
 	}
-	.pp-sub-widget-classic a .pp-sub-ic {
+	.pp-sub-widget-classic a .pp-sub-ic, .pp-sub-widget-dark a .pp-sub-ic {
 		background-image: url('../images/white_logos.png');
 		width: 50px;
 		background-size: 50px;
@@ -376,40 +396,40 @@ body .pp-sub-widget-classic.pp-sub-widget-include a:hover {
 }
 
 /*Sprite background positions for classic buttons*/
-.pp-sub-widget-classic .pp-sub-itunes .pp-sub-ic {
+.pp-sub-widget-classic .pp-sub-itunes .pp-sub-ic, .pp-sub-widget-dark .pp-sub-itunes .pp-sub-ic {
 	background-position: 0 -5px;
 }
-.pp-sub-widget-classic .pp-sub-rss .pp-sub-ic {
+.pp-sub-widget-classic .pp-sub-rss .pp-sub-ic, .pp-sub-widget-dark .pp-sub-rss .pp-sub-ic {
 	background-position: 0 -355px;
 }
-.pp-sub-widget-classic .pp-sub-email .pp-sub-ic {
+.pp-sub-widget-classic .pp-sub-email .pp-sub-ic, .pp-sub-widget-dark .pp-sub-email .pp-sub-ic {
 	background-position: 0 -105px;
 }
-.pp-sub-widget-classic .pp-sub-android .pp-sub-ic {
+.pp-sub-widget-classic .pp-sub-android .pp-sub-ic, .pp-sub-widget-dark .pp-sub-android .pp-sub-ic {
 	background-position: 0 -55px;
 }
-.pp-sub-widget-classic .pp-sub-stitcher .pp-sub-ic {
+.pp-sub-widget-classic .pp-sub-stitcher .pp-sub-ic, .pp-sub-widget-dark .pp-sub-stitcher .pp-sub-ic {
 	background-position: 0 -205px;
 }
-.pp-sub-widget-classic .pp-sub-tunein .pp-sub-ic {
+.pp-sub-widget-classic .pp-sub-tunein .pp-sub-ic, .pp-sub-widget-dark .pp-sub-tunein .pp-sub-ic {
 	background-position: 0 -255px;
 }
-.pp-sub-widget-classic .pp-sub-spotify .pp-sub-ic {
+.pp-sub-widget-classic .pp-sub-spotify .pp-sub-ic, .pp-sub-widget-dark .pp-sub-spotify .pp-sub-ic {
 	background-position: 0 -305px;
 }
-.pp-sub-widget-classic .pp-sub-gp .pp-sub-ic {
+.pp-sub-widget-classic .pp-sub-gp .pp-sub-ic, .pp-sub-widget-dark .pp-sub-gp .pp-sub-ic {
 	background-position: 0 -155px;
 }
-.pp-sub-widget-classic .pp-sub-more .pp-sub-ic {
+.pp-sub-widget-classic .pp-sub-more .pp-sub-ic, .pp-sub-widget-dark .pp-sub-more .pp-sub-ic {
 	background-position: 0 -405px;
 }
-.pp-sub-widget-classic .pp-sub-iheartradio .pp-sub-ic {
+.pp-sub-widget-classic .pp-sub-iheartradio .pp-sub-ic, .pp-sub-widget-dark .pp-sub-iheartradio .pp-sub-ic {
 	background-position: 0 -455px;
 }
-.pp-sub-widget-classic .pp-sub-deezer .pp-sub-ic {
+.pp-sub-widget-classic .pp-sub-deezer .pp-sub-ic, .pp-sub-widget-dark .pp-sub-deezer .pp-sub-ic {
 	background-position: 0 -505px;
 }
-.pp-sub-widget-classic .pp-sub-pandora .pp-sub-ic {
+.pp-sub-widget-classic .pp-sub-pandora .pp-sub-ic, .pp-sub-widget-dark .pp-sub-pandora .pp-sub-ic {
 	background-position: 0 -555px;
 }
 

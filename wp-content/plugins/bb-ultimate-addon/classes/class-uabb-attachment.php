@@ -18,7 +18,7 @@ if ( ! class_exists( 'UABB_Attachment' ) ) {
 		 *
 		 * @since 1.0
 		 */
-		function __construct() {
+		public function __construct() {
 
 			add_filter( 'attachment_fields_to_edit', array( $this, 'uabb_attachment_field_cta' ), 10, 2 );
 			add_filter( 'attachment_fields_to_save', array( $this, 'uabb_attachment_field_cta_save' ), 10, 2 );
@@ -31,11 +31,16 @@ if ( ! class_exists( 'UABB_Attachment' ) ) {
 		 * @param object $post object, attachment record in database.
 		 * @return $form_fields, modified form fields
 		 */
-		function uabb_attachment_field_cta( $form_fields, $post ) {
-			$form_fields['uabb-cta-link'] = array(
+		public function uabb_attachment_field_cta( $form_fields, $post ) {
+			$form_fields['uabb-cta-link']   = array(
 				'label' => __( 'Image Link', 'uabb' ),
 				'input' => 'text',
 				'value' => get_post_meta( $post->ID, 'uabb-cta-link', true ),
+			);
+			$form_fields['uabb-categories'] = array(
+				'label' => __( ' UABB - Categories  (Ex: Cat1, Cat2) ', 'uabb' ),
+				'input' => 'text',
+				'value' => get_post_meta( $post->ID, 'uabb-categories', true ),
 			);
 
 			return $form_fields;
@@ -49,9 +54,12 @@ if ( ! class_exists( 'UABB_Attachment' ) ) {
 		 * @param array $attachment array, attachment fields from $_POST form.
 		 * @return array $post array, modified post data
 		 */
-		function uabb_attachment_field_cta_save( $post, $attachment ) {
+		public function uabb_attachment_field_cta_save( $post, $attachment ) {
 			if ( isset( $attachment['uabb-cta-link'] ) ) {
 				update_post_meta( $post['ID'], 'uabb-cta-link', $attachment['uabb-cta-link'] );
+			}
+			if ( isset( $attachment['uabb-categories'] ) ) {
+				update_post_meta( $post['ID'], 'uabb-categories', $attachment['uabb-categories'] );
 			}
 
 			return $post;

@@ -149,6 +149,12 @@ class SB_Instagram_Settings {
 		if ( $sb_instagram_posts_manager->are_current_api_request_delays() ) {
 			$this->settings['alwaysUseBackup'] = true;
 		}
+
+		$this->settings['isgutenberg'] = SB_Instagram_Blocks::is_gb_editor();
+		if ( $this->settings['isgutenberg'] ) {
+			$this->settings['ajax_post_load'] = false;
+			$this->settings['disable_js_image_loading'] = true;
+		}
 	}
 
 	/**
@@ -351,6 +357,18 @@ class SB_Instagram_Settings {
 			foreach ( $access_tokens as $access_token ) {
 				$split_token = explode( '.', $access_token );
 				$this->settings['id'][] = $split_token[0];
+			}
+		}
+
+		if ( empty( $this->settings['id'] )
+		     && empty( $this->settings['user'] )
+		     && ! empty ( $this->connected_accounts ) ) {
+			$set = false;
+			foreach ( $this->connected_accounts as $connected_account ) {
+				if ( ! $set ) {
+					$set = true;
+					$this->settings['user'] = $connected_account['username'];
+				}
 			}
 		}
 

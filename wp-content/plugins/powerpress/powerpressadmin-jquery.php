@@ -125,7 +125,7 @@ function powerpress_admin_jquery_init()
 				// Congratulations you aleady have hosting!
 ?>
 <div style="line-height: 32px; height: 32px;">&nbsp;</div>
-<iframe src="//www.blubrry.com/pp/" frameborder="0" style="overflow:hidden; overflow-y: hidden;" width="100%" height="480" scrolling="no" seamless="seamless"></iframe>
+<iframe src="//www.blubrry.com/pp/" frameborder="0" title="<?php echo esc_attr(__('Blubrry Services Integration', 'powerpress')); ?>" style="overflow:hidden; overflow-y: hidden;" width="100%" height="480" scrolling="no" seamless="seamless"></iframe>
 <p><?php echo __('Already have a blubrry hosting account?', 'powerpress'); ?> 
 	<strong><a class="button-primary button-blubrry thickbox" title="<?php echo esc_attr(__('Blubrry Services Integration', 'powerpress')); ?>" href="<?php echo wp_nonce_url(admin_url('admin.php?action=powerpress-jquery-account'), 'powerpress-jquery-account'); ?>"><?php echo __('Click here to link Blubrry account', 'powerpress'); ?></a></strong>
 </p>
@@ -174,7 +174,7 @@ function powerpress_admin_jquery_init()
 ?>
 <h2><?php echo __('Select Media', 'powerpress'); ?></h2>
 <p><?php echo __('Wait a sec! This feature is only available to Blubrry Media Podcast Hosting customers.', 'powerpress'); ?></p>
-<iframe src="//www.blubrry.com/pp/" frameborder="0" style="overflow:hidden; overflow-y: hidden;" width="100%" height="480" scrolling="no" seamless="seamless"></iframe>
+<iframe src="//www.blubrry.com/pp/" frameborder="0" title="<?php echo esc_attr(__('Blubrry Services Integration', 'powerpress')); ?>" style="overflow:hidden; overflow-y: hidden;" width="100%" height="480" scrolling="no" seamless="seamless"></iframe>
 <p><?php echo __('Already have a blubrry hosting account?', 'powerpress'); ?> 
 	<strong><a class="button-primary button-blubrry thickbox" title="<?php echo esc_attr(__('Blubrry Services Integration', 'powerpress')); ?>" href="<?php echo wp_nonce_url(admin_url('admin.php?action=powerpress-jquery-account'), 'powerpress-jquery-account'); ?>"><?php echo __('Click here to link Blubrry account', 'powerpress'); ?></a></strong>
 </p>
@@ -349,6 +349,8 @@ window.onload = function() {
                 <select id="blubrry_program_keyword" name="Settings[blubrry_program_keyword]">
                     <option value="!selectPodcast"><?php echo __('Select Program', 'powerpress'); ?></option>
                     <?php
+                    //TODO: I THINK THIS LINE WILL SOLVE THE ISSUE OF NETWORK STUFF BEING IN THE WRONG ORDER
+                    //ksort($Programs);
                     foreach ($Programs as $value => $desc)
                         echo "\t<option value=\"$value\"" . ($blubrryProgramKeyword == $value ? ' selected' : '') . ">$desc</option>\n";
                     ?>
@@ -593,8 +595,7 @@ window.onload = function() {
 			{
 				$Programs = array();
 				$ProgramHosting = array();
-					
-					// Anytime we change the password we need to test it...
+                // Anytime we change the password we need to test it...
 				$auth = base64_encode( $SaveSettings['blubrry_username'] . ':' . $Password );
 				$json_data = false;
 				$api_url_array = powerpress_get_api_array();
@@ -609,7 +610,8 @@ window.onload = function() {
 					if( $json_data != false )
 						break;
 				}
-				
+
+
 				if( $json_data )
 				{
 					$results =  powerpress_json_decode($json_data);
@@ -648,17 +650,17 @@ window.onload = function() {
 						if( count($Programs) > 0 )
 						{
 							$SaveSettings['blubrry_auth'] = $auth;
-							
+
 							if( !empty($SaveSettings['blubrry_program_keyword']) )
 							{
 								powerpress_add_blubrry_redirect($SaveSettings['blubrry_program_keyword']);
-								$SaveSettings['blubrry_hosting'] = $ProgramHosting[ $SaveSettings['blubrry_program_keyword'] ];
-								if( !is_bool($SaveSettings['blubrry_hosting']) )
-								{
-									if( $SaveSettings['blubrry_hosting'] === 'false' || empty($SaveSettings['blubrry_hosting']) )
-										$SaveSettings['blubrry_hosting'] = false;
-								}
-									
+								if ($SaveSettings['blubrry_program_keyword'] != 'no_default') {
+                                    $SaveSettings['blubrry_hosting'] = $ProgramHosting[$SaveSettings['blubrry_program_keyword']];
+                                    if (!is_bool($SaveSettings['blubrry_hosting'])) {
+                                        if ($SaveSettings['blubrry_hosting'] === 'false' || empty($SaveSettings['blubrry_hosting']))
+                                            $SaveSettings['blubrry_hosting'] = false;
+                                    }
+                                }
 								$Save = true;
 								$Close = true;
 							}
@@ -847,7 +849,7 @@ foreach( $Programs as $value => $desc )
                 jQuery("#blubrry_program_keyword").prepend('<option value="no_default"><?php echo __("No Default", "powerpress"); ?></option>');
             }
             else {
-                jQuery('#blubrry_program_keyword option[value="no_default"').remove();
+                jQuery('#blubrry_program_keyword option[value="no_default"]').remove();
             }
 
         } );
@@ -1033,6 +1035,43 @@ self.parent.tb_remove();
 			else
 				echo "Error";
 		}; break;
+        case 'powerpress-ep-box-options': {
+            if (defined('WP_DEBUG')) {
+                if (WP_DEBUG) {
+                    wp_register_style('powerpress-episode-box', powerpress_get_root_url() . 'css/episode-box.css', array(), POWERPRESS_VERSION);
+                } else {
+                    wp_register_style('powerpress-episode-box', powerpress_get_root_url() . 'css/episode-box.min.css', array(), POWERPRESS_VERSION);
+                }
+            } else {
+                wp_register_style('powerpress-episode-box', powerpress_get_root_url() . 'css/episode-box.min.css', array(), POWERPRESS_VERSION);
+            }
+            wp_enqueue_style( 'powerpress-episode-box' );
+            wp_enqueue_script('powerpress-admin', powerpress_get_root_url() . 'js/admin.js', array(), POWERPRESS_VERSION );
+
+            powerpress_admin_jquery_header( __('PowerPress Entry Box Settings','powerpress') );
+            require_once(dirname(__FILE__). '/views/ep-box-settings.php');
+            powerpressadmin_edit_entry_options($Settings);
+            powerpress_admin_jquery_footer();
+        }; break;
+        case 'powerpress-ep-box-options-save': {
+            if( !current_user_can(POWERPRESS_CAPABILITY_MANAGE_OPTIONS) )
+            {
+                powerpress_admin_jquery_header('PowerPress Entry Box Settings', 'powerpress');
+                powerpress_page_message_add_notice( __('You do not have sufficient permission to manage options.', 'powerpress') );
+                powerpress_page_message_print();
+                powerpress_admin_jquery_footer();
+                exit;
+            }
+
+            check_admin_referer('powerpress-edit');
+            $Settings = $_POST['General'];
+            powerpress_save_settings($Settings);
+            powerpress_admin_jquery_header('PowerPress Entry Box Settings', 'powerpress');
+            powerpress_page_message_add_notice( __('Settings will be applied on page refresh. If you\'ve already entered information into this post, simply finish the post and the settings will apply when you start your next one.', 'powerpress') );
+            powerpress_page_message_print();
+            powerpress_admin_jquery_footer();
+            exit;
+        }; break;
 	}
 	
 }
@@ -1073,9 +1112,16 @@ do_action('admin_head');
 
 echo '<!-- done adding extra stuff -->';
 
-?>
+if (defined('WP_DEBUG')) {
+    if (WP_DEBUG) {?>
 <link rel="stylesheet" href="<?php echo powerpress_get_root_url(); ?>css/jquery.css" type="text/css" media="screen" />
-<?php if( $other ) echo $other; ?>
+    <?php } else { ?>
+<link rel="stylesheet" href="<?php echo powerpress_get_root_url(); ?>css/jquery.min.css" type="text/css" media="screen" />
+    <?php   }
+} else { ?>
+<link rel="stylesheet" href="<?php echo powerpress_get_root_url(); ?>css/jquery.min.css" type="text/css" media="screen" />
+<?php }
+if( $other ) echo $other; ?>
 </head>
 <body>
 <div id="container">

@@ -8,8 +8,11 @@
  *  @package UABB Content Toggle Module
  */
 
+$nonce = wp_create_nonce( 'uabb-module-nonce' );
+
 FLBuilder::register_module(
-	'UABBContentToggleModule', array(
+	'UABBContentToggleModule',
+	array(
 		'general_content1' => array(
 			'title'    => __( 'Content 1', 'uabb' ),
 			'sections' => array(
@@ -69,22 +72,27 @@ FLBuilder::register_module(
 								'selector'  => '.uabb-rbs-toggle-sections .uabb-rbs-content-1',
 								'important' => true,
 							),
+							'wpautop'     => false,
 							'connections' => array( 'string', 'html' ),
+						),
+						'ct_raw'               => array(
+							'type'    => 'raw',
+							'content' => '<div class="uabb-module-raw" data-uabb-module-nonce=' . $nonce . '></div>',
 						),
 						'cont1_saved_rows'     => array(
 							'type'    => 'select',
 							'label'   => __( 'Select Row', 'uabb' ),
-							'options' => UABB_Model_Helper::get_saved_row_template(),
+							'options' => array(),
 						),
 						'cont1_saved_modules'  => array(
 							'type'    => 'select',
 							'label'   => __( 'Select Module', 'uabb' ),
-							'options' => UABB_Model_Helper::get_saved_module_template(),
+							'options' => array(),
 						),
 						'cont1_page_templates' => array(
 							'type'    => 'select',
 							'label'   => __( 'Select Page Template', 'uabb' ),
-							'options' => UABB_Model_Helper::get_saved_page_template(),
+							'options' => array(),
 						),
 					),
 				),
@@ -149,22 +157,27 @@ FLBuilder::register_module(
 								'selector'  => '.uabb-rbs-toggle-sections .uabb-rbs-content-2',
 								'important' => true,
 							),
+							'wpautop'     => false,
 							'connections' => array( 'string', 'html' ),
+						),
+						'ct_raw_one'           => array(
+							'type'    => 'raw',
+							'content' => '<div class="uabb-module-raw" data-uabb-module-nonce=' . $nonce . '></div>',
 						),
 						'cont2_saved_rows'     => array(
 							'type'    => 'select',
 							'label'   => __( 'Select Row', 'uabb' ),
-							'options' => UABB_Model_Helper::get_saved_row_template(),
+							'options' => array(),
 						),
 						'cont2_saved_modules'  => array(
 							'type'    => 'select',
 							'label'   => __( 'Select Module', 'uabb' ),
-							'options' => UABB_Model_Helper::get_saved_module_template(),
+							'options' => array(),
 						),
 						'cont2_page_templates' => array(
 							'type'    => 'select',
 							'label'   => __( 'Select Page Template', 'uabb' ),
-							'options' => UABB_Model_Helper::get_saved_page_template(),
+							'options' => array(),
 						),
 					),
 				),
@@ -628,6 +641,24 @@ FLBuilder::register_module(
 								'property'  => 'color',
 								'important' => true,
 							),
+						),
+					),
+				),
+			),
+		),
+		'uabb_docs'        => array(
+			'title'    => __( 'Docs', 'uabb' ),
+			'sections' => array(
+				'knowledge_base' => array(
+					'title'  => __( 'Helpful Information', 'uabb' ),
+					'fields' => array(
+						'uabb_helpful_information' => array(
+							'type'    => 'raw',
+							'content' => '<ul class="uabb-docs-list" data-branding=' . BB_Ultimate_Addon_Helper::$is_branding_enabled . '>
+
+								<li class="uabb-docs-list-item"> <i class="ua-icon ua-icon-chevron-right2"> </i> <a href="https://www.ultimatebeaver.com/docs/open-content-toggle-specific-section-from-remote-link/?utm_source=Uabb-Pro-Backend&utm_medium=Module-Editor-Screen&utm_campaign=Content-Toggle-module" target="_blank" rel="noopener"> How to Open a Specific Section of Content Toggle from a Remote Link? </a> </li>
+
+							 </ul>',
 						),
 					),
 				),

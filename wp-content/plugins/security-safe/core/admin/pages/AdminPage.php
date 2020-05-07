@@ -32,7 +32,7 @@ class AdminPage {
         $this->settings = $settings;
 
         // Prevent Caching
-        $this->prevent_caching();
+        Janitor::prevent_caching();
 
         // Set page variables
         $this->set_page();
@@ -49,33 +49,6 @@ class AdminPage {
         // This is overwritten by specific page.
     
     } // set_page()
-
-
-    /**
-     * Prevent plugins like WP Super Cache and W3TC from caching any data on this page.
-     * @since  2.0.0
-     */ 
-    private function prevent_caching() {
-
-        if ( ! defined( 'DONOTCACHEOBJECT' ) ) {
-
-            define( 'DONOTCACHEOBJECT', true );
-
-        }
-
-        if ( ! defined( 'DONOTCACHEDB' ) ) {
-
-            define( 'DONOTCACHEDB', true );
-            
-        }
-
-        if ( ! defined( 'DONOTCACHEPAGE' ) ) {
-
-            define( 'DONOTCACHEPAGE', true );
-            
-        }
-
-    } // prevent_caching()
 
 
     /** 
