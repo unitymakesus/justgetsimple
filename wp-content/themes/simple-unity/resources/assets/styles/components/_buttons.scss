@@ -55,3 +55,8 @@ a.btn {
     color: inherit;
   }
 }
+
+.gform_button {
+  @extend .btn;
+  @extend .btn-primary;
+}

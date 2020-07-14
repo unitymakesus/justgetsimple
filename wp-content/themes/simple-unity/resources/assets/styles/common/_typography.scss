@@ -32,7 +32,7 @@ body {
         font-size: rem-calc(36px) !important;
       }
 
-      .et_bloom_optin.et_bloom_optin .et_bloom_form_container p {
+      .et_bloom_optin.et_bloom_optin .et_bloom_form_container p, .gfield_label {
         font-family: nth($body-fonts-list, $i) !important;
         font-size: 1rem !important;
       }
