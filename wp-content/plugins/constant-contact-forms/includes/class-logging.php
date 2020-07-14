@@ -86,7 +86,7 @@ class ConstantContact_Logging {
 	/**
 	 * The logging directory name.
 	 *
-	 * @since NEXT
+	 * @since 1.8.2
 	 * @var   string
 	 */
 	protected $log_file_dir = 'ctct-logs';
@@ -210,47 +210,45 @@ class ConstantContact_Logging {
 			<img class="ctct-logo" src="<?php echo esc_url( constant_contact()->url . 'assets/images/constant-contact-logo.png' ); ?>" alt="<?php echo esc_attr_x( 'Constant Contact logo', 'img alt text', 'constant-contact-forms' ); ?>">
 			<div class="ctct-body">
 				<?php
-				$contents     = '';
-				$log_location = $this->log_location_url;
 
-				if ( ! file_exists( constant_contact()->logger_location ) ) {
+				$contents = '';
 
-					if ( ! is_writable( constant_contact()->logger_location ) ) {
-						$contents .= sprintf(
-						/* Translators: placeholder holds the log location. */
-							esc_html__( 'We are not able to write to the %s file.', 'constant-contact-forms' ),
-							constant_contact()->logger_location
-						);
-					} else {
-						$contents .= esc_html__( 'No error log exists', 'constant-contact-forms' );
-					}
-				} elseif ( ! is_writable( constant_contact()->logger_location ) ) {
+				if ( ! file_exists( $this->log_location_file ) ) {
+					$contents .= esc_html__( 'No error log exists', 'constant-contact-forms' );
+				}
+
+				if ( ! is_writable( $this->log_location_file ) ) {
 					$contents .= sprintf(
 						/* Translators: placeholder holds the log location. */
 						esc_html__( 'We are not able to write to the %s file.', 'constant-contact-forms' ),
 						constant_contact()->logger_location
 					);
-				} else {
-					$contents .= $this->get_log_contents();
 				}
+
+				if ( is_file( $this->log_location_file ) && is_readable( $this->log_location_file ) ) {
+					// phpcs:ignore -- Not reading over network, it's on the filesystem.
+					$contents .= file_get_contents( $this->log_location_file );
+				}
+
 				?>
 				<p><?php esc_html_e( 'Error log below can be used with support requests to help identify issues with Constant Contact Forms.', 'constant-contact-forms' ); ?></p>
 				<p><?php esc_html_e( 'When available, you can share information by copying and pasting the content in the textarea, or by using the "Download logs" link at the end. Logs can be cleared by using the "Delete logs" link.', 'constant-contact-forms' ); ?></p>
 				<textarea name="ctct_error_logs" id="ctct_error_logs" cols="80" rows="40" onclick="this.focus();this.select();" onfocus="this.focus();this.select();" readonly="readonly" aria-readonly="true"><?php echo esc_html( $contents ); ?></textarea>
 				<?php
 
-				if ( file_exists( constant_contact()->logger_location ) ) {
-					if ( ! empty( $contents ) && is_wp_error( $contents ) ) {
-						?>
-						<p><?php esc_html_e( 'Error log may still have content, even if an error is shown above. Please use the download link below.', 'constant-contact-forms' ); ?></p>
-						<?php
-					}
+				if ( is_file( $this->log_location_file ) && ! is_readable( $this->log_location_file ) ) {
+					?>
+					<p><?php esc_html_e( 'Error log may still have content, even if an error is shown above. Please use the download link below.', 'constant-contact-forms' ); ?></p>
+					<?php
+				}
+
+				if ( file_exists( $this->log_location_file ) ) {
 					?>
 					<p>
 						<?php
 							printf(
 								'<p><a href="%s" download>%s</a></p><p><a href="%s" id="deletelog">%s</a></p>',
-								esc_attr( $log_location ),
+								esc_attr( $this->log_location_url ),
 								esc_html__( 'Download logs', 'constant-contact-forms' ),
 								esc_attr(
 									wp_nonce_url(
@@ -304,7 +302,7 @@ class ConstantContact_Logging {
 			$this->create_log_file();
 		}
 
-		wp_redirect( $this->options_url );
+		wp_safe_redirect( $this->options_url );
 		exit();
 	}
 
@@ -360,8 +358,7 @@ class ConstantContact_Logging {
 	 * @since 1.5.0
 	 */
 	public function create_log_folder() {
-		mkdir( $this->log_location_dir );
-		chmod( $this->log_location_dir, 0755 );
+		wp_mkdir_p( $this->log_location_dir );
 	}
 
 	/**
@@ -404,7 +401,7 @@ class ConstantContact_Logging {
 	 * Retrieve logging file location.
 	 *
 	 * @author Rebekah Van Epps <rebekah.vanepps@webdevstudios.com>
-	 * @since  NEXT
+	 * @since  1.8.2
 	 *
 	 * @return string Logging file location.
 	 */
@@ -416,7 +413,7 @@ class ConstantContact_Logging {
 	 * Remove old logging directory and files for older plugin versions (<= 1.8.1).
 	 *
 	 * @author Rebekah Van Epps <rebekah.vanepps@webdevstudios.com>
-	 * @since  NEXT
+	 * @since  1.8.2
 	 *
 	 * @return void
 	 */
@@ -432,7 +429,7 @@ class ConstantContact_Logging {
 	 * Remove current logging directory and files.
 	 *
 	 * @author Rebekah Van Epps <rebekah.vanepps@webdevstudios.com>
-	 * @since  NEXT
+	 * @since  1.8.2
 	 */
 	public function delete_current_log_dir() {
 		$this->delete_log_dir( $this->log_location_dir );
@@ -442,7 +439,7 @@ class ConstantContact_Logging {
 	 * Helper function to remove logging directory.
 	 *
 	 * @author Rebekah Van Epps <rebekah.vanepps@webdevstudios.com>
-	 * @since  NEXT
+	 * @since  1.8.2
 	 *
 	 * @return void
 	 */
@@ -458,5 +455,17 @@ class ConstantContact_Logging {
 
 		array_map( 'unlink', glob( "{$dir}/*" ) );
 		rmdir( $dir );
+	}
+
+	/**
+	 * Initialize Logging directories and files.
+	 *
+	 * @author Richard Aber <richard.aber@webdevstudios.com>
+	 * @since  1.8.5
+	 */
+	public function initialize_logging() {
+		$this->create_log_folder();
+		$this->create_log_index_file();
+		$this->create_log_file();
 	}
 }

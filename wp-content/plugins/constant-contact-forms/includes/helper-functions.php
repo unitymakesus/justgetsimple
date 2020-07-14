@@ -415,11 +415,7 @@ function constant_contact_maybe_log_it( $log_name, $error, $extra_data = '' ) {
 	$logging_file = constant_contact()->logger_location;
 
 	// Create logging file and directory if they don't exist.
-	if ( ! file_exists( $logging_file ) ) {
-		constant_contact()->logging->create_log_folder();
-		constant_contact()->logging->create_log_index_file();
-		constant_contact()->logging->create_log_file();
-	}
+	constant_contact()->logging->initialize_logging();
 
 	if ( ! is_writable( $logging_file ) ) {
 		return;
@@ -690,7 +686,7 @@ function constant_contact_location_and_line( $location = '', $line = '' ) {
 /**
  * Get posts containing specified form ID.
  *
- * @since NEXT
+ * @since 1.8.0
  *
  * @param  int $form_id Form ID.
  * @return array        Array of posts containing the form ID.
@@ -723,7 +719,7 @@ function constant_contact_get_posts_by_form( $form_id ) {
 /**
  * Get links and info on widgets containing specified form ID.
  *
- * @since  NEXT
+ * @since  1.8.0
  *
  * @param  int $form_id Form ID.
  * @return array        Array of widgets containing the form ID.
@@ -758,7 +754,7 @@ function constant_contact_get_widgets_by_form( $form_id ) {
  * Walker callback for widget references of deleted forms.
  *
  * @author Rebekah Van Epps <rebekah.vanepps@webdevstudios.com>
- * @since  NEXT
+ * @since  1.8.0
  *
  * @param  array  $value Array of current widget settings.
  * @param  string $key   Current widget key.
@@ -784,7 +780,7 @@ function constant_contact_walk_widget_references( array &$value, $key, $type ) {
 /**
  * Check for affected posts and widgets for the newly trashed form post type.
  *
- * @since NEXT
+ * @since 1.8.0
  *
  * @param int $form_id Form ID being trashed.
  * @return void
@@ -807,7 +803,7 @@ add_action( 'trash_ctct_forms', 'constant_contact_check_for_affected_forms_on_tr
 /**
  * Remove saved references to deleted form if restored from trash.
  *
- * @since  NEXT
+ * @since  1.8.0
  *
  * @param  int $post_id Post ID being restored.
  * @return void
@@ -828,7 +824,7 @@ add_action( 'untrashed_post', 'constant_contact_remove_form_references_on_restor
 /**
  * Determine whether to display the deleted forms notice in admin.
  *
- * @since  NEXT
+ * @since  1.8.0
  *
  * @return bool Whether to display the deleted forms notice.
  */
