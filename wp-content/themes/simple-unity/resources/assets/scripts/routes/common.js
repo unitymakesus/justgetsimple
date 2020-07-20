@@ -1,5 +1,15 @@
+import prefersReducedMotion from '../util/prefersReducedMotion';
+
 export default {
   init() {
+    // Add a class to the body for disabling CSS-based animations.
+    document.body.className += ' ' + (prefersReducedMotion() ? 'prefers-reduced-motion' : 'prefers-motion');
+
+    // missing forEach on NodeList for IE11
+    if (window.NodeList && !NodeList.prototype.forEach) {
+      NodeList.prototype.forEach = Array.prototype.forEach;
+    }
+
     /**
      * Set aria labels for current navigation items
      */
