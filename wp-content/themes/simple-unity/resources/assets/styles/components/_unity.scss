@@ -1,20 +1,14 @@
 .unity-link {
   display: inline-block;
-  width: 120px;
-  height: 20px;
+  max-width: 120px;
+  width: 100%;
 
   svg {
-    width: 100%;
-    height: auto;
     display: inline-block;
     vertical-align: middle;
 
     path {
       fill: $color-white;
     }
-  }
-
-  &:hover, &:focus {
-    outline: none;
   }
 }

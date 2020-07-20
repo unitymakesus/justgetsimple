@@ -27,8 +27,10 @@
       @endif
     </div>
     <div class="footer-right col m4 s12">
-      @include('partials.unity')
+      <a href="https://justgetsimple.com/" target="_blank" class="unity-link" rel="noopener nofollow">
+        <span class="screen-reader-text">{{ __('Simple by Unity', 'sage') }}</span>
+        {{ \BladeSvgSage\svg_image('simple-by-unity', ['class' => 'svg-unity-logo']) }}
+      </a>
     </div>
   </div>
-
 </footer>

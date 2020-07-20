@@ -3,7 +3,7 @@
   "images/icon-contrast.svg": "images/icon-contrast_e8cb0e0d.svg",
   "images/icon-search-white.svg": "images/icon-search-white_bea31f83.svg",
   "images/icon-search.svg": "images/icon-search_366987c5.svg",
-  "images/simple-by-unity.svg": "images/simple-by-unity_b0609838.svg",
+  "images/simple-by-unity.svg": "images/simple-by-unity_c35f9a91.svg",
   "images/socialicons/behance.svg": "images/socialicons/behance_cc36254f.svg",
   "images/socialicons/dribbble.svg": "images/socialicons/dribbble_553aa7f4.svg",
   "images/socialicons/facebook.svg": "images/socialicons/facebook_5249e0bb.svg",
@@ -16,8 +16,8 @@
   "images/socialicons/twitter.svg": "images/socialicons/twitter_c2e2b4bb.svg",
   "images/socialicons/yelp.svg": "images/socialicons/yelp_add935d3.svg",
   "images/socialicons/youtube.svg": "images/socialicons/youtube_47c2665f.svg",
-  "scripts/customizer-panel.js": "scripts/customizer-panel_3f28e4be.js",
-  "scripts/customizer.js": "scripts/customizer_3f28e4be.js",
-  "styles/main.css": "styles/main_3f28e4be.css",
-  "scripts/main.js": "scripts/main_3f28e4be.js"
+  "scripts/customizer-panel.js": "scripts/customizer-panel_35c9e9c1.js",
+  "scripts/customizer.js": "scripts/customizer_35c9e9c1.js",
+  "styles/main.css": "styles/main_35c9e9c1.css",
+  "scripts/main.js": "scripts/main_35c9e9c1.js"
 }
