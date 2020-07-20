@@ -60,3 +60,34 @@ a.btn {
   @extend .btn;
   @extend .btn-primary;
 }
+
+// Menu toggle
+.btn-menu-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-width: 1px;
+  border-style: solid;
+  font-size: 1.25rem;
+  margin-right: 0.5rem;
+  margin-left: auto;
+  background-color: transparent;
+  padding: 0.6rem 0.75rem;
+  color: black;
+  border-color: rgba(0, 0, 0, 0.75);
+
+  > i {
+    font-size: inherit;
+  }
+
+  &:hover {
+    cursor: pointer;
+  }
+
+  &:focus {
+    background-color: transparent;
+    outline: 0.125rem solid;
+    outline-offset: 0.125rem;
+    outline-color: inherit;
+  }
+}
