@@ -11,4 +11,5 @@ $args = array(
 );
 wp_dropdown_categories( $args ); 
 ?>
+<em><?php esc_html_e( 'The selection of a category includes all of its subcategories.', 'quick-featured-images' ); ?></em>
 </p>

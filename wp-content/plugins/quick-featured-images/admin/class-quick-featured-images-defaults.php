@@ -233,7 +233,7 @@ class Quick_Featured_Images_Defaults {
 				$msg = 'Changes saved.';
 				$class = 'updated';
 			} else {
-				$msg = 'Error while saving the changes.';
+				$msg = 'Error while saving.';
 				$class = 'error';
 			}
 			printf ( '<div class="%s"><p><strong>%s</strong></p></div>', $class, esc_html__( $msg ) );

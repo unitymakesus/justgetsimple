@@ -4,7 +4,7 @@
  * Description: The fast & visual way to understand your users.
  * Author: Hotjar
  * Author URI: https://www.hotjar.com/
- * Version: 1.0.7
+ * Version: 1.0.8
  * License: GPLv3
  * License URI: https://www.gnu.org/licenses/gpl-3.0.en.html
  * Text Domain: hotjar

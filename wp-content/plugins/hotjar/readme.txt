@@ -2,8 +2,8 @@
 Contributors: hotjar
 Tags: hotjar,insights,visual,heatmaps,recordings,funnels,analytics
 Requires at least: 4.6
-Tested up to: 5.4.0
-Stable tag: 1.0.7
+Tested up to: 5.5.0
+Stable tag: 1.0.8
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.en.html
 
@@ -83,6 +83,9 @@ You can uninstall this plugin at any time to remove Hotjar from your site. Data 
 3. Success! If you see this message Hotjar is installed on your site. Visit [Insights](https://insights.hotjar.com) to configure the Hotjar tools on your site.
 
 == Changelog ==
+
+= 1.0.8 =
+* Tested on WP 5.5.
 
 = 1.0.7 =
 * Update description.

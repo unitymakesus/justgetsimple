@@ -597,7 +597,7 @@ function artwork_tab($FeedSlug, $ExtraData, $object, $CoverImage, $GeneralSettin
         </div>
         <div class="ep-box-line-margin"></div>
         <?php }
-        if( !isset($GeneralSettings['new_episode_box_cover_image']) || $GeneralSettings['new_episode_box_cover_image'] == 1 ) { ?>
+        if( isset($GeneralSettings['new_episode_box_cover_image']) && $GeneralSettings['new_episode_box_cover_image'] == 1 ) { ?>
         <div id="powerpress_thumbnail_container_<?php echo $FeedSlug; ?>" class="pp-section-container">
             <div class="powerpress-art-text">
                 <h4 class="pp-section-title"><?php echo esc_html(__('Thumbnail Image', 'powerpress')); ?></h4>

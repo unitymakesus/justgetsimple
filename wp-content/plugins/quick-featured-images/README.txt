@@ -4,8 +4,8 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_i
 Tags: featured image,featured images,bulk set,automatic,thumbnails
 Requires at least: 3.8
 Requires PHP: 5.2
-Tested up to: 5.4
-Stable tag: 13.4.1
+Tested up to: 5.5
+Stable tag: 13.5.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -29,13 +29,13 @@ The plugin 'Quick Featured Images' helps you bulk managing featured images, sett
 You get the free version here. If you want to include **audios, videos and custom post types** and get more options then take a look the **Pro version** [Quick Featured Images Pro](https://www.quickfeaturedimages.com/).
 
 = What users said =
+* **&#8220;One of My Must Have Plugins&#8221;** in [Reviews at wordpress.org](https://wordpress.org/support/topic/must-have-plugins-2/) by WillOfTheWeb on June 25, 2020
 * **&#8220;I&#39;m confused about it. It&#39;s very very very useful!&#8221;** in [Reviews at wordpress.org](https://wordpress.org/support/topic/cool-928/) by yueli on December 19, 2019
 * **&#8220;Doing the job perfect&#8221;** in [Reviews at wordpress.org](https://wordpress.org/support/topic/doing-the-job-perfect/) by stigbarrett on February 14, 2019
 * **&#8220;Must be part of wordpress core&#8221;** in [Reviews at wordpress.org](https://wordpress.org/support/topic/mag-ni-fi-cient-must-be-part-of-wordpress-core/) by Marc73 on November 2, 2018
 * **&#8220;Simply the best for bulk featured image&#8221;** in [Reviews at wordpress.org](https://wordpress.org/support/topic/simply-the-best-324/) by Syamsul Alam on January 21, 2018
 * **&#8220;Made adding 10,000 featured images a breeze.&#8221;** in [Reviews at wordpress.org](https://wordpress.org/support/topic/super-helpful-30/) by synchronista on July 28, 2017
 * **Number 7** in [8 Plugins to Help Supercharge Your WordPress Media Library](https://www.elegantthemes.com/blog/tips-tricks/8-plugins-to-help-supercharge-your-wordpress-media-library) by John Hughes on April 6, 2017
-* Mentioned in a comment of [What are must-have WordPress plugins for developer?](https://www.quora.com/What-are-must-have-WordPress-plugins-for-developer/answer/Joel-Rivera-2) by Joel Rivera on February 7, 2017
 * **&#8220;The plugin is fast, and it works great on big WordPress websites.&#8221;** in [How to make WP display featured image on excerpts?](http://hostileblog.com/wp-display-featured-image/) by Pramod on July 16, 2016
 * **&#8220;The plugin offers great features for handling the post thumbnails including bulk editing, overview, replace and much more.&#8221;** in [6+ Best Plugins To Fix Featured Image Issues in WordPress](https://85ideas.com/plugins/best-plugins-fix-featured-image-issues-wordpress/) by Editorial Staff on December 3, 2015
 * Mentioned under **&#8220;Essential Plugins&#8221;** on slide #24 in [The Plugins That Will Make Your Business Sink or Swim](http://www.slideshare.net/HeatherWilde/wordpress-plugins-52971643) by Heather Wilde on September 15, 2015
@@ -290,6 +290,15 @@ If you want to contribute a translation of the plugin in your language it would 
 
 == Changelog ==
 
+= 13.5.0 =
+* Fixed missed binding to dynamically created selection options in 'Default Images'
+* Fixed missed higher upgrade of the version number
+
+= 13.4.2 =
+* Revised an error message in 'Bulk Edit'
+* Fixed deprecated jQuery function live() in 'Default Images'
+* Tested successfully with WP 5.5
+
 = 13.4.1 =
 * Fixed error in image columns on post overview pages
 
@@ -519,6 +528,12 @@ Added spanish translation for the main texts of the plugin
 
 
 == Upgrade Notice ==
+
+= 13.5.0 =
+Fixed missed binding to dynamically created selection options in 'Default Images'
+
+= 13.4.2 =
+Revisions and fixes for WordPress 5.5, tested successfully with WP 5.5
 
 = 13.4.1 =
 Fixed error in image columns on post overview pages

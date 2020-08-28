@@ -191,7 +191,7 @@ foreach ( $users as $user ) {
 	 /*
 	 * Options changes
 	 */
-	 $( '.selection_rules' ).live( 'change', function() {
+	 $( document ).on( 'change', '.selection_rules', function() {
 		// get number of row
 		var row_number = this.id.match( /[0-9]+/ );
 		// set selector names
