@@ -84,7 +84,11 @@ button {
   background-color: transparent;
   padding: 0.6rem 0.75rem;
   color: black;
-  border-color: rgba(0, 0, 0, 0.75);
+  border-color: currentColor;
+
+  [data-text-color=light] & {
+    color: white;
+  }
 
   > i {
     font-size: inherit;
