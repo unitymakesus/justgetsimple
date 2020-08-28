@@ -29,7 +29,6 @@
     }
 
     @media #{$medium-and-down} {
-      padding-left: 0;
       min-height: 120px;
       display: flex;
 
@@ -75,6 +74,7 @@
   }
 
   .navbar {
+    flex-wrap: wrap;
     margin-bottom: 0;
 
     &[data-text-color="light"] {
@@ -125,6 +125,10 @@
 }
 
 nav {
+  a {
+    color: $color-black;
+  }
+
   ul {
     a {
       text-decoration: none;
@@ -151,7 +155,6 @@ nav {
 }
 
 .navbar-menu {
-  // width: 100%;
   border: none;
   margin: 0;
   box-shadow: none;
@@ -167,57 +170,43 @@ nav {
     }
 
     &.menu-item-has-children {
-      a {
-        cursor: default;
-
-        @media #{$medium-and-down} {
-          cursor: pointer;
-        }
+      > a::after {
+        display: inline-block;
+        margin-left: 0.5em;
+        vertical-align: 0.255em;
+        border-style: solid;
+        border-width: 2px 0 0 2px;
+        height: 7px;
+        width: 7px;
+        transform: rotate(225deg);
+        transform-origin: center;
+        content: '';
       }
 
       .sub-menu {
-        max-height: 0;
-        overflow: hidden;
-        transition: max-height 0.3s ease;
-        // background: $color-blue-light;
+        display: none;
+        transition: all 0.3s ease-in-out;
 
         li {
           float: none;
         }
 
-        a {
-          cursor: pointer;
-        }
-
         @media #{$large-and-up} {
-          max-height: 300em;
           flex-direction: column;
           position: absolute;
           z-index: 10;
           background: $color-white;
-          transition: max-height 0.3s ease;
-          height: 0;
-          overflow: hidden;
         }
       }
 
-      &:hover, &:focus, &.hover {
+      &.open {
+        > a::after {
+          transform: rotate(45deg);
+        }
+
         .sub-menu {
-          height: auto;
+          display: block;
         }
-      }
-    }
-
-    &.current-page-ancestor, &.current-menu-item, &.active {
-      // background: $color-teal;
-    }
-
-    &:hover, &:focus, &.hover {
-      // background: $color-teal;
-
-      & > a {
-        // color: $color-white;
-        text-decoration: underline;
       }
     }
 
@@ -240,30 +229,44 @@ nav {
     }
   }
   @media #{$medium-and-down} {
+    display: none;
     flex-direction: column;
     flex-wrap: nowrap;
     margin: 0;
     width: 100%;
-    transition: max-height 0.3s ease;
-    max-height: 0;
-    overflow: hidden;
+
+    ul {
+      flex-direction: column;
+      width: 100%;
+    }
 
     li {
+      flex-direction: column;
       width: 100%;
 
-      &.hover {
+      a {
+        width: 100%;
+      }
+
+      &.open {
         .sub-menu {
-          max-height: 100em;
+          display: block;
         }
       }
     }
 
     .mobilenav-active & {
-      max-height: 100em;
+      display: block;
     }
   }
 
   .cta-link {
     padding: 0 15px;
+  }
+}
+
+@media only screen and (max-width: 992px) and (min-width: 769px) {
+  .navbar-menu {
+    height: auto;
   }
 }

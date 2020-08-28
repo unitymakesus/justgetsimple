@@ -1,7 +1,7 @@
 <!doctype html>
 @php
-  $text_size = $_COOKIE['data_text_size'];
-  $contrast = $_COOKIE['data_contrast'];
+  $text_size = $_COOKIE['data_text_size'] ?? '';
+  $contrast = $_COOKIE['data_contrast'] ?? '';
   $simple_fonts = get_theme_mod('theme_fonts');
   $simple_color = get_theme_mod('theme_color');
   $button_font = get_theme_mod('button_font');
@@ -11,7 +11,7 @@
   @include('partials.head')
   <body {!! body_class() !!} data-font="{{ $simple_fonts }}" data-color="{{ $simple_color }}" data-buttons="{{ $button_font }}">
     {!! do_action( 'body_open' ) !!}
-    <a href="#content" class="screen-reader-text">Skip to content</a>
+    <a href="#content" class="btn screen-reader-text">Skip to content</a>
     <!--[if IE]>
       <div class="alert alert-warning">
         {!! __('You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.', 'sage') !!}

@@ -38,8 +38,9 @@
       </a>
       @if (has_nav_menu('primary_navigation'))
         <div class="menu-trigger-wrapper hide-on-large-only">
-          <input type="checkbox" name="menu-trigger" id="menu-trigger" value="true" />
-          <label for="menu-trigger"><i class="material-icons" aria-label="Show navigation menu">menu</i></label>
+          <button class="btn-menu-toggle" id="menu-trigger" aria-label="Show navigation menu" aria-expanded="false" aria-controls="menu-main-menu">
+            <i class="material-icons" aria-hidden="true">menu</i>
+          </button>
         </div>
         <div class="navbar-menu flex flex-center space-between">
           {!! wp_nav_menu(['theme_location' => 'primary_navigation', 'container' => FALSE, 'menu_class' => 'flex flex-center space-between']) !!}
@@ -48,8 +49,8 @@
               <a href="{{ $cta_link }}" class="btn" {{ $cta_target }}>{{ $cta_text }}</a>
             </div>
           @endif
-        @endif
-      </div>
+        </div>
+      @endif
     </div>
   </nav>
 </header>

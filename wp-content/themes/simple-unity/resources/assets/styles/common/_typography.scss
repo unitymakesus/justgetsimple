@@ -99,9 +99,8 @@ h5, .h5 {
     font-weight: bold;
     transition: all 0.3s;
 
-    &:hover, &:active {
-      text-decoration-style: double;
-      // color: $color-green;
+    &:hover, &:focus, &:active {
+      text-decoration-style: none;
 
       html[data-contrast="true"] & {
         color: $color-white;
@@ -173,7 +172,6 @@ blockquote {
 }
 
 .label {
-  // font-family: $font-serif;
   font-weight: 600;
 }
 

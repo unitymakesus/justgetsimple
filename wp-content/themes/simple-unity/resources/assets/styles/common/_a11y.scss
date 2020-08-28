@@ -1,3 +1,9 @@
+:focus {
+  outline: 0.125rem solid;
+  outline-offset: 0.125rem;
+  outline-color: inherit;
+}
+
 .screen-reader-text {
   clip: rect(1px, 1px, 1px, 1px);
   clip-path: polygon(0 0, 0 0, 0 0, 0 0);
@@ -56,10 +62,6 @@
 
     span {
       display: none;
-    }
-
-    &:hover {
-      // background: $color-green;
     }
 
     html[data-contrast="true"] & {
@@ -172,8 +174,6 @@
     input {
       &[type="radio"] {
         &:checked + label {
-          // background: $color-green-dark;
-
           &::after {
             color: $color-white;
           }
@@ -194,8 +194,6 @@
 
       &[type="checkbox"] {
         &:checked + label {
-          // background: $color-green-dark;
-
           &::after {
             background-image: image('icon-contrast-inverse.svg');
           }
@@ -269,7 +267,6 @@
       padding-top: 8px;
       font-size: 12px;
       line-height: 1.5;
-      // font-family: $font-sans;
       font-weight: normal;
     }
 
