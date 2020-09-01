@@ -11,9 +11,15 @@ function sb_instagram_menu() {
 
 	$cap = apply_filters( 'sbi_settings_pages_capability', $cap );
 
+	global $sb_instagram_posts_manager;
+	$notice = '';
+	if ( $sb_instagram_posts_manager->are_critical_errors() ) {
+		$notice = ' <span class="update-plugins sbi-error-alert"><span>!</span></span>';
+	}
+
 	add_menu_page(
 		__( 'Instagram Feed', 'instagram-feed' ),
-		__( 'Instagram Feed', 'instagram-feed' ),
+		__( 'Instagram Feed', 'instagram-feed' ) . $notice,
 		$cap,
 		'sb-instagram-feed',
 		'sb_instagram_settings_page'
@@ -21,13 +27,25 @@ function sb_instagram_menu() {
 	add_submenu_page(
 		'sb-instagram-feed',
 		__( 'Settings', 'instagram-feed' ),
-		__( 'Settings', 'instagram-feed' ),
+		__( 'Settings', 'instagram-feed' ) . $notice,
 		$cap,
 		'sb-instagram-feed',
 		'sb_instagram_settings_page'
 	);
+	add_submenu_page(
+		'sb-instagram-feed',
+		__( 'About Us', 'instagram-feed' ),
+		__( 'About Us', 'instagram-feed' ),
+		$cap,
+		'sb-instagram-feed-about',
+		'sb_instagram_about_page'
+	);
 }
 add_action('admin_menu', 'sb_instagram_menu');
+
+function sb_instagram_about_page() {
+    do_action('sbi_admin_page' );
+}
 
 function sb_instagram_settings_page() {
 
@@ -91,7 +109,11 @@ function sb_instagram_settings_page() {
 		'sb_instagram_disable_mob_swipe' => false,
 		'sbi_font_method' => 'svg',
 		'sb_instagram_disable_awesome'      => false,
-        'custom_template' => false
+        'custom_template' => false,
+        'disable_admin_notice' => false,
+		'enable_email_report' => 'on',
+		'email_notification' => 'monday',
+		'email_notification_addresses' => get_option( 'admin_email' ),
 	);
 	//Save defaults in an array
 	$options = wp_parse_args(get_option('sb_instagram_settings'), $sb_instagram_settings_defaults);
@@ -155,9 +177,10 @@ function sb_instagram_settings_page() {
 	$sbi_font_method = $options[ 'sbi_font_method' ];
 	$sb_instagram_disable_awesome = $options[ 'sb_instagram_disable_awesome' ];
 	$sb_instagram_custom_template = $options[ 'custom_template' ];
-
-
-
+	$sb_instagram_disable_admin_notice = $options[ 'disable_admin_notice' ];
+	$sb_instagram_enable_email_report = $options[ 'enable_email_report' ];
+	$sb_instagram_email_notification = $options[ 'email_notification' ];
+	$sb_instagram_email_notification_addresses = $options[ 'email_notification_addresses' ];
 	//Check nonce before saving data
 	if ( ! isset( $_POST['sb_instagram_settings_nonce'] ) || ! wp_verify_nonce( $_POST['sb_instagram_settings_nonce'], 'sb_instagram_saving_settings' ) ) {
 		//Nonce did not verify
@@ -276,7 +299,11 @@ function sb_instagram_settings_page() {
 				//Header
 				isset($_POST[ 'sb_instagram_show_header' ]) ? $sb_instagram_show_header = sanitize_text_field( $_POST[ 'sb_instagram_show_header' ] ) : $sb_instagram_show_header = '';
 				isset($_POST[ 'sb_instagram_show_bio' ]) ? $sb_instagram_show_bio = sanitize_text_field( $_POST[ 'sb_instagram_show_bio' ] ) : $sb_instagram_show_bio = '';
-				isset($_POST[ 'sb_instagram_custom_bio' ]) ? $sb_instagram_custom_bio = sanitize_textarea_field( $_POST[ 'sb_instagram_custom_bio' ] ) : $sb_instagram_custom_bio = '';
+				if ( function_exists( 'sanitize_textarea_field' ) ) {
+					isset($_POST[ 'sb_instagram_custom_bio' ]) ? $sb_instagram_custom_bio = sanitize_textarea_field( $_POST[ 'sb_instagram_custom_bio' ] ) : $sb_instagram_custom_bio = '';
+				} else {
+					isset($_POST[ 'sb_instagram_custom_bio' ]) ? $sb_instagram_custom_bio = sanitize_text_field( $_POST[ 'sb_instagram_custom_bio' ] ) : $sb_instagram_custom_bio = '';
+				}
 				isset($_POST[ 'sb_instagram_custom_avatar' ]) ? $sb_instagram_custom_avatar = sanitize_text_field( $_POST[ 'sb_instagram_custom_avatar' ] ) : $sb_instagram_custom_avatar = '';
 				if (isset($_POST[ 'sb_instagram_header_size' ]) ) $sb_instagram_header_size = $_POST[ 'sb_instagram_header_size' ];
 
@@ -354,9 +381,31 @@ function sb_instagram_settings_page() {
 
 				isset($_POST[ 'sb_instagram_custom_template' ]) ? $sb_instagram_custom_template = $_POST[ 'sb_instagram_custom_template' ] : $sb_instagram_custom_template = '';
 				$options['custom_template'] = $sb_instagram_custom_template;
+				isset($_POST[ 'sb_instagram_disable_admin_notice' ]) ? $sb_instagram_disable_admin_notice = $_POST[ 'sb_instagram_disable_admin_notice' ] : $sb_instagram_disable_admin_notice = '';
+				$options['disable_admin_notice'] = $sb_instagram_disable_admin_notice;
+				isset($_POST[ 'sb_instagram_enable_email_report' ]) ? $sb_instagram_enable_email_report = $_POST[ 'sb_instagram_enable_email_report' ] : $sb_instagram_enable_email_report = '';
+				$options['enable_email_report'] = $sb_instagram_enable_email_report;
+				isset($_POST[ 'sb_instagram_email_notification' ]) ? $sb_instagram_email_notification = $_POST[ 'sb_instagram_email_notification' ] : $sb_instagram_email_notification = '';
+				$original = $options['email_notification'];
+				$options['email_notification'] = $sb_instagram_email_notification;
+				isset($_POST[ 'sb_instagram_email_notification_addresses' ]) ? $sb_instagram_email_notification_addresses = $_POST[ 'sb_instagram_email_notification_addresses' ] : $sb_instagram_email_notification_addresses = get_option( 'admin_email' );
+				$options['email_notification_addresses'] = $sb_instagram_email_notification_addresses;
 
-				//clear expired tokens
-				delete_option( 'sb_expired_tokens' );
+				if ( $original !== $sb_instagram_email_notification && $sb_instagram_enable_email_report === 'on' ){
+					//Clear the existing cron event
+					wp_clear_scheduled_hook('sb_instagram_feed_issue_email');
+
+					$input = sanitize_text_field($_POST[ 'sb_instagram_email_notification' ] );
+					$timestamp = strtotime( 'next ' . $input );
+
+					if ( $timestamp - (3600 * 1) < time() ) {
+						$timestamp = $timestamp + (3600 * 24 * 7);
+					}
+					$six_am_local = $timestamp + sbi_get_utc_offset() + (6*60*60);
+
+					wp_schedule_event( $six_am_local, 'sbiweekly', 'sb_instagram_feed_issue_email' );
+				}
+
 
 				//Delete all SBI transients
 				global $wpdb;
@@ -415,7 +464,17 @@ function sb_instagram_settings_page() {
 
 
 	<div id="sbi_admin" class="wrap">
+        <?php
+        $lite_notice_dismissed = get_transient( 'instagram_feed_dismiss_lite' );
 
+        if ( ! $lite_notice_dismissed ) :
+        ?>
+        <div id="sbi-notice-bar" style="display:none">
+            <span class="sbi-notice-bar-message"><?php _e( 'You\'re using Instagram Feed Lite. To unlock more features consider <a href="https://smashballoon.com/instagram-feed/?utm_campaign=instagram-free&utm_source=notices&utm_medium=litenotice" target="_blank" rel="noopener noreferrer">upgrading to Pro</a>.', 'instagram-feed'); ?></span>
+            <button type="button" class="dismiss" title="<?php _e( 'Dismiss this message.', 'instagram-feed'); ?>" data-page="overview">
+            </button>
+        </div>
+        <?php endif; ?>
 		<div id="header">
 			<h1><?php _e( 'Instagram Feed', 'instagram-feed' ); ?></h1>
 		</div>
@@ -539,6 +598,8 @@ function sb_instagram_settings_page() {
 								<?php endforeach; ?>
 
                             </div> <!-- end scrollable -->
+                            <p style="font-size: 11px; line-height: 1.5; margin-bottom: 0;"><i style="color: #666;">*<?php echo sprintf( __( 'Changing the password, updating privacy settings, or removing page admins for the related Facebook page may require %smanually reauthorizing our app%s to reconnect an account.', 'instagram-feed' ), '<a href="https://smashballoon.com/reauthorizing-our-instagram-facebook-app/" target="_blank" rel="noopener noreferrer">', '</a>' ); ?></i></p>
+
                             <a href="JavaScript:void(0);" id="sbi-connect-business-accounts" class="button button-primary" disabled="disabled" style="margin-top: 20px;">Connect Accounts</a>
 
 						<?php endif; ?>
@@ -568,7 +629,7 @@ function sb_instagram_settings_page() {
 			$matches_existing_personal = sbi_matches_existing_personal( $new_account_details );
 			$button_text = $matches_existing_personal ? __( 'Update This Account', 'instagram-feed' ) : __( 'Connect This Account', 'instagram-feed' );
 
-			$account_json = wp_json_encode( $new_account_details );
+			$account_json = sbi_json_encode( $new_account_details );
 
 			$already_connected_as_business_account = (isset( $connected_accounts[ $user_id ] ) && $connected_accounts[ $user_id ]['type'] === 'business');
 
@@ -644,11 +705,7 @@ function sb_instagram_settings_page() {
                 <div id="sbi_config">
                     <a data-personal-basic-api="https://api.instagram.com/oauth/authorize?app_id=423965861585747&redirect_uri=https://api.smashballoon.com/instagram-basic-display-redirect.php&response_type=code&scope=user_profile,user_media&state=<?php echo admin_url('admin.php?page=sb-instagram-feed'); ?>"
                        data-new-api="https://www.facebook.com/dialog/oauth?client_id=254638078422287&redirect_uri=https://api.smashballoon.com/instagram-graph-api-redirect.php&scope=manage_pages,instagram_basic,instagram_manage_insights,instagram_manage_comments&state=<?php echo admin_url('admin.php?page=sb-instagram-feed'); ?>"
-                       data-old-api="https://instagram.com/oauth/authorize/?client_id=3a81a9fa2a064751b8c31385b91cc25c&scope=basic&redirect_uri=https://smashballoon.com/instagram-feed/instagram-token-plugin/?return_uri=<?php echo admin_url('admin.php?page=sb-instagram-feed'); ?>&response_type=token&state=<?php echo admin_url('admin.php?page-sb-instagram-feed'); ?>&hl=en"
-                       href="https://instagram.com/oauth/authorize/?client_id=3a81a9fa2a064751b8c31385b91cc25c&scope=basic&redirect_uri=https://smashballoon.com/instagram-feed/instagram-token-plugin/?return_uri=<?php echo admin_url('admin.php?page=sb-instagram-feed'); ?>&response_type=token&state=<?php echo admin_url('admin.php?page-sb-instagram-feed'); ?>&hl=en" class="sbi_admin_btn"><i class="fa fa-user-plus" aria-hidden="true" style="font-size: 20px;"></i>&nbsp; <?php _e('Connect an Instagram Account', 'instagram-feed' ); ?></a>
-
-                    <!--<a href="https://instagram.com/oauth/authorize/?client_id=3a81a9fa2a064751b8c31385b91cc25c&scope=basic&redirect_uri=https://smashballoon.com/instagram-feed/instagram-token-plugin/?return_uri=<?php echo admin_url('admin.php?page=sb-instagram-feed'); ?>&response_type=token&state=<?php echo admin_url('admin.php?page-sb-instagram-feed'); ?>" class="sbi_admin_btn"><i class="fa fa-user-plus" aria-hidden="true" style="font-size: 20px;"></i>&nbsp; <?php _e('Connect an Instagram Account', 'instagram-feed' ); ?></a>
-                    -->
+                       href="https://api.instagram.com/oauth/authorize?app_id=423965861585747&redirect_uri=https://api.smashballoon.com/instagram-basic-display-redirect.php&response_type=code&scope=user_profile,user_media&state=<?php echo admin_url('admin.php?page=sb-instagram-feed'); ?>" class="sbi_admin_btn"><i class="fa fa-user-plus" aria-hidden="true" style="font-size: 20px;"></i>&nbsp; <?php _e('Connect an Instagram Account', 'instagram-feed' ); ?></a>
                     <a href="https://smashballoon.com/instagram-feed/token/" target="_blank" style="position: relative; top: 14px; left: 15px;"><?php _e('Button not working?', 'instagram-feed'); ?></a>
                 </div>
 
@@ -664,7 +721,7 @@ function sb_instagram_settings_page() {
 							if ( sbi_is_after_deprecation_deadline() ) {
 								$deprecated_connected_account_message = __( '<b>Action Needed:</b> Reconnect this account to allow feed to update.', 'instagram-feed' );
 							} else {
-								$deprecated_connected_account_message = __( '<b>Action Needed:</b> Reconnect this account before March 31, 2020 to avoid disruption with this feed.', 'instagram-feed' );
+								$deprecated_connected_account_message = __( '<b>Action Needed:</b> Reconnect this account before June 1, 2020 to avoid disruption with this feed.', 'instagram-feed' );
 							}
 
 							$accounts_that_need_updating = sbi_get_user_names_of_personal_accounts_not_also_already_updated();
@@ -718,7 +775,7 @@ function sb_instagram_settings_page() {
                                 <div class="sbi_ca_info">
 
                                     <div class="sbi_ca_delete">
-                                        <a href="JavaScript:void(0);" class="sbi_delete_account"><i class="fa fa-times"></i><span class="sbi_remove_text"><?php _e( 'Remove', 'instagram-feed' ); ?></span></a>
+                                        <a href="<?php echo add_query_arg( 'disconnect', $account['user_id'], get_admin_url( null, 'admin.php?page=sb-instagram-feed' ) ); ?>" class="sbi_delete_account"><i class="fa fa-times"></i><span class="sbi_remove_text"><?php _e( 'Remove', 'instagram-feed' ); ?></span></a>
                                     </div>
 
                                     <div class="sbi_ca_username">
@@ -770,12 +827,13 @@ function sb_instagram_settings_page() {
 						<?php endif; ?>
                         <a href="JavaScript:void(0);" class="sbi_manually_connect button-secondary"><?php _e( 'Manually Connect an Account', 'instagram-feed' ); ?></a>
                         <div class="sbi_manually_connect_wrap">
-                            <input name="sb_manual_at" id="sb_manual_at" type="text" value="" style="margin-top: 4px; padding: 5px 9px; margin-left: 0px;" size="64" minlength="15" maxlength="200" placeholder="Enter a valid Instagram Access Token" /><span class='sbi_business_profile_tag'><?php _e('Business or Basic Display', 'instagram-feed');?></span>
+                            <input name="sb_manual_at" id="sb_manual_at" type="text" value="" style="margin-top: 4px; padding: 5px 9px; margin-left: 0px;" size="64" minlength="15" maxlength="200" placeholder="<?php esc_attr_e( 'Enter a valid Instagram Access Token', 'instagram-feed' ); ?>" /><span class='sbi_business_profile_tag'><?php _e('Business or Basic Display', 'instagram-feed');?></span>
                             <div class="sbi_manual_account_id_toggle">
                                 <label><?php _e('Please enter the User ID for this Profile:', 'instagram-feed');?></label>
                                 <input name="sb_manual_account_id" id="sb_manual_account_id" type="text" value="" style="margin-top: 4px; padding: 5px 9px; margin-left: 0px;" size="40" minlength="5" maxlength="100" placeholder="Eg: 15641403491391489" />
                             </div>
-                            <p class="sbi_submit" style="display: inline-block;"><input type="sbi_submit" name="submit" id="sbi_manual_submit" class="button button-primary" style="text-align: center; padding: 0;" value="<?php _e('Connect This Account', 'instagram-feed' );?>"></p>
+                            <p id="sbi_no_js_warning" class="sbi_notice"><?php echo sprintf( __('It looks like JavaScript is not working on this page. Some features may not work fully. Visit %sthis page%s for help resolving this issue.', 'instagram-feed'), '<a href="https://smashballoon.com/i-cant-connect-or-manage-accounts-on-the-instagram-feed-settings-page/" target="_blank" rel="noopener">', '</a>' ); ?></p>
+                            <p class="sbi_submit" style="display: inline-block;"><input type="submit" name="sbi_submit" id="sbi_manual_submit" class="button button-primary" value="<?php _e('Connect This Account', 'instagram-feed' );?>"></p>
                         </div>
                     </td>
                 </tr>
@@ -825,7 +883,7 @@ function sb_instagram_settings_page() {
 							<div class="sbi_col sbi_two">
 
 								<p class="sbi_pro_tooltip"><?php _e( 'Upgrade to the Pro version to display Hashtag and Tagged feeds', 'instagram-feed' ); ?><i class="fa fa-caret-down" aria-hidden="true"></i></p>
-								<a href="https://smashballoon.com/instagram-feed/?utm_source=plugin-free&utm_campaign=sbi" target="_blank" class="sbi_lock"><i class="fa fa-rocket"></i><?php _e('Pro', 'instagram-feed'); ?></a>
+								<a href="https://smashballoon.com/instagram-feed/?utm_campaign=instagram-free&utm_source=settings&utm_medium=hashtags" target="_blank" class="sbi_lock"><i class="fa fa-rocket"></i><?php _e('Pro', 'instagram-feed'); ?></a>
 
 								<input readonly type="text" size="25" style="height: 32px; top: -2px; position: relative; box-shadow: none;" disabled />
 								&nbsp;<a class="sbi_tooltip_link sbi_pro" href="JavaScript:void(0);"><?php _e( 'What is this?', 'instagram-feed' ); ?></a>
@@ -847,11 +905,31 @@ function sb_instagram_settings_page() {
                             </div>
                         </div>
 
+                        <div class="sbi_pro sbi_row sbi_mixed_directions">
+                            <div class="sbi_col sbi_one">
+                                <input type="radio" name="sb_instagram_type" disabled />
+                                <label class="sbi_radio_label" for="sb_instagram_type_mixed">Mixed:</label>
+                            </div>
+                            <div class="sbi_col sbi_two">
+                                <input readonly type="text" size="25" style="height: 32px; top: -2px; position: relative; box-shadow: none;" disabled />
+                                &nbsp;<a class="sbi_tooltip_link sbi_pro" href="JavaScript:void(0);"><?php _e( 'What is this?', 'instagram-feed' ); ?></a>
+
+                                <div class="sbi_tooltip sbi_type_tooltip">
+                                    <p>
+			                            <?php echo sprintf( __('To display multiple feed types in a single feed, use %s in your shortcode and then add the user name or hashtag for each feed into the shortcode, like so: %s. This will combine a user feed and a hashtag feed into the same feed.', 'instagram-feed'), 'type="mixed"', '<code>[instagram-feed type="mixed" user="smashballoon" hashtag="#awesomeplugins"]</code>' ); ?>
+                                    </p>
+                                    <p style="padding-top: 8px;"><b>Note:</b> To display a hashtag feed, it is required that you first connect an Instagram Business Profile using the <b>"Connect an Instagram Account"</b> button above. &nbsp;<a href="https://smashballoon.com/instagram-business-profiles/" target="_blank">Why is this required?</a>
+                                    </p>
+                                </div>
+                            </div>
+
+                        </div>
+
 						<div class="sbi_row sbi_pro">
 							<br>
 							<a class="sbi_tooltip_link sbi_pro" href="JavaScript:void(0);" style="margin-left: 0;"><i class="fa fa-question-circle" aria-hidden="true" style="margin-right: 6px;"></i><?php _e('Combine multiple feed types into a single feed', 'instagram-feed'); ?></a>
 							<p class="sbi_tooltip">
-								<b><?php _e( 'Please note: this is only available in the <a href="https://smashballoon.com/instagram-feed/?utm_source=plugin-free&utm_campaign=sbi" target="_blank">Pro version</a>', 'instagram-feed' ); ?>.</b><br />
+								<b><?php _e( 'Please note: this is only available in the <a href="https://smashballoon.com/instagram-feed/?utm_campaign=instagram-free&utm_source=settings&utm_medium=multipletypes" target="_blank">Pro version</a>', 'instagram-feed' ); ?>.</b><br />
 								<?php echo sprintf( __('To display multiple feed types in a single feed, use %s in your shortcode and then add each user name or hashtag of each feed into the shortcode, like so: %s. This will combine a user feed and a hashtag feed into the same feed.', 'instagram-feed'), 'type="mixed"', '<code>[instagram-feed type="mixed" user="smashballoon" hashtag="#awesomeplugins"]</code>' ); ?>
 							</p>
 						</div>
@@ -879,7 +957,7 @@ function sb_instagram_settings_page() {
                             <label for="sbi_caching_type_page"><?php _e( 'When the page loads', 'instagram-feed' ); ?></label>
                             <a class="sbi_tooltip_link" href="JavaScript:void(0);" style="position: relative; top: 2px;"><i class="fa fa-question-circle" aria-hidden="true"></i></a>
                             <p class="sbi_tooltip sbi-more-info"><?php _e( 'Your Instagram post data is temporarily cached by the plugin in your WordPress database. There are two ways that you can set the plugin to check for new data', 'instagram-feed' ); ?>:<br><br>
-	                            <?php _e( '<b>1. When the page loads</b><br>Selecting this option means that when the cache expires then the plugin will check Facebook for new posts the next time that the feed is loaded. You can choose how long this data should be cached for. If you set the time to 60 minutes then the plugin will clear the cached data after that length of time, and the next time the page is viewed it will check for new data. <b>Tip:</b> If you\'re experiencing an issue with the plugin not updating automatically then try enabling the setting labeled <b>\'Force cache to clear on interval\'</b> which is located on the \'Customize\' tab.', 'instagram-feed' ); ?>
+	                            <?php _e( '<b>1. When the page loads</b><br>Selecting this option means that when the cache expires then the plugin will check Instagram for new posts the next time that the feed is loaded. You can choose how long this data should be cached for. If you set the time to 60 minutes then the plugin will clear the cached data after that length of time, and the next time the page is viewed it will check for new data. <b>Tip:</b> If you\'re experiencing an issue with the plugin not updating automatically then try enabling the setting labeled <b>\'Force cache to clear on interval\'</b> which is located on the \'Customize\' tab.', 'instagram-feed' ); ?>
                                 <br><br>
 	                            <?php _e( '<b>2. In the background</b><br>Selecting this option means that the plugin will check for new data in the background so that the feed is updated behind the scenes. You can select at what time and how often the plugin should check for new data using the settings below. <b>Please note</b> that the plugin will initially check for data from Instagram when the page first loads, but then after that will check in the background on the schedule selected - unless the cache is cleared.</p>', 'instagram-feed' ); ?>
                         </div>
@@ -962,7 +1040,7 @@ function sb_instagram_settings_page() {
 
 		<p><i class="fa fa-chevron-circle-right" aria-hidden="true"></i>&nbsp; <?php _e('Next Step: <a href="?page=sb-instagram-feed&tab=customize">Customize your Feed</a>', 'instagram-feed'); ?></p>
 
-		<p><i class="fa fa-life-ring" aria-hidden="true"></i>&nbsp; <?php _e('Need help setting up the plugin? Check out our <a href="https://smashballoon.com/instagram-feed/free/?utm_source=plugin-free&utm_campaign=sbi" target="_blank">setup directions</a>', 'instagram-feed'); ?></p>
+		<p><i class="fa fa-life-ring" aria-hidden="true"></i>&nbsp; <?php _e('Need help setting up the plugin? Check out our <a href="https://smashballoon.com/instagram-feed/free/?utm_campaign=instagram-free&utm_source=supportpage&utm_medium=setupdirections" target="_blank">setup directions</a>', 'instagram-feed'); ?></p>
 
 
 		<?php } // End Configure tab ?>
@@ -1057,7 +1135,7 @@ function sb_instagram_settings_page() {
 							<?php endforeach; ?>
 
 							<p class="sbi_pro_tooltip"><?php _e('Upgrade to the Pro version to unlock these layouts', 'instagram-feed'); ?><i class="fa fa-caret-down" aria-hidden="true"></i></p>
-							<a href="https://smashballoon.com/instagram-feed/?utm_source=plugin-free&utm_campaign=sbi" target="_blank" class="sbi_lock"><i class="fa fa-rocket"></i><?php _e('Pro', 'instagram-feed'); ?></a>
+							<a href="https://smashballoon.com/instagram-feed/?utm_campaign=instagram-free&utm_source=settings&utm_medium=layouts" target="_blank" class="sbi_lock"><i class="fa fa-rocket"></i><?php _e('Pro', 'instagram-feed'); ?></a>
 
 						</div>
 						<div class="sb_layout_options_wrap sbi_pro">
@@ -1255,7 +1333,7 @@ function sb_instagram_settings_page() {
 
 			<div class="sbi-pro-options">
 				<p class="sbi-upgrade-link">
-					<i class="fa fa-rocket" aria-hidden="true"></i>&nbsp; <a href="https://smashballoon.com/instagram-feed/?utm_source=plugin-free&utm_campaign=sbi" target="_blank"><?php _e('Upgrade to Pro to enable these settings', 'instagram-feed'); ?></a>
+					<i class="fa fa-rocket" aria-hidden="true"></i>&nbsp; <a href="https://smashballoon.com/instagram-feed/?utm_campaign=instagram-free&utm_source=settings&utm_medium=general" target="_blank"><?php _e('Upgrade to Pro to enable these settings', 'instagram-feed'); ?></a>
 				</p>
 				<table class="form-table">
 					<tbody>
@@ -1282,7 +1360,7 @@ function sb_instagram_settings_page() {
 						<td>
 							<input type="checkbox" name="sb_instagram_captionlinks" id="sb_instagram_captionlinks" disabled />
 							&nbsp;<a class="sbi_tooltip_link sbi_pro" href="JavaScript:void(0);"><?php _e("What will this do?",'instagram-feed'); ?></a>
-							<p class="sbi_tooltip"><?php _e("Checking this box will change the link for each post to any url included in the caption for that Instagram post. The lightbox will be disabled. Visit <a href='https://smashballoon.com/make-a-shoppable-feed?utm_source=plugin-free&utm_campaign=sbi'>this link</a> to learn how this works.",'instagram-feed'); ?></p>
+							<p class="sbi_tooltip"><?php _e("Checking this box will change the link for each post to any url included in the caption for that Instagram post. The lightbox will be disabled. Visit <a href='https://smashballoon.com/make-a-shoppable-feed?utm_campaign=instagram-free&utm_source=settings&utm_medium=shoppable'>this link</a> to learn how this works.",'instagram-feed'); ?></p>
 						</td>
 					</tr>
 					</tbody>
@@ -1294,7 +1372,7 @@ function sb_instagram_settings_page() {
 			<h3><?php _e('Photo Hover Style','instagram-feed'); ?></h3>
 
 			<p style="padding-bottom: 18px;">
-				<a href="https://smashballoon.com/instagram-feed/?utm_source=plugin-free&utm_campaign=sbi" target="_blank"><?php _e('Upgrade to Pro to enable Photo Hover styles','instagram-feed'); ?></a><br />
+				<a href="https://smashballoon.com/instagram-feed/?utm_campaign=instagram-free&utm_source=settings&utm_medium=photohover" target="_blank"><?php _e('Upgrade to Pro to enable Photo Hover styles','instagram-feed'); ?></a><br />
 				<a href="javascript:void(0);" class="button button-secondary sbi-show-pro"><b>+</b> <?php _e('Show Pro Options','instagram-feed'); ?></a>
 			</p>
 
@@ -1355,7 +1433,7 @@ function sb_instagram_settings_page() {
 			<hr />
 			<h3><?php _e( 'Carousel', 'instagram-feed' ); ?></h3>
 			<p style="padding-bottom: 18px;">
-				<a href="https://smashballoon.com/instagram-feed/?utm_source=plugin-free&utm_campaign=sbi" target="_blank"><?php _e('Upgrade to Pro to enable Carousels', 'instagram-feed'); ?></a><br />
+				<a href="https://smashballoon.com/instagram-feed/?utm_campaign=instagram-free&utm_source=settings&utm_medium=carousel" target="_blank"><?php _e('Upgrade to Pro to enable Carousels', 'instagram-feed'); ?></a><br />
 				<a href="javascript:void(0);" class="button button-secondary sbi-show-pro"><b>+</b> <?php _e('Show Pro Options', 'instagram-feed'); ?></a>
 			</p>
 
@@ -1438,7 +1516,7 @@ function sb_instagram_settings_page() {
 
                                 <textarea type="text" name="sb_instagram_custom_bio" id="sb_instagram_custom_bio" ><?php echo esc_textarea( stripslashes( $sb_instagram_custom_bio ) ); ?></textarea>
                                 &nbsp;<a class="sbi_tooltip_link sbi_tooltip_under" href="JavaScript:void(0);"><?php _e("Why is my bio not displaying automatically?", 'instagram-feed'); ?></a>
-                                <p class="sbi_tooltip" style="padding: 10px 0 0 0; width: 99%;"><?php echo sprintf( __("Instagram is deprecating their old API for Personal accounts on March 31, 2020. The plugin supports their new API, however, their new API does not yet include the bio text for Personal accounts. If you require this feature then it is available if you convert your Instagram account from a Personal to a Business account by following %s. Note: If you previously had a Personal account connected then the plugin has saved the avatar for that feed and will continue to use it automatically.", 'instagram-feed'), '<a href="https://smashballoon.com/instagram-business-profiles/" target="_blank">these directions</a>' ); ?></p>
+                                <p class="sbi_tooltip" style="padding: 10px 0 0 0; width: 99%;"><?php echo sprintf( __("Instagram is deprecating their old API for Personal accounts on June 1, 2020. The plugin supports their new API, however, their new API does not yet include the bio text for Personal accounts. If you require this feature then it is available if you convert your Instagram account from a Personal to a Business account by following %s. Note: If you previously had a Personal account connected then the plugin has saved the avatar for that feed and will continue to use it automatically.", 'instagram-feed'), '<a href="https://smashballoon.com/instagram-business-profiles/" target="_blank">these directions</a>' ); ?></p>
                             </div>
                         </div>
 
@@ -1454,7 +1532,7 @@ function sb_instagram_settings_page() {
                         <br>
                         <a class="sbi_tooltip_link sbi_tooltip_under" href="JavaScript:void(0);"><?php _e("Why is my avatar not displaying automatically?", 'instagram-feed'); ?></a>
 
-                        <p class="sbi_tooltip sbi_tooltip_under_text" style="padding: 10px 0 0 0;"><?php echo sprintf( __("Instagram is deprecating their old API for Personal accounts on March 31, 2020. The plugin supports their new API, however, their new API does not yet include the avatar image for Personal accounts. If you require this feature then it is available if you convert your Instagram account from a Personal to a Business account by following %s. Note: If you previously had a Personal account connected then the plugin has saved the bio text for that feed and will continue to use it automatically.", 'instagram-feed'), '<a href="https://smashballoon.com/instagram-business-profiles/" target="_blank">these directions</a>' ); ?></p>
+                        <p class="sbi_tooltip sbi_tooltip_under_text" style="padding: 10px 0 0 0;"><?php echo sprintf( __("Instagram is deprecating their old API for Personal accounts on June 1, 2020. The plugin supports their new API, however, their new API does not yet include the avatar image for Personal accounts. If you require this feature then it is available if you convert your Instagram account from a Personal to a Business account by following %s. Note: If you previously had a Personal account connected then the plugin has saved the bio text for that feed and will continue to use it automatically.", 'instagram-feed'), '<a href="https://smashballoon.com/instagram-business-profiles/" target="_blank">these directions</a>' ); ?></p>
 
                     </td>
                 </tr>
@@ -1472,7 +1550,7 @@ function sb_instagram_settings_page() {
 
 			<div class="sbi-pro-options">
 				<p class="sbi-upgrade-link">
-					<i class="fa fa-rocket" aria-hidden="true"></i>&nbsp; <a href="https://smashballoon.com/instagram-feed/?utm_source=plugin-free&utm_campaign=sbi" target="_blank"><?php _e('Upgrade to Pro to enable these settings', 'instagram-feed'); ?></a>
+					<i class="fa fa-rocket" aria-hidden="true"></i>&nbsp; <a href="https://smashballoon.com/instagram-feed/?utm_campaign=instagram-free&utm_source=settings&utm_medium=header" target="_blank"><?php _e('Upgrade to Pro to enable these settings', 'instagram-feed'); ?></a>
 				</p>
 				<table class="form-table">
 					<tbody>
@@ -1503,7 +1581,7 @@ function sb_instagram_settings_page() {
 			<hr />
 			<h3><?php _e("Caption", 'instagram-feed'); ?></h3>
 			<p style="padding-bottom: 18px;">
-				<a href="https://smashballoon.com/instagram-feed/?utm_source=plugin-free&utm_campaign=sbi" target="_blank"><?php _e("Upgrade to Pro to enable Photo Captions", 'instagram-feed'); ?></a><br />
+				<a href="https://smashballoon.com/instagram-feed/?utm_campaign=instagram-free&utm_source=settings&utm_medium=caption" target="_blank"><?php _e("Upgrade to Pro to enable Photo Captions", 'instagram-feed'); ?></a><br />
 				<a href="javascript:void(0);" class="button button-secondary sbi-show-pro"><b>+</b> <?php _e("Show Pro Options", 'instagram-feed'); ?></a>
 			</p>
 
@@ -1559,7 +1637,7 @@ function sb_instagram_settings_page() {
 			<hr />
 			<h3><?php _e("Likes &amp; Comments", 'instagram-feed'); ?></h3>
 			<p style="padding-bottom: 18px;">
-				<a href="https://smashballoon.com/instagram-feed/?utm_source=plugin-free&utm_campaign=sbi" target="_blank"><?php _e("Upgrade to Pro to enable Likes &amp; Comments", 'instagram-feed'); ?></a><br />
+				<a href="https://smashballoon.com/instagram-feed/?utm_campaign=instagram-free&utm_source=settings&utm_medium=stats" target="_blank"><?php _e("Upgrade to Pro to enable Likes &amp; Comments", 'instagram-feed'); ?></a><br />
 				<a href="javascript:void(0);" class="button button-secondary sbi-show-pro"><b>+</b> <?php _e("Show Pro Options", 'instagram-feed'); ?></a>
 			</p>
 
@@ -1608,7 +1686,7 @@ function sb_instagram_settings_page() {
 			<h3><?php _e('Lightbox Comments', 'instagram-feed'); ?></h3>
 
 			<p style="padding-bottom: 18px;">
-				<a href="https://smashballoon.com/instagram-feed/?utm_source=plugin-free&utm_campaign=sbi" target="_blank"><?php _e('Upgrade to Pro to enable Comments', 'instagram-feed'); ?></a><br />
+				<a href="https://smashballoon.com/instagram-feed/?utm_campaign=instagram-free&utm_source=settings&utm_medium=comments" target="_blank"><?php _e('Upgrade to Pro to enable Comments', 'instagram-feed'); ?></a><br />
 				<a href="javascript:void(0);" class="button button-secondary sbi-show-pro"><b>+</b> <?php _e('Show Pro Options', 'instagram-feed'); ?></a>
 			</p>
 
@@ -1717,7 +1795,7 @@ function sb_instagram_settings_page() {
 			<h3><?php _e('Post Filtering', 'instagram-feed'); ?></h3>
 
 			<p style="padding-bottom: 18px;">
-				<a href="https://smashballoon.com/instagram-feed/?utm_source=plugin-free&utm_campaign=sbi" target="_blank"><?php _e('Upgrade to Pro to enable Post Filtering options', 'instagram-feed'); ?></a><br />
+				<a href="https://smashballoon.com/instagram-feed/?utm_campaign=instagram-free&utm_source=settings&utm_medium=filtering" target="_blank"><?php _e('Upgrade to Pro to enable Post Filtering options', 'instagram-feed'); ?></a><br />
 				<a href="javascript:void(0);" class="button button-secondary sbi-show-pro"><b>+</b> <?php _e('Show Pro Options', 'instagram-feed'); ?></a>
 			</p>
 
@@ -1767,7 +1845,7 @@ function sb_instagram_settings_page() {
 			<h3><?php _e('Moderation', 'instagram-feed'); ?></h3>
 
 			<p style="padding-bottom: 18px;">
-				<a href="https://smashballoon.com/instagram-feed/?utm_source=plugin-free&utm_campaign=sbi" target="_blank"><?php _e('Upgrade to Pro to enable Moderation options', 'instagram-feed'); ?></a><br />
+				<a href="https://smashballoon.com/instagram-feed/?utm_campaign=instagram-free&utm_source=settings&utm_medium=moderation" target="_blank"><?php _e('Upgrade to Pro to enable Moderation options', 'instagram-feed'); ?></a><br />
 				<a href="javascript:void(0);" class="button button-secondary sbi-show-pro"><b>+</b> <?php _e('Show Pro Options', 'instagram-feed'); ?></a>
 			</p>
 
@@ -1780,7 +1858,7 @@ function sb_instagram_settings_page() {
 							<input class="sb_instagram_moderation_mode" checked="checked" disabled type="radio" value="visual" style="margin-top: 0;" /><label><?php _e('Visual', 'instagram-feed'); ?></label>
 							<input class="sb_instagram_moderation_mode" disabled type="radio" value="manual" style="margin-top: 0; margin-left: 10px;"/><label><?php _e('Manual', 'instagram-feed'); ?></label>
 
-							<p class="sbi_tooltip" style="display: block;"><?php _e("<b>Visual Moderation Mode</b><br />This adds a button to each feed that will allow you to hide posts, block users, and create white lists from the front end using a visual interface. Visit <a href='https://smashballoon.com/guide-to-moderation-mode/?utm_source=plugin-free&utm_campaign=sbi' target='_blank'>this page</a> for details", 'instagram-feed'); ?></p>
+							<p class="sbi_tooltip" style="display: block;"><?php _e("<b>Visual Moderation Mode</b><br />This adds a button to each feed that will allow you to hide posts, block users, and create white lists from the front end using a visual interface. Visit <a href='https://smashballoon.com/guide-to-moderation-mode/?utm_campaign=instagram-free&utm_source=settings&utm_medium=moderationmode' target='_blank'>this page</a> for details", 'instagram-feed'); ?></p>
 
 						</td>
 					</tr>
@@ -1972,6 +2050,103 @@ function sb_instagram_settings_page() {
                         <p class="sbi_tooltip"><?php _e("The default HTML for the feed can be replaced with custom templates added to your theme's folder. Enable this setting to use these templates. See <a href=\"https://smashballoon.com/guide-to-creating-custom-templates/\" target=\"_blank\">this guide</a>", 'instagram-feed'); ?></p>
                     </td>
                 </tr>
+                <tr>
+                    <th class="bump-left"><label class="bump-left"><?php _e("Disable Admin Error Notice", 'instagram-feed'); ?></label></th>
+                    <td>
+                        <input name="sb_instagram_disable_admin_notice" type="checkbox" id="sb_instagram_disable_admin_notice" <?php if($sb_instagram_disable_admin_notice == true) echo "checked"; ?> />
+                        <label for="sb_instagram_disable_admin_notice"><?php _e('Yes', 'instagram-feed'); ?></label>
+                        <a class="sbi_tooltip_link" href="JavaScript:void(0);"><?php _e('What does this mean?', 'instagram-feed'); ?></a>
+                        <p class="sbi_tooltip"><?php _e("This will permanently disable the feed error notice that displays in the bottom right corner for admins on the front end of your site.", 'instagram-feed'); ?></p>
+                    </td>
+                </tr>
+                <tr>
+                    <th class="bump-left"><label class="bump-left"><?php _e("Feed Issue Email Report", 'instagram-feed'); ?></label></th>
+                    <td>
+                        <input name="sb_instagram_enable_email_report" type="checkbox" id="sb_instagram_enable_email_report" <?php if($sb_instagram_enable_email_report == 'on') echo "checked"; ?> />
+                        <label for="sb_instagram_enable_email_report"><?php _e('Yes', 'instagram-feed'); ?></label>
+                        <a class="sbi_tooltip_link" href="JavaScript:void(0);"><?php _e('What does this mean?', 'instagram-feed'); ?></a>
+                        <p class="sbi_tooltip"><?php _e("Instagram Feed will send a weekly notification email using your site's wp_mail() function if one or more of your feeds is not updating or is not displaying. If you're not receiving the emails in your inbox, you may need to configure an SMTP service using another plugin like WP Mail SMTP.", 'instagram-feed'); ?></p>
+
+                        <div class="sb_instagram_box" style="display: block;">
+                            <div class="sb_instagram_box_setting">
+                                <label><?php _e('Schedule Weekly on', 'instagram-feed'); ?></label><br>
+								<?php
+								$schedule_options = array(
+									array(
+										'val' => 'monday',
+										'label' => __( 'Monday', 'instagram-feed' )
+									),
+									array(
+										'val' => 'tuesday',
+										'label' => __( 'Tuesday', 'instagram-feed' )
+									),
+									array(
+										'val' => 'wednesday',
+										'label' => __( 'Wednesday', 'instagram-feed' )
+									),
+									array(
+										'val' => 'thursday',
+										'label' => __( 'Thursday', 'instagram-feed' )
+									),
+									array(
+										'val' => 'friday',
+										'label' => __( 'Friday', 'instagram-feed' )
+									),
+									array(
+										'val' => 'saturday',
+										'label' => __( 'Saturday', 'instagram-feed' )
+									),
+									array(
+										'val' => 'sunday',
+										'label' => __( 'Sunday', 'instagram-feed' )
+									),
+								);
+
+								if ( isset( $_GET['flag'] ) ){
+									echo '<span id="sbi-goto"></span>';
+								}
+								?>
+                                <select name="sb_instagram_email_notification" id="sb_instagram_email_notification">
+									<?php foreach ( $schedule_options as $schedule_option ) : ?>
+                                        <option value="<?php echo esc_attr( $schedule_option['val'] ) ; ?>" <?php if ( $schedule_option['val'] === $sb_instagram_email_notification ) { echo 'selected';} ?>><?php echo esc_html( $schedule_option['label'] ) ; ?></option>
+									<?php endforeach; ?>
+                                </select>
+                            </div>
+                            <div class="sb_instagram_box_setting">
+                                <label><?php _e('Email Recipients', 'instagram-feed'); ?></label><br><input class="regular-text" type="text" name="sb_instagram_email_notification_addresses" value="<?php echo esc_attr( $sb_instagram_email_notification_addresses ); ?>"><span class="sbi_note"><?php _e('separate multiple emails with commas', 'instagram-feed'); ?></span>
+                                <br><br><?php _e( 'Emails not working?', 'instagram-feed' ) ?> <a href="https://smashballoon.com/email-report-is-not-in-my-inbox/" target="_blank"><?php _e( 'See our related FAQ', 'instagram-feed' ) ?></a>
+                            </div>
+                        </div>
+
+                    </td>
+                </tr>
+				<?php
+				$usage_tracking = get_option( 'sbi_usage_tracking', false );
+				if ( $usage_tracking !== false ) :
+
+				if ( isset( $_POST['sb_instagram_enable_email_report'] ) ) {
+					$usage_tracking['enabled'] = false;
+					if ( isset( $_POST['sbi_usage_tracking_enable'] ) ) {
+						$usage_tracking['enabled'] = true;
+					}
+					update_option( 'sbi_usage_tracking', $usage_tracking, false );
+				}
+				$sbi_usage_tracking_enable = isset( $usage_tracking['enabled'] ) ? $usage_tracking['enabled'] : true;
+
+				// only show this setting after they have opted in or opted out using the admin notice
+				?>
+                <tr>
+
+                    <th class="bump-left"><label class="bump-left"><?php _e("Enable Usage Tracking", 'instagram-feed'); ?></label></th>
+                    <td>
+                        <input name="sbi_usage_tracking_enable" type="checkbox" id="sbi_usage_tracking_enable" <?php if( $sbi_usage_tracking_enable ) echo "checked"; ?> />
+                        <label for="sbi_usage_tracking_enable"><?php _e('Yes', 'instagram-feed'); ?></label>
+                        <a class="sbi_tooltip_link" href="JavaScript:void(0);"><?php _e('What is usage tracking?', 'instagram-feed'); ?></a>
+                        <p class="sbi_tooltip"><?php _e("Instagram Feed will record information and statistics about your site in order for the team at Smash Balloon to learn more about how our plugins are used. The plugin will never collect any sensitive information like access tokens, email addresses, or user information.", 'instagram-feed'); ?></p>
+                    </td>
+                </tr>
+                <?php endif; ?>
+
                 </tbody>
 			</table>
 
@@ -1981,7 +2156,7 @@ function sb_instagram_settings_page() {
 
 			<p><i class="fa fa-chevron-circle-right" aria-hidden="true"></i>&nbsp; <?php _e('Next Step: <a href="?page=sb-instagram-feed&tab=display">Display your Feed</a>', 'instagram-feed'); ?></p>
 
-			<p><i class="fa fa-life-ring" aria-hidden="true"></i>&nbsp; <?php _e('Need help setting up the plugin? Check out our <a href="https://smashballoon.com/instagram-feed/free/?utm_source=plugin-free&utm_campaign=sbi" target="_blank">setup directions</a>', 'instagram-feed'); ?></p>
+			<p><i class="fa fa-life-ring" aria-hidden="true"></i>&nbsp; <?php _e('Need help setting up the plugin? Check out our <a href="https://smashballoon.com/instagram-feed/free/?utm_campaign=instagram-free&utm_source=settings&utm_medium=display" target="_blank">setup directions</a>', 'instagram-feed'); ?></p>
 
 
 		<?php } //End Customize tab ?>
@@ -2366,7 +2541,7 @@ function sb_instagram_settings_page() {
 				</tbody>
 			</table>
 
-			<p><i class="fa fa-life-ring" aria-hidden="true"></i>&nbsp; <?php _e('Need help setting up the plugin? Check out our <a href="https://smashballoon.com/instagram-feed/free/?utm_source=plugin-free&utm_campaign=sbi" target="_blank">setup directions</a>', 'instagram-feed'); ?></p>
+			<p><i class="fa fa-life-ring" aria-hidden="true"></i>&nbsp; <?php _e('Need help setting up the plugin? Check out our <a href="https://smashballoon.com/instagram-feed/free/?utm_campaign=instagram-free&utm_source=display&utm_medium=supportsetup" target="_blank">setup directions</a>', 'instagram-feed'); ?></p>
 
 		<?php } //End Display tab ?>
 
@@ -2380,7 +2555,7 @@ function sb_instagram_settings_page() {
 
 				<p>
 			    <span class="sbi-support-title"><i class="fa fa-life-ring" aria-hidden="true"></i>&nbsp; <a
-					    href="https://smashballoon.com/instagram-feed/free/?utm_source=plugin-free&utm_campaign=sbi"
+					    href="https://smashballoon.com/instagram-feed/free/?utm_campaign=instagram-free&utm_source=settings&utm_medium=general"
 					    target="_blank"><?php _e( 'Setup Directions', 'instagram-feed' ); ?></a></span>
 					<?php _e( 'A step-by-step guide on how to setup and use the plugin.', 'instagram-feed' ); ?>
 				</p>
@@ -2389,7 +2564,7 @@ function sb_instagram_settings_page() {
 			    <span class="sbi-support-title"><i class="fa fa-youtube-play" aria-hidden="true"></i>&nbsp; <a
 					    href="https://www.youtube.com/embed/q6ZXVU4g970" target="_blank"
 					    id="sbi-play-support-video"><?php _e( 'Watch a Video', 'instagram-feed' ); ?></a></span>
-					<?php _e( "Watch a short video demonstrating how to set up, customize and use the plugin.<br /><b>Please note</b> that the video shows the set up and use of the <b><a href='https://smashballoon.com/instagram-feed/?utm_source=plugin-free&utm_campaign=sbi' target='_blank'>Pro version</a></b> of the plugin, but the process is the same for this free version. The only difference is some of the features available.", 'instagram-feed' ); ?>
+					<?php _e( "Watch a short video demonstrating how to set up, customize and use the plugin.<br /><b>Please note</b> that the video shows the set up and use of the <b><a href='https://smashballoon.com/instagram-feed/?utm_campaign=instagram-free&utm_source=settings&utm_medium=general' target='_blank'>Pro version</a></b> of the plugin, but the process is the same for this free version. The only difference is some of the features available.", 'instagram-feed' ); ?>
 
 					<iframe id="sbi-support-video"
 					        src="//www.youtube.com/embed/q6ZXVU4g970?theme=light&amp;showinfo=0&amp;controls=2" width="960"
@@ -2398,7 +2573,7 @@ function sb_instagram_settings_page() {
 
 				<p>
 			    <span class="sbi-support-title"><i class="fa fa-question-circle" aria-hidden="true"></i>&nbsp; <a
-					    href="https://smashballoon.com/instagram-feed/support/faq/?utm_source=plugin-free&utm_campaign=sbi"
+					    href="https://smashballoon.com/instagram-feed/support/faq/?utm_campaign=instagram-free&utm_source=support&utm_medium=faqs"
 					    target="_blank"><?php _e( 'FAQs and Docs', 'instagram-feed' ); ?></a></span>
 					<?php _e( 'View our expansive library of FAQs and documentation to help solve your problem as quickly as possible.', 'instagram-feed' ); ?>
 				</p>
@@ -2407,22 +2582,22 @@ function sb_instagram_settings_page() {
 
 					<ul>
 						<li><b><?php _e( 'FAQs', 'instagram-feed' ); ?></b></li>
-						<li>&bull;&nbsp; <?php _e( '<a href="https://smashballoon.com/my-photos-wont-load/?utm_source=plugin-free&utm_campaign=sbi" target="_blank">My Instagram Feed Won\'t Load</a>', 'instagram-feed' ); ?></li>
-						<li>&bull;&nbsp; <?php _e( '<a href="https://smashballoon.com/my-instagram-access-token-keep-expiring/?utm_source=plugin-free&utm_campaign=sbi" target="_blank">My Access Token Keeps Expiring</a>', 'instagram-feed' ); ?></li>
-						<li style="margin-top: 8px; font-size: 12px;"><a href="https://smashballoon.com/instagram-feed/support/faq/?utm_source=plugin-free&utm_campaign=sbi" target="_blank"><?php _e( 'See All', 'instagram-feed' ); ?><i class="fa fa-chevron-right" aria-hidden="true"></i></a></li>
+						<li>&bull;&nbsp; <?php _e( '<a href="https://smashballoon.com/my-photos-wont-load/?utm_campaign=instagram-free&utm_source=support&utm_medium=faqsnophotos" target="_blank">My Instagram Feed Won\'t Load</a>', 'instagram-feed' ); ?></li>
+						<li>&bull;&nbsp; <?php _e( '<a href="https://smashballoon.com/my-instagram-access-token-keep-expiring/?utm_campaign=instagram-free&utm_source=support&utm_medium=faqsexpiring" target="_blank">My Access Token Keeps Expiring</a>', 'instagram-feed' ); ?></li>
+						<li style="margin-top: 8px; font-size: 12px;"><a href="https://smashballoon.com/instagram-feed/support/faq/?utm_campaign=instagram-free&utm_source=support&utm_medium=faqs" target="_blank"><?php _e( 'See All', 'instagram-feed' ); ?><i class="fa fa-chevron-right" aria-hidden="true"></i></a></li>
 					</ul>
 
 					<ul>
 						<li><b><?php _e("Documentation", 'instagram-feed'); ?></b></li>
-						<li>&bull;&nbsp; <?php _e( '<a href="https://smashballoon.com/instagram-feed/free?utm_source=plugin-free&utm_campaign=sbi" target="_blank">Installation and Configuration</a>', 'instagram-feed' ); ?></li>
-						<li>&bull;&nbsp; <?php _e( '<a href="https://smashballoon.com/display-multiple-instagram-feeds/?utm_source=plugin-free&utm_campaign=sbi" target="_blank">Displaying multiple feeds</a>', 'instagram-feed' ); ?></li>
-						<li>&bull;&nbsp; <?php _e( '<a href="https://smashballoon.com/instagram-feed-faq/customization/?utm_source=plugin-free&utm_campaign=sbi" target="_blank">Customizing your Feed</a>', 'instagram-feed' ); ?></li>
+						<li>&bull;&nbsp; <?php _e( '<a href="https://smashballoon.com/instagram-feed/free?utm_campaign=instagram-free&utm_source=support&utm_medium=installation" target="_blank">Installation and Configuration</a>', 'instagram-feed' ); ?></li>
+						<li>&bull;&nbsp; <?php _e( '<a href="https://smashballoon.com/display-multiple-instagram-feeds/?utm_campaign=instagram-free&utm_source=support&utm_medium=multiple" target="_blank">Displaying multiple feeds</a>', 'instagram-feed' ); ?></li>
+						<li>&bull;&nbsp; <?php _e( '<a href="https://smashballoon.com/instagram-feed-faq/customization/?utm_campaign=instagram-free&utm_source=support&utm_medium=customizing" target="_blank">Customizing your Feed</a>', 'instagram-feed' ); ?></li>
 					</ul>
 				</div>
 
 				<p>
 			    <span class="sbi-support-title"><i class="fa fa-envelope" aria-hidden="true"></i>&nbsp; <a
-					    href="https://smashballoon.com/instagram-feed/support/?utm_source=plugin-free&utm_campaign=sbi"
+					    href="https://smashballoon.com/instagram-feed/support/?utm_campaign=instagram-free&utm_source=support&utm_medium=contact"
 					    target="_blank"><?php _e( 'Request Support', 'instagram-feed' ); ?></a></span>
 					<?php _e( 'Still need help? Submit a ticket and one of our support experts will get back to you as soon as possible.<br /><b>Important:</b> Please include your <b>System Info</b> below with all support requests.', 'instagram-feed' ); ?>
 				</p>
@@ -2686,9 +2861,15 @@ if ( ! empty( $errors ) ) :
 		echo $type . ': ' . $error[1] . "\n";
 	endforeach;
 endif;
+$error_page = $sb_instagram_posts_manager->get_error_page();
+if ( $error_page ) {
+	echo 'Feed with error: ' . esc_url( get_the_permalink( $error_page ) ). "\n";
+}
 $ajax_statuses = $sb_instagram_posts_manager->get_ajax_status();
 if ( ! $ajax_statuses['successful'] ) {
+	?>
 ## AJAX Status ##
+	<?php
 	echo 'test not successful';
 }
 ?>
@@ -2706,7 +2887,7 @@ if ( ! $ajax_statuses['successful'] ) {
 			<p><?php _e('Find out how to display <a href="?page=sb-instagram-feed&amp;tab=display">multiple feeds</a>.', 'instagram-feed'); ?></p>
 		</div>
 
-		<a href="https://smashballoon.com/instagram-feed/demo/?utm_source=plugin-free&utm_campaign=sbi" target="_blank" class="sbi-pro-notice">
+		<a href="https://smashballoon.com/instagram-feed/demo/?utm_campaign=instagram-free&utm_source=footer&utm_medium=ad" target="_blank" class="sbi-pro-notice">
 			<img src="<?php echo SBI_PLUGIN_URL . 'img/instagram-pro-promo.png?2019'; ?>" alt="<?php esc_attr_e( 'Instagram Feed Pro', 'instagram-feed' ); ?>">
 		</a>
 

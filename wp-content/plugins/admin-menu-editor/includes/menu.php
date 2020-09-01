@@ -3,6 +3,8 @@ abstract class ameMenu {
 	const format_name = 'Admin Menu Editor menu';
 	const format_version = '7.0';
 
+	protected static $custom_loaders = array();
+
 	/**
 	 * Load an admin menu from a JSON string.
 	 *
@@ -40,7 +42,7 @@ abstract class ameMenu {
 				$compared = version_compare($arr['format']['version'], self::format_version);
 				if ( $compared > 0 ) {
 					throw new InvalidMenuException(sprintf(
-						"Can't load a menu created by a newer version of the plugin. Menu format: '%s', newest supported format: '%s'.",
+						"Can't load a menu created by a newer version of the plugin. Menu format: '%s', newest supported format: '%s'. Try updating the plugin.",
 						$arr['format']['version'],
 						self::format_version
 					));
@@ -99,7 +101,7 @@ abstract class ameMenu {
 				$is_valid_preset = true;
 				foreach($preset as $property => $color) {
 					//Note: It would good to check $property against a list of known color names.
-					if ( !is_string($property) || !is_string($color) || !preg_match('/^\#[0-9a-f]{6}$/i', $color) ) {
+					if ( !is_string($property) || !is_string($color) || !preg_match('/^#[0-9a-f]{6}$/i', $color) ) {
 						$is_valid_preset = false;
 						break;
 					}
@@ -158,6 +160,10 @@ abstract class ameMenu {
 			$menu['prebuilt_virtual_caps'] = $arr['prebuilt_virtual_caps'];
 		}
 
+		foreach(self::$custom_loaders as $callback) {
+			$menu = call_user_func($callback, $menu, $arr);
+		}
+
 		return $menu;
 	}
 
@@ -206,7 +212,21 @@ abstract class ameMenu {
 	 */
 	public static function to_json($menu) {
 		$menu = self::add_format_header($menu);
-		return json_encode($menu);
+		$result = json_encode($menu);
+		if ( !is_string($result) ) {
+			$message = sprintf(
+				'Failed to encode the menu configuration as JSON. json_encode returned a %s.',
+				gettype($result)
+			);
+			if ( function_exists('json_last_error') ) {
+				$message .= sprintf(' JSON error code: %d.', json_last_error());
+			}
+			if ( function_exists('json_last_error_msg') ) {
+				$message .= sprintf(' JSON error message: %s', json_last_error_msg());
+			}
+			throw new RuntimeException($message);
+		}
+		return $result;
 	}
 
   /**
@@ -497,11 +517,24 @@ abstract class ameMenu {
 			}
 		}
 	}
+
+	/**
+	 * @param callable $callback
+	 */
+	public static function add_custom_loader($callback) {
+		self::$custom_loaders[] = $callback;
+	}
 }
 
 class ameGrantedCapabilityFilter {
-	private $post_types = array();
-	private $taxonomies = array();
+	/**
+	 * @var string[]
+	 */
+	private $post_types;
+	/**
+	 * @var string[]
+	 */
+	private $taxonomies;
 
 	public function __construct() {
 		$this->post_types = get_post_types(array('public' => true, 'show_ui' => true), 'names', 'or');
@@ -567,4 +600,4 @@ class ameModifiedIconDetector {
 
 class InvalidMenuException extends Exception {}
 
-class ameInvalidJsonException extends RuntimeException {};
+class ameInvalidJsonException extends RuntimeException {}

@@ -179,14 +179,82 @@ class ConstantContact_Notification_Content {
 	public static function exceptions() {
 		return sprintf(
 			/* Translators: placeholders will be html `<a>` links. */
-			esc_html__( 'Constant Contact Forms has experienced issues that may need addressed and functionality may be missing. Please enable the "Support" checkbox in the %1$sConstant Contact settings%2$s and start a %3$sforum support thread%4$s. Our support team will aid with further steps.', 'constant-contact-forms' ),
+			esc_html__( 'Constant Contact Forms has experienced issues that may need addressed and functionality may be missing. Please enable the "Support" checkbox under the Support tab in %1$sConstant Contact settings%2$s and start a %3$sforum support thread%4$s. Our support team will aid with further steps.', 'constant-contact-forms' ),
 			sprintf( '<a href="%s">', esc_url( admin_url( 'edit.php?post_type=ctct_forms&page=ctct_options_settings' ) ) ),
 			'</a>',
-			sprintf( '<a href="%s" target="_blank">', esc_url( 'https://wordpress.org/support/topic/constant-contact-forms-has-experienced-issues-that-need-addressed-admin-notice/ ' ) ),
+			sprintf( '<a href="%s" target="_blank">', esc_url( 'https://wordpress.org/support/topic/constant-contact-forms-has-experienced-issues-that-need-addressed-admin-notice/' ) ),
 			'</a>'
 		);
 	}
 
+	/**
+	 * Admin notice regarding deleted forms.
+	 *
+	 * @since  1.8.0
+	 *
+	 * @return string Deleted forms notice HTML.
+	 */
+	public static function deleted_forms() {
+		$option = get_option( ConstantContact_Notifications::$deleted_forms, [] );
+
+		ob_start();
+		?>
+		<div class="admin-notice-message">
+			<p><?php esc_html_e( 'References to one or more deleted Constant Contact forms are still present on your site. Please review the list below and update or remove the references to avoid issues on your site:', 'constant-contact-forms' ); ?></p>
+			<ul>
+				<?php foreach ( $option as $form_id => $references ) { ?>
+					<li><?php self::display_deleted_form_reference_markup( $form_id, $references ); ?></li>
+				<?php } ?>
+			</ul>
+		</div>
+		<?php
+		return ob_get_clean();
+	}
+
+	/**
+	 * Display deleted form references HTML.
+	 *
+	 * @since  1.8.0
+	 *
+	 * @param  int   $form_id    Current form ID.
+	 * @param  array $references Current form references.
+	 */
+	protected static function display_deleted_form_reference_markup( $form_id, array $references ) {
+		printf(
+			/* Translators: 1: label for form ID, 2: form ID, 3: references to specified form. */
+			'%1$s #%2$d: ',
+			esc_html__( 'Form', 'constant-contact-forms' ),
+			esc_html( $form_id )
+		);
+
+		$reference_keys = array_keys( $references );
+		$last_key = array_pop( $reference_keys );
+
+		array_walk( $references, function( $value, $key, $last_key ) {
+			if ( 'post' === $value['type'] ) {
+				printf(
+					/* Translators: 1: URL to edit screen for current post, 2: post type singular label, 3: current post ID, 4: separator between links. */
+					'<a href="%1$s">%2$s #%3$d</a>%4$s',
+					esc_url( $value['url'] ),
+					esc_html( $value['label'] ),
+					esc_html( $value['id'] ),
+					esc_html( $key === $last_key ? '' : ', ' )
+				);
+			} else if ( 'widget' === $value['type'] ) {
+				printf(
+					/* Translators: 1: URL to widgets admin screen, 2: current widget name, 3: generic widget text, 4: current widget title, 5: preposition, 6: specific sidebar name, 7: separator between links. */
+					'<a href="%1$s">%2$s %3$s "%4$s" %5$s %6$s</a>%7$s',
+					esc_url( $value['url'] ),
+					esc_html( $value['name'] ),
+					esc_html__( 'Widget titled', 'constant-contact-forms' ),
+					esc_html( $value['title'] ),
+					esc_html__( 'in', 'constant-contact-forms' ),
+					esc_html( $value['sidebar'] ),
+					esc_html( $key === $last_key ? '' : ', ' )
+				);
+			}
+		}, $last_key );
+	}
 }
 
 /**
@@ -269,3 +337,22 @@ function constant_contact_exceptions_thrown( $notifications = [] ) {
 }
 
 add_filter( 'constant_contact_notifications', 'constant_contact_exceptions_thrown' );
+
+/**
+ * Add notification on form deletion if instances of that form appear as shortcodes or widgets.
+ *
+ * @since  1.8.0
+ *
+ * @param  array $notifications Array of notifications to be shown.
+ * @return array                Array of notifications to be shown.
+ */
+function constant_contact_form_deleted( array $notifications = [] ) {
+	$notifications[] = [
+		'ID'         => 'deleted_forms',
+		'callback'   => [ 'ConstantContact_Notification_Content', 'deleted_forms' ],
+		'require_cb' => 'constant_contact_maybe_display_deleted_forms_notice',
+	];
+
+	return $notifications;
+}
+add_filter( 'constant_contact_notifications', 'constant_contact_form_deleted' );

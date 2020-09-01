@@ -12,7 +12,7 @@
  * Plugin Name: Constant Contact Forms for WordPress
  * Plugin URI:  https://www.constantcontact.com
  * Description: Be a better marketer. All it takes is Constant Contact email marketing.
- * Version:     1.6.1
+ * Version:     1.8.7
  * Author:      Constant Contact
  * Author URI:  https://www.constantcontact.com/index?pn=miwordpress
  * License:     GPLv3
@@ -72,7 +72,7 @@ class Constant_Contact {
 	 * @since 1.0.0
 	 * @var string
 	 */
-	const VERSION = '1.6.1';
+	const VERSION = '1.8.7';
 
 	/**
 	 * URL of plugin directory.
@@ -376,7 +376,6 @@ class Constant_Contact {
 		$this->basename        = plugin_basename( __FILE__ );
 		$this->url             = plugin_dir_url( __FILE__ );
 		$this->path            = plugin_dir_path( __FILE__ );
-		$this->logger_location = WP_CONTENT_DIR . '/ctct-logs/constant-contact-errors.log';
 
 		if ( ! $this->meets_php_requirements() ) {
 			add_action( 'admin_notices', array( $this, 'minimum_version' ) );
@@ -386,6 +385,9 @@ class Constant_Contact {
 		// Load our plugin and our libraries.
 		$this->plugin_classes();
 		$this->admin_plugin_classes();
+
+		// Set logging location.
+		$this->logger_location = $this->logging->get_logging_location();
 
 		// Include our helper functions function for end-users.
 		self::include_file( 'helper-functions', false );
@@ -520,7 +522,7 @@ class Constant_Contact {
 	 * @return bool
 	 */
 	public function meets_php_requirements() {
-		return version_compare( PHP_VERSION, '5.4.0', '>=' );
+		return version_compare( PHP_VERSION, '5.6.0', '>=' );
 	}
 
 	/**
@@ -530,6 +532,24 @@ class Constant_Contact {
 	 */
 	public function init() {
 		load_plugin_textdomain( 'constant-contact-forms', false, dirname( $this->basename ) . '/languages/' );
+		$this->init_debug_log();
+	}
+
+	/**
+	 * Initialize debug log on init.
+	 *
+	 * @since 1.8.5
+	 *
+	 * @return void
+	 */
+	protected function init_debug_log() {
+
+		if ( ! constant_contact_debugging_enabled() ) {
+			return;
+		}
+
+		// Create logging file and directory.
+		$this->logging->initialize_logging();
 	}
 
 	/**
@@ -819,16 +839,3 @@ function constant_contact_uninstall() {
 	$instance = Constant_Contact::get_instance();
 	$instance->uninstall();
 }
-
-/**
- * Modify our shortcode-button assets url without having to touch vendor folder.
- *
- * @since 1.5.3
- *
- * @param string $url Assets url for shortcode-button library.
- * @return string
- */
-function ctct_shortcode_button_assets_url( $url ) {
-	return plugin_dir_url( __FILE__ ) . 'vendor/jtsternberg/shortcode-button/';
-}
-add_filter( 'shortcode_button_assets_url', 'ctct_shortcode_button_assets_url' );

@@ -8,7 +8,7 @@ namespace The_SEO_Framework\Builders;
 
 /**
  * The SEO Framework plugin
- * Copyright (C) 2019 Sybre Waaijer, CyberWire (https://cyberwire.nl/)
+ * Copyright (C) 2019 - 2020 Sybre Waaijer, CyberWire (https://cyberwire.nl/)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as published
@@ -63,13 +63,14 @@ abstract class Sitemap {
 	 * Prepares sitemap generation by raising the memory limit and fixing the timezone.
 	 *
 	 * @since 4.0.0
+	 * @since 4.0.4 Now sets timezone to UTC to fix WP 5.3 bug <https://core.trac.wordpress.org/ticket/48623>
 	 */
 	final public function prepare_generation() {
 
 		\wp_raise_memory_limit( 'sitemap' );
 
 		// Set timezone according to settings.
-		static::$tsf->set_timezone();
+		static::$tsf->set_timezone( 'UTC' );
 	}
 
 	/**
@@ -131,7 +132,13 @@ abstract class Sitemap {
 
 		// ROBOTS_IGNORE_PROTECTION as we don't need to test 'private' (because of sole 'publish'), and 'password' (because of false 'has_password')
 		return ! isset( $excluded[ $post_id ] )
-			&& ! static::$tsf->is_robots_meta_noindex_set_by_args( [ 'id' => $post_id ], \The_SEO_Framework\ROBOTS_IGNORE_PROTECTION );
+			&& ! static::$tsf->is_robots_meta_noindex_set_by_args(
+				[
+					'id'       => $post_id,
+					'taxonomy' => '',
+				],
+				\The_SEO_Framework\ROBOTS_IGNORE_PROTECTION
+			);
 	}
 
 	/**

@@ -8,7 +8,7 @@
 
 /**
  * The SEO Framework plugin
- * Copyright (C) 2019 Sybre Waaijer, CyberWire (https://cyberwire.nl/)
+ * Copyright (C) 2019 - 2020 Sybre Waaijer, CyberWire (https://cyberwire.nl/)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as published
@@ -293,7 +293,7 @@ window.tsfAys = function( $ ) {
 			'click'
 		);
 
-		$( document ).trigger( 'tsf-registered-ays-listeners' );
+		document.dispatchEvent( new CustomEvent( 'tsf-registered-ays-listeners' ) );
 
 		_loadedListeners = true;
 	}
@@ -336,7 +336,7 @@ window.tsfAys = function( $ ) {
 		 * @return {undefined}
 		 */
 		load: () => {
-			$( document.body ).on( 'tsf-ready', _readyAys );
+			document.body.addEventListener( 'tsf-ready', _readyAys );
 		}
 	}, {
 		reset,
@@ -351,4 +351,4 @@ window.tsfAys = function( $ ) {
 		l10n
 	} );
 }( jQuery );
-jQuery( window.tsfAys.load );
+window.tsfAys.load();

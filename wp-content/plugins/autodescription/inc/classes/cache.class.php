@@ -10,7 +10,7 @@ defined( 'THE_SEO_FRAMEWORK_PRESENT' ) or die;
 
 /**
  * The SEO Framework plugin
- * Copyright (C) 2015 - 2019 Sybre Waaijer, CyberWire (https://cyberwire.nl/)
+ * Copyright (C) 2015 - 2020 Sybre Waaijer, CyberWire (https://cyberwire.nl/)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as published
@@ -33,18 +33,6 @@ defined( 'THE_SEO_FRAMEWORK_PRESENT' ) or die;
  * @since 2.8.0
  */
 class Cache extends Site_Options {
-
-	/**
-	 * Determines whether object cache is being used.
-	 *
-	 * @since 2.8.0
-	 * @see $this->use_object_cache
-	 *
-	 * @return bool
-	 */
-	protected function use_object_cache() {
-		return \wp_using_ext_object_cache() && $this->get_option( 'cache_object' );
-	}
 
 	/**
 	 * Initializes admin caching actions.
@@ -200,6 +188,7 @@ class Cache extends Site_Options {
 	 * @since 2.8.0
 	 * @since 2.9.3 $type = 'front' now also returns true.
 	 * @since 3.1.0 Added action.
+	 * @since 4.0.5 Removed all JSON-LD transient clear calls.
 	 *
 	 * @param string $type The type
 	 * @param int    $id The post, page or TT ID. Defaults to $this->get_the_real_ID().
@@ -217,7 +206,6 @@ class Cache extends Site_Options {
 				$front_id = $this->get_the_front_page_ID();
 
 				$this->object_cache_delete( $this->get_meta_output_cache_key_by_type( $front_id, '', 'frontpage' ) );
-				$this->delete_ld_json_transient( $front_id, '', 'frontpage' );
 				$success = true;
 				break;
 
@@ -238,7 +226,6 @@ class Cache extends Site_Options {
 					}
 
 					$this->object_cache_delete( $this->get_meta_output_cache_key_by_type( $id, '', $post_type ) );
-					$this->delete_ld_json_transient( $id, '', $post_type );
 					$success = true;
 				}
 				break;
@@ -246,13 +233,11 @@ class Cache extends Site_Options {
 			//* Careful, this can only run on archive pages. For now.
 			case 'term':
 				$this->object_cache_delete( $this->get_meta_output_cache_key_by_type( $id, $args['term'], 'term' ) );
-				$this->delete_ld_json_transient( $id, $args['term'], 'term' );
 				$success = true;
 				break;
 
 			case 'author':
 				$this->object_cache_delete( $this->get_meta_output_cache_key_by_type( $id, 'author', 'author' ) );
-				$this->delete_ld_json_transient( $id, 'author', 'author' );
 				$success = true;
 				break;
 
@@ -412,7 +397,7 @@ class Cache extends Site_Options {
 	 *
 	 * @param string $key   The Object cache key.
 	 * @param string $group The Object cache group.
-	 * @return mixed wp_cache_delete if object caching is allowed. False otherwise.
+	 * @return mixed `wp_cache_delete()` if object caching is allowed. False otherwise.
 	 */
 	public function object_cache_delete( $key, $group = 'the_seo_framework' ) {
 
@@ -449,35 +434,6 @@ class Cache extends Site_Options {
 	}
 
 	/**
-	 * Returns ld_json transients for page ID.
-	 *
-	 * @since 3.1.0
-	 * @since 3.1.1 : The first parameter is now optional.
-	 *
-	 * @param int|string|bool $id       The Taxonomy or Post ID. If false it will generate for the blog page.
-	 * @param string          $taxonomy The taxonomy name.
-	 * @param string|null     $type     The post type.
-	 * @return string The ld_json cache key.
-	 */
-	public function get_ld_json_transient_name( $id = 0, $taxonomy = '', $type = null ) {
-
-		if ( ! $this->get_option( 'cache_meta_schema' ) )
-			return '';
-
-		$cache_key = $this->generate_cache_key( $id, $taxonomy, $type );
-
-		$revision = '7';
-
-		/**
-		 * Change key based on options.
-		 */
-		$options  = $this->enable_ld_json_breadcrumbs() ? '1' : '0';
-		$options .= $this->enable_ld_json_searchbox() ? '1' : '0';
-
-		return 'tsf_' . $revision . '_' . $options . '_ldjs_' . $cache_key;
-	}
-
-	/**
 	 * Generate transient key based on query vars or input variables.
 	 *
 	 * Warning: This can generate errors when used too early if no type has been set.
@@ -510,7 +466,6 @@ class Cache extends Site_Options {
 	 *
 	 * @since 2.9.1
 	 * @since 3.1.1 : The first parameter is now optional.
-	 * @staticvar array $cached_id : contains cache strings.
 	 * @see $this->generate_cache_key_by_type() to get cache key outside of the query.
 	 *
 	 * @param int|string|bool $page_id  The Taxonomy or Post ID.
@@ -565,11 +520,8 @@ class Cache extends Site_Options {
 						$the_id .= 'day_' . \mysql2date( 'd_m_y', $date, false );
 					}
 				} else {
-					//* Get seconds since UNIX Epoch. This is a failsafe.
-
-					/**
-					 * @staticvar string $unix : Used to maintain a static timestamp for this query.
-					 */
+					// Get seconds since UNIX Epoch. This is a failsafe.
+					// Memoize the timestamp, so that the key stays the same.
 					static $unix = null;
 
 					if ( ! isset( $unix ) )
@@ -577,7 +529,7 @@ class Cache extends Site_Options {
 
 					//* Temporarily disable caches to prevent database spam.
 					$this->the_seo_framework_use_transients = false;
-					$this->use_object_cache = false;
+					$this->use_object_cache                 = false;
 
 					$the_id = 'unix_' . $unix;
 				}
@@ -632,9 +584,8 @@ class Cache extends Site_Options {
 					break;
 			endswitch;
 		} elseif ( $this->is_search() ) {
-			//* Remove spaces. Limit to 10 chars.
-			// TODO use metahpone?
-			$query = \esc_sql( substr( str_replace( ' ', '', \get_search_query( true ) ), 0, 10 ) );
+			//* Remove spaces, jumble with md5, Limit to 12 chars.
+			$query = \esc_sql( substr( md5( str_replace( ' ', '', \get_search_query( true ) ) ), 0, 12 ) );
 
 			//* Temporarily disable caches to prevent database spam.
 			$this->the_seo_framework_use_transients = false;
@@ -665,7 +616,6 @@ class Cache extends Site_Options {
 	 *
 	 * @since 2.9.1
 	 * @since 2.9.2 Now returns false when an incorrect $type is supplied.
-	 * @staticvar array $cached_id : contains cache strings.
 	 * @see $this->generate_cache_key().
 	 * @see $this->generate_cache_key_by_query() to get cache key from the query.
 	 *
@@ -675,38 +625,27 @@ class Cache extends Site_Options {
 	 * @return string|bool String the generated cache key. Bool false on failure.
 	 */
 	public function generate_cache_key_by_type( $page_id, $taxonomy = '', $type = '' ) {
-
 		switch ( $type ) :
 			case 'author':
 				return $this->add_cache_key_suffix( 'author_' . $page_id );
-				break;
 			case 'frontpage':
 				return $this->add_cache_key_suffix( $this->generate_front_page_cache_key() );
-				break;
 			case 'page':
 				return $this->add_cache_key_suffix( 'page_' . $page_id );
-				break;
 			case 'post':
 				return $this->add_cache_key_suffix( 'post_' . $page_id );
-				break;
 			case 'attachment':
 				return $this->add_cache_key_suffix( 'attach_' . $page_id );
-				break;
 			case 'singular':
 				return $this->add_cache_key_suffix( 'singular_' . $page_id );
-				break;
 			case 'term':
 				return $this->add_cache_key_suffix( $this->generate_taxonomical_cache_key( $page_id, $taxonomy ) );
-				break;
 			case 'ping':
 				return $this->add_cache_key_suffix( 'tsf_throttle_ping' );
 			default:
 				$this->_doing_it_wrong( __METHOD__, 'Third parameter must be a known type.', '2.6.5' );
 				return $this->add_cache_key_suffix( \esc_sql( $type . '_' . $page_id . '_' . $taxonomy ) );
-				break;
 		endswitch;
-
-		return false;
 	}
 
 	/**
@@ -750,6 +689,7 @@ class Cache extends Site_Options {
 	 * Generates Cache key for taxonomical archives.
 	 *
 	 * @since 2.6.0
+	 * @since 4.0.6 No longer uses mb encoding functions, speeding up this method.
 	 *
 	 * @param int    $page_id  The taxonomy or page ID.
 	 * @param string $taxonomy The taxonomy name.
@@ -763,8 +703,8 @@ class Cache extends Site_Options {
 			$taxonomy_name = explode( '_', $taxonomy );
 			if ( is_array( $taxonomy_name ) ) {
 				foreach ( $taxonomy_name as $name ) {
-					if ( mb_strlen( $name ) >= 3 ) {
-						$the_id .= mb_substr( $name, 0, 3 ) . '_';
+					if ( strlen( $name ) >= 3 ) {
+						$the_id .= substr( $name, 0, 3 ) . '_';
 					} else {
 						$the_id = $name . '_';
 					}
@@ -773,14 +713,14 @@ class Cache extends Site_Options {
 		}
 
 		if ( ! $the_id ) {
-			if ( mb_strlen( $taxonomy ) >= 5 ) {
-				$the_id = mb_substr( $taxonomy, 0, 5 );
+			if ( strlen( $taxonomy ) >= 6 ) {
+				$the_id = substr( $taxonomy, 0, 6 );
 			} else {
-				$the_id = \esc_sql( $taxonomy );
+				$the_id = $taxonomy;
 			}
 		}
 
-		$the_id = strtolower( $the_id );
+		$the_id = strtolower( \esc_sql( $the_id ) );
 
 		//* Put it all together.
 		return rtrim( $the_id, '_' ) . '_' . $page_id;
@@ -870,10 +810,11 @@ class Cache extends Site_Options {
 	 * Delete transient for sitemap on requests.
 	 * Also ping search engines.
 	 *
+	 * Can only run once per request.
+	 *
 	 * @since 2.2.9
-	 * @since 2.8.0 : Mow listens to option 'cache_sitemap' before deleting transient.
-	 * @since 2.8.2 : Added cache to prevent duplicated flushes.
-	 * @staticvar bool $run
+	 * @since 2.8.0 Now listens to option 'cache_sitemap' before deleting transient.
+	 * @since 2.8.2 Added cache to prevent duplicated flushes.
 	 *
 	 * @return bool True on success, false on failure.
 	 */
@@ -897,35 +838,13 @@ class Cache extends Site_Options {
 	}
 
 	/**
-	 * Deletes transient for the LD+Json scripts on requests.
-	 *
-	 * @since 2.4.2
-	 * @since 2.8.0 Now listens to option 'cache_meta_schema' before deleting transient.
-	 * @since 2.9.1 Now no longer sets object property $this->ld_json_transient.
-	 * @since 2.9.4 Removed cache.
-	 *
-	 * @param mixed       $page_id  The page ID or identifier.
-	 * @param string      $taxonomy The tt name.
-	 * @param string|null $type     The post type.
-	 * @return bool true
-	 */
-	public function delete_ld_json_transient( $page_id, $taxonomy = '', $type = null ) {
-
-		if ( $this->get_option( 'cache_meta_schema' ) ) {
-			$transient = $this->get_ld_json_transient_name( $page_id, $taxonomy, $type );
-			$transient and \delete_transient( $transient );
-		}
-
-		return true;
-	}
-
-	/**
 	 * Builds and returns the excluded post IDs transient.
 	 * The transients are autoloaded, as no expiration is set.
 	 *
+	 * Memoizes the database request.
+	 *
 	 * @since 3.0.0
 	 * @since 3.1.0 Now no longer crashes on database errors.
-	 * @staticvar array $cache
 	 *
 	 * @return array : { 'archive', 'search' }
 	 */

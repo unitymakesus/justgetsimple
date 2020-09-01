@@ -5,8 +5,8 @@ if ( $results ) {
 		// WP core labels
 		$text 			  = 'Number of items found: %d';
 		$number_found     = esc_html__( $text );
-		$text             = 'Deleted!';
-		$label_deleted    = esc_html( _x( $text, 'plugin' ) );
+		$text             = '[deleted]';
+		$label_deleted    = esc_html__( $text );
 ?> 
 <p><?php printf( $number_found, $results ); ?></p>
 <p><?php echo $label_deleted; ?> <img src="<?php echo esc_url( admin_url() ); ?>images/yes.png" alt="" width="16" height="16"></p>

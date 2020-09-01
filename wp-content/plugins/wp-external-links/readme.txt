@@ -1,27 +1,27 @@
 === External Links - nofollow, noopener & new window ===
-Contributors: WebFactory, UnderConstructionPage, googlemapswidget, securityninja, wpreset
-Tags: new window, new tab, external links, nofollow, noopener, follow, dofollow, seo, noreferrer, internal links, target, links, link, internal link, external link
+Contributors: WebFactory, UnderConstructionPage, googlemapswidget, wpreset
+Tags: new window, new tab, external links, nofollow, noopener, ugc, sponsored, follow, dofollow, seo, noreferrer, internal links, target, links, link, internal link, external link
 Requires at least: 4.2
-Tested up to: 5.2
+Tested up to: 5.4
 Requires PHP: 5.3
-Stable tag: 2.35
+Stable tag: 2.46
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Manage internal & external links: open in new window or tab, control nofollow & noopener. SEO friendly.
+Manage internal & external links: open in new window or tab, control nofollow, ugc, sponsored & noopener. SEO friendly.
 
 == Description ==
 
-**Manage all external & internal links on your site**. Control icons, nofollow, noopener and if links open in new window or new tab.
+**Manage all external & internal links on your site**. Control icons, nofollow, noopener, ugc (User Generated Content), sponsored and if links open in new window or new tab.
 
-= NEW: Version 2 =
-WP External Links plugin was completely rebuilt in v2 and has lots of new features, like "noopener", font icons, internal links options and full WPMU support.
+WP External Links plugin was completely rebuilt in v2 and has lots of new features, like noopener, ugc and sponsored values for rel; font icons, internal links options and full WPMU support.
 
 = Features =
 * Manage external and internal links 
 * Open links in new window or tab
 * Add follow or nofollow (for SEO)
 * Add noopener and noreferrer (for security)
+* Add ugc (User Generated Content) and sponsored values to rel (<a href="https://webmasters.googleblog.com/2019/09/evolving-nofollow-new-ways-to-identify.html">Google announcement</a>)
 * Add link icons (FontAwesome and Dashicons)
 * Set other attributes like title and CSS classes
 * Scan complete page (or just posts, comments, widgets)
@@ -242,6 +242,29 @@ See [FAQ](https://wordpress.org/plugins/wp-external-links/faq/) for more info.
 
 
 == Changelog ==
+
+= 2.46 =
+ * 2020-05-09
+ * fixed "unable to save post" when using Gutenberg
+ * sorry for two updated in two days :(
+ 
+= 2.45 =
+ * 2020-05-08
+ * fixed compatibility issue with Site Kit by Google
+
+= 2.43 =
+ * 2019-12-27
+ * improved link detection regex
+ 
+= 2.42 =
+ * 2019-12-18
+ * fixed various undefined variable notices
+ * fixed an issue when there’s no href attribute set in an A element
+ 
+= 2.40 =
+ * 2019-11-20
+ * no longer loads CSS and FontAwesome globally on admin pages
+ * added support for "ugc" (User Generated Content) and "sponsored" values in rel
 
 = 2.35 =
  * 2019-09-12

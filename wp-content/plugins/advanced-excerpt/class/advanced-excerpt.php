@@ -11,6 +11,7 @@ class Advanced_Excerpt {
 		'length' => 40,
 		'length_type' => 'words',
 		'no_custom' => 1,
+		'link_excerpt' => 0,
 		'no_shortcode' => 1,
 		'finish' => 'exact',
 		'ellipsis' => '&hellip;',
@@ -41,7 +42,7 @@ class Advanced_Excerpt {
 		$this->plugin_basename = plugin_basename( $plugin_file_path );
 		$this->plugin_base ='options-general.php?page=advanced-excerpt';
 
-		if ( 'POST' == $_SERVER['REQUEST_METHOD'] && isset( $_REQUEST['page'] ) && 'advanced-excerpt' === $_REQUEST['page'] ) {
+		if ( isset($_SERVER['REQUEST_METHOD']) && 'POST' == $_SERVER['REQUEST_METHOD'] && isset( $_REQUEST['page'] ) && 'advanced-excerpt' === $_REQUEST['page'] ) {
 			check_admin_referer( 'advanced_excerpt_update_options' );
 			$this->update_options();
 		}
@@ -86,6 +87,9 @@ class Advanced_Excerpt {
 		 * and instead use the_content(). As such, we also need to hook into the_content().
 		 * To ensure we're not changing the content of single posts / pages we automatically exclude 'singular' page types.
 		 */
+
+        add_filter( 'wppsac_excerpt', array( $this, 'filter_content' ) );
+
 		$page_types = $this->get_current_page_types();
 		$skip_page_types = array_unique( array_merge( array( 'singular' ), $this->options['exclude_pages'] ) );
 		$skip_page_types = apply_filters( 'advanced_excerpt_skip_page_types', $skip_page_types ); 
@@ -96,6 +100,16 @@ class Advanced_Excerpt {
 		if ( in_array( 'woocommerce', $skip_page_types ) && get_post_type( get_the_ID() ) == 'product' ) {
 			return;
 		}
+
+        // conflict with WPTouch
+        if ( function_exists( 'wptouch_is_mobile_theme_showing' ) && wptouch_is_mobile_theme_showing() ) {
+            return;
+        }
+
+        // skip bbpress
+        if ( function_exists( 'is_bbpress' ) && is_bbpress() ) {
+            return;
+        }
 
 		if ( 1 == $this->options['the_excerpt'] ) {
 			remove_all_filters( 'get_the_excerpt' );
@@ -306,6 +320,10 @@ class Advanced_Excerpt {
 			}
 		}
 
+		if ( $link_excerpt ) {
+			$text = '<a href="' . get_permalink( $post ) . '">' . $text . '</a>';
+		}
+
 		return apply_filters( 'advanced_excerpt_content', $text );
 
 	}
@@ -321,9 +339,10 @@ class Advanced_Excerpt {
 		foreach ( $tokens[0] as $t ) { // Parse each token
 			if ( $w >= $length && 'sentence' != $finish ) { // Limit reached
 				break;
-			}
+            }
 			if ( $t[0] != '<' ) { // Token is not a tag
-				if ( $w >= $length && 'sentence' == $finish && preg_match( '/[\?\.\!]\s*$/uS', $t ) == 1 ) { // Limit reached, continue until ? . or ! occur at the end
+				$t_trimmed = trim( $t );
+				if ( $w >= $length && 'sentence' == $finish && preg_match( '/[\?\.\!](?!\d).*$/uS', $t_trimmed ) == 1 ) { // Limit reached, continue until ? . or ! occur at the end
 					$out .= trim( $t );
 					break;
 				}
@@ -338,7 +357,7 @@ class Advanced_Excerpt {
 					$c = mb_strlen( $chars );
 					if ( $c + $w > $length && 'sentence' != $finish ) { // Token is too long
 						$c = ( 'word' == $finish ) ? $c : $length - $w; // Keep token to finish word
-						$t = substr( $t, 0, $c );
+						$t = mb_substr( $t, 0, $c );
 					}
 					$w += $c;
 				}
@@ -404,7 +423,7 @@ class Advanced_Excerpt {
 		$_POST = stripslashes_deep( $_POST );
 		$this->options['length'] = (int) $_POST['length'];
 
-		$checkbox_options = array( 'no_custom', 'no_shortcode', 'add_link', 'link_new_tab', 'link_screen_reader', 'link_exclude_length', 'the_excerpt', 'the_content', 'the_content_no_break' );
+		$checkbox_options = array( 'no_custom', 'no_shortcode', 'add_link', 'link_new_tab', 'link_screen_reader', 'link_exclude_length', 'the_excerpt', 'the_content', 'the_content_no_break', 'link_excerpt' );
 
 		foreach ( $checkbox_options as $checkbox_option ) {
 			$this->options[$checkbox_option] = ( isset( $_POST[$checkbox_option] ) ) ? 1 : 0;

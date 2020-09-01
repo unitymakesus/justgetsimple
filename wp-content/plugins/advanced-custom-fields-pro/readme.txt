@@ -2,7 +2,7 @@
 Contributors: elliotcondon
 Tags: acf, advanced, custom, field, fields, form, repeater, content
 Requires at least: 4.7.0
-Tested up to: 5.2
+Tested up to: 5.4
 Requires PHP: 5.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -66,6 +66,54 @@ From your WordPress dashboard
 
 
 == Changelog ==
+
+= 5.8.9 =
+*Release Date - 26 March 2020*
+
+* Fix - Fixed bug in ACF Blocks causing default "align" property to be ignored.
+* Fix - Fixed bug allowing Taxonomy field to save terms to a non "post" object.
+* Tweak - Improved User field AJAX query performance.
+* Tweak - Improved logic that determines width of Range field input.
+* Tweak - Improved styling of ACF Blocks components.
+* Dev - Added new "acf/register_block_type_args" filter.
+* Dev - Added new generic ACF_Ajax_Query and ACF_Ajax_Query_Users classes.
+* i18n - Updated French Canadian translation thanks to Bérenger Zyla.
+* i18n - Updated Traditional Chinese translation thanks to Audi Lu.
+* i18n - Updated German translation thanks to Ralf Koller.
+* i18n - Updated Portuguese language thanks to Pedro Mendonça.
+
+= 5.8.8 =
+*Release Date - 4 March 2020*
+
+* Fix - Fixed bug in `have_rows()` function causing a PHP warning when no value is found.
+* Fix - Fixed bug in Google Maps field causing marker to snap to nearest address.
+* Fix - Avoid Nav Menu items displaying twice in WordPress 5.4.
+* Tweak - Added place name data to Google Maps field value.
+* Tweak - Improved performance of PHP registered fields.
+* Dev - Added new "acf/prepare_field_group_for_import" filter.
+* i18n - Added Traditional Chinese translation thanks to Audi Lu.
+* i18n - Added Catalan translation thanks to Jordi Tarrida.
+* i18n - Updated French translation thanks to Maxime Bernard-Jacquet & Bérenger Zyla.
+
+= 5.8.7 =
+*Release Date - 12 November 2019*
+
+* New - Updated admin CSS for new WordPress 5.3 styling.
+* Fix - Fixed various issues affecting dynamic metaboxes in the block editor (requires WordPress 5.3)
+* Fix - Fixed performance issue when checking network sites for upgrades.
+* Fix - Fixed Select2 clones appearing after duplicating a Relationship field.
+* Tweak - Repeater field "Add row" icons will now hide when maximum rows are reached.
+* Tweak - Removed ACF Blocks keyword limit for later versions of Gutenberg.
+
+= 5.8.6 =
+*Release Date - 24 October 2019*
+
+* New - Added more data to Google Maps field value including place_id, street_name, country and more.
+* Fix - Fixed bug in Gallery field incorrectly displaying .pdf attachments as icons.
+* Fix - Fixed bug in Checkbox field missing "selected" class after "Toggle All".
+* Dev - Added compatibility for Attachments in the Post Taxonomy location rule.
+* Dev - Added missing return statement from `acf_get_form()` function.
+* Dev - Added "google_map_result" JS filter.
 
 = 5.8.5 =
 *Release Date - 8 October 2019*

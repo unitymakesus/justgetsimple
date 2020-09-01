@@ -186,6 +186,7 @@ class FLPhotoModule extends FLBuilderModule {
 				$this->data->link          = $this->settings->photo_url;
 				$this->data->url           = $this->settings->photo_url;
 				$this->settings->photo_src = $this->settings->photo_url;
+				$this->data->title         = ( '' !== $this->settings->url_title ) ? $this->settings->url_title : basename( $this->settings->photo_url );
 			} elseif ( is_object( $this->settings->photo ) ) {
 				$this->data = $this->settings->photo;
 			} else {
@@ -197,8 +198,12 @@ class FLPhotoModule extends FLBuilderModule {
 				$this->data = $this->settings->data;
 			}
 		}
-
-		return $this->data;
+		/**
+		 * Make photo data filterable.
+		 * @since 2.2.6
+		 * @see fl_builder_photo_data
+		 */
+		return apply_filters( 'fl_builder_photo_data', $this->data, $this->settings, $this->node );
 	}
 
 	/**
@@ -260,7 +265,6 @@ class FLPhotoModule extends FLBuilderModule {
 				}
 			}
 		}
-
 		return $src;
 	}
 
@@ -361,7 +365,8 @@ class FLPhotoModule extends FLBuilderModule {
 		if ( $this->_has_source() && null === $this->_editor ) {
 
 			$url_path  = $this->_get_uncropped_url();
-			$file_path = str_ireplace( home_url(), ABSPATH, $url_path );
+
+			$file_path = trailingslashit( WP_CONTENT_DIR ) . ltrim( str_replace( basename( WP_CONTENT_DIR ), '', wp_make_link_relative( $url_path ) ), '/' );
 
 			if ( fl_builder_filesystem()->file_exists( $file_path ) ) {
 				$this->_editor = wp_get_image_editor( $file_path );
@@ -480,7 +485,7 @@ FLBuilder::register_module('FLPhotoModule', array(
 								'fields' => array( 'photo' ),
 							),
 							'url'     => array(
-								'fields' => array( 'photo_url', 'caption' ),
+								'fields' => array( 'photo_url', 'caption', 'url_title' ),
 							),
 						),
 						'preview' => array(
@@ -503,6 +508,21 @@ FLBuilder::register_module('FLPhotoModule', array(
 						'preview'     => array(
 							'type' => 'none',
 						),
+					),
+					'title_hover'  => array(
+						'type'    => 'select',
+						'label'   => __( 'Show title attribute on mouse hover', 'fl-builder' ),
+						'default' => 'no',
+						'options' => array(
+							'no'  => __( 'No', 'fl-builder' ),
+							'yes' => __( 'Yes', 'fl-builder' ),
+						),
+					),
+					'url_title'    => array(
+						'type'        => 'text',
+						'label'       => __( 'Image title attribute', 'fl-builder' ),
+						'default'     => '',
+						'placeholder' => __( 'Use image filename if left blank', 'fl-builder' ),
 					),
 				),
 			),

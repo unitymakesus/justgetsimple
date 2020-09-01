@@ -6,6 +6,8 @@
  * @link      http://stehle-internet.de
  * @copyright 2014 Martin Stehle
  */
+// Exit if accessed directly
+if ( ! defined( 'ABSPATH' ) ) exit;
 
 class Quick_Featured_Images_Tools { // only for debugging: extends Quick_Featured_Images_Base {
 
@@ -760,6 +762,11 @@ class Quick_Featured_Images_Tools { // only for debugging: extends Quick_Feature
 				$msg = $value_name;
 				$solution = __( 'Type in values stored by WordPress.', 'quick-featured-images' );
 				break;
+			default:
+				$text = 'An error occurred. Please try again.';
+				$msg = __( $text );
+				$text = 'Unknown';
+				$solution = ( $value_name ) ? $value_name : _x( $text, 'name' );
 		} // switch ( $reason )
 		include_once( 'views/section_errormsg.php' );
 		//die();

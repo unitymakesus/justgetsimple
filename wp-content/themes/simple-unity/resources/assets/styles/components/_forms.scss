@@ -1,3 +1,290 @@
+.gform_body {
+  label {
+    color: inherit;
+  }
+}
+
+.gform_wrapper .gform_body {
+  .gsection {
+    border-bottom: 0;
+  }
+
+  .gsection_title {
+    text-transform: uppercase;
+  }
+
+  .gsection_title,
+  .gfield_label {
+    font-weight: normal;
+    color: $color-grey-dark;
+  }
+
+  .gfield {
+    padding-left: 0;
+    padding-right: 0;
+    margin-top: 1rem;
+
+    &::before {
+      display: none;
+    }
+
+    &_required {
+      color: $error-color;
+    }
+
+    &_error {
+      border: none !important;
+      background: none !important;
+
+      input {
+        border: none !important;
+        border-bottom: 2px solid $error-color !important;
+      }
+
+      textarea {
+        border: 2px solid $error-color !important;
+      }
+
+      .validation_message {
+        color: $error-color;
+        padding-top: 0;
+      }
+    }
+  }
+
+  .gfield--label-swap {
+    margin-top: 0;
+
+    .gfield_label {
+      position: relative;
+      top: 2.8rem;
+      transition: 0.3s all ease-in-out;
+    }
+  }
+
+  input[type="text"],
+  input[type="password"],
+  input[type="email"],
+  input[type="url"],
+  input[type="tel"] {
+    border-bottom: 2px solid $color-grey-light;
+    padding-bottom: 0;
+    width: 100%;
+
+    &::placeholder {
+      color: $color-white;
+      transition: color 0.3s ease;
+    }
+
+    &:focus {
+      box-shadow: none;
+
+      @for $n from 1 through length($themes-list) {
+        [data-color="#{nth($themes-list, $n)}"] & {
+          border-bottom: 2px solid nth($color-secondary-list, $n);
+        }
+      }
+
+      &::placeholder {
+        color: $color-grey-light;
+      }
+    }
+  }
+
+  textarea {
+    border: 2px solid $color-grey-light;
+
+    &:focus {
+      box-shadow: none;
+      outline: none;
+
+      @for $n from 1 through length($themes-list) {
+        [data-color="#{nth($themes-list, $n)}"] & {
+          border-color: nth($color-secondary-list, $n);
+        }
+      }
+    }
+  }
+
+  .ginput_container {
+    margin-top: 0;
+  }
+
+  .ginput_container_select {
+    max-width: 300px;
+
+    .select-dropdown {
+      li {
+        padding-left: 0;
+
+        span {
+          color: $color-black;
+        }
+
+        &::before {
+          display: none;
+        }
+      }
+    }
+  }
+
+  .gfield_radio,
+  .gfield_checkbox {
+    margin-bottom: 0 !important;
+
+    li {
+      margin-bottom: 0.5rem !important;
+
+      &::before {
+        display: none;
+      }
+
+      label {
+        overflow: visible;
+        white-space: pre-wrap !important;
+      }
+    }
+
+    input[type="radio"],
+    input[type="checkbox"] {
+      + label {
+        display: flex;
+        align-items: center;
+        position: relative;
+        padding-left: 50px;
+        cursor: pointer;
+        min-height: 38px;
+        height: auto;
+        font-size: 1rem;
+        font-weight: normal;
+        transition: 0.3s ease;
+        user-select: none;
+
+        &::before,
+        &::after {
+          position: absolute;
+          left: 0;
+          top: 0;
+          margin: 4px;
+          width: 32px;
+          height: 32px;
+          z-index: 0;
+          transition: 0.28s ease;
+          border-radius: 50%;
+          border: 2px solid $color-grey-light;
+          content: '';
+        }
+      }
+
+      &:not(:checked):focus {
+        + label {
+          &::before {
+            @for $n from 1 through length($themes-list) {
+              [data-color="#{nth($themes-list, $n)}"] & {
+                border-color: nth($color-secondary-list, $n);
+              }
+            }
+          }
+        }
+      }
+    }
+
+    input[type="radio"] {
+      &:not(:checked) {
+        + label {
+          &::after {
+            transform: scale(0);
+          }
+        }
+      }
+
+      &:checked {
+        + label {
+          font-weight: normal;
+
+          &::before {
+            @for $n from 1 through length($themes-list) {
+              [data-color="#{nth($themes-list, $n)}"] & {
+                border: 2px solid nth($color-secondary-list, $n);
+              }
+            }
+          }
+
+          &::after {
+            transform: scale(0.5);
+
+            @for $n from 1 through length($themes-list) {
+              [data-color="#{nth($themes-list, $n)}"] & {
+                border: nth($color-secondary-list, $n);
+                background-color: nth($color-secondary-list, $n);
+              }
+            }
+          }
+        }
+      }
+    }
+
+    input[type="checkbox"] {
+      + label {
+        &::after {
+          margin: 0;
+          border: 0;
+          border-radius: 0;
+          opacity: 0;
+          width: 36px;
+          height: 36px;
+          z-index: -1;
+
+          @for $n from 1 through length($themes-list) {
+            [data-color="#{nth($themes-list, $n)}"] & {
+              background-color: nth($color-secondary-list, $n);
+            }
+          }
+        }
+
+        &::before {
+          width: 34px;
+          height: 34px;
+          border-radius: 1px;
+          margin: 3px 0 0 0;
+        }
+      }
+
+      &:checked {
+        + label {
+          font-weight: normal;
+
+          &::before {
+            top: 2px;
+            left: 4px;
+            width: 12px;
+            height: 22px;
+            border-top: 2px solid transparent;
+            border-left: 2px solid transparent;
+            border-right-color: $color-white;
+            border-bottom-color: $color-white;
+            transform: rotate(40deg);
+            backface-visibility: hidden;
+            transform-origin: 100% 100%;
+          }
+
+          &::after {
+            opacity: 1;
+          }
+        }
+      }
+    }
+  }
+}
+
+.gform_footer {
+  text-align: center;
+}
+
+.gform_confirmation_message {
+  padding: 3rem 0;
+}
+
 .search-form {
   .banner &, .content &, .footer & {
     height: auto;

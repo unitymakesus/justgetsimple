@@ -31,6 +31,11 @@ switch ( $instance ) :
 				'callback' => SeoSettings::class . '::_social_metabox_twitter_tab',
 				'dashicon' => 'twitter',
 			],
+			'oembed' => [
+				'name'     => 'oEmbed',
+				'callback' => SeoSettings::class . '::_social_metabox_oembed_tab',
+				'dashicon' => 'share-alt2',
+			],
 			'postdates' => [
 				'name'     => __( 'Post Dates', 'autodescription' ),
 				'callback' => SeoSettings::class . '::_social_metabox_postdates_tab',
@@ -54,7 +59,7 @@ switch ( $instance ) :
 		?>
 		<h4><?php esc_html_e( 'Social Meta Tags Settings', 'autodescription' ); ?></h4>
 		<?php
-		$this->description( __( 'Output various meta tags for social site integration, among other 3rd party services.', 'autodescription' ) );
+		$this->description( __( 'Output various meta tags for social site integration, among other third-party services.', 'autodescription' ) );
 
 		?>
 		<hr>
@@ -70,7 +75,6 @@ switch ( $instance ) :
 			),
 			true
 		);
-
 		if ( $this->detect_og_plugin() )
 			$this->attention_description( __( 'Note: Another Open Graph plugin has been detected. These meta tags might conflict.', 'autodescription' ) );
 
@@ -95,17 +99,47 @@ switch ( $instance ) :
 			),
 			true
 		);
-
 		if ( $this->detect_twitter_card_plugin() )
 			$this->attention_description( __( 'Note: Another Twitter Card plugin has been detected. These meta tags might conflict.', 'autodescription' ) );
 
+		//* Echo oEmbed scripts checkboxes.
+		$this->wrap_fields(
+			$this->make_checkbox(
+				'oembed_scripts',
+				__( 'Output oEmbed scripts?', 'autodescription' ),
+				__( 'WordPress, Discord, Drupal, Squarespace, and many other clients can make use of these scripts.', 'autodescription' ),
+				true
+			),
+			true
+		);
+		?>
+		<hr>
+
+		<h4><?php esc_html_e( 'Social Title Settings', 'autodescription' ); ?></h4>
+		<?php
+		$this->description( __( 'Most social sites and third-party services automatically include the website URL inside their embeds. When the site title is described well in the site URL, including it in the social title will be redundant.', 'autodescription' ) );
+
+		$info = $this->make_info(
+			__( 'When you provide a custom Open Graph or Twitter title, the site title will be omitted automatically.', 'autodescription' ),
+			'',
+			false
+		);
+
+		$this->wrap_fields(
+			$this->make_checkbox(
+				'social_title_rem_additions',
+				esc_html__( 'Remove site title from generated social titles?', 'autodescription' ) . ' ' . $info,
+				'',
+				false
+			),
+			true
+		);
 		?>
 		<hr>
 
 		<h4><?php esc_html_e( 'Social Image Settings', 'autodescription' ); ?></h4>
 		<?php
 		$this->description( __( 'A social image can be displayed when your website is shared. It is a great way to grab attention.', 'autodescription' ) );
-
 
 		$this->wrap_fields(
 			$this->make_checkbox(
@@ -129,9 +163,23 @@ switch ( $instance ) :
 		</p>
 		<p class="hide-if-no-tsf-js">
 			<?php
-			// phpcs:ignore, WordPress.Security.EscapeOutput
+			// phpcs:ignore, WordPress.Security.EscapeOutput.OutputNotEscaped -- already escaped.
 			echo $this->get_social_image_uploader_form( 'tsf_fb_socialimage' );
 			?>
+		</p>
+		<hr>
+
+		<h4><?php esc_html_e( 'Theme Color Settings', 'autodescription' ); ?></h4>
+		<?php
+		$this->description( __( 'Discord styles embeds with the theme color. The theme color can also affect the tab-color in some browsers.', 'autodescription' ) );
+		?>
+		<p>
+			<label for="<?php $this->field_id( 'theme_color' ); ?>">
+				<strong><?php esc_html_e( 'Theme Color', 'autodescription' ); ?></strong>
+			</label>
+		</p>
+		<p>
+			<input type="text" name="<?php $this->field_name( 'theme_color' ); ?>" class="tsf-color-picker" id="<?php $this->field_id( 'theme_color' ); ?>" value="<?php echo esc_attr( $this->get_option( 'theme_color' ) ); ?>" data-tsf-default-color="" />
 		</p>
 		<hr>
 
@@ -161,7 +209,7 @@ switch ( $instance ) :
 		$fb_appid_placeholder = '123456789012345';
 
 		?>
-		<h4><?php esc_html_e( 'Default Facebook Integration Settings', 'autodescription' ); ?></h4>
+		<h4><?php esc_html_e( 'Facebook Integration Settings', 'autodescription' ); ?></h4>
 		<?php
 		$this->description( __( 'Facebook post sharing works mostly through Open Graph. However, you can also link your Business and Personal Facebook pages, among various other options.', 'autodescription' ) );
 		$this->description( __( 'When these options are filled in, Facebook might link the Facebook profile to be followed and liked when your post or page is shared.', 'autodescription' ) );
@@ -229,7 +277,7 @@ switch ( $instance ) :
 		$twitter_card = $this->get_twitter_card_types();
 
 		?>
-		<h4><?php esc_html_e( 'Default Twitter Integration Settings', 'autodescription' ); ?></h4>
+		<h4><?php esc_html_e( 'Twitter Integration Settings', 'autodescription' ); ?></h4>
 		<?php
 		$this->description( __( 'Twitter post sharing works mostly through Twitter Cards, and may fall back to use Open Graph. However, you can also link your Business and Personal Twitter pages, among various other options.', 'autodescription' ) );
 
@@ -256,9 +304,8 @@ switch ( $instance ) :
 							echo $this->code_wrap( $name ); // phpcs:ignore, WordPress.Security.EscapeOutput
 							echo ' ';
 							$this->make_info(
-								esc_html( 'Learn more about this card.' ),
-								esc_url( 'https://dev.twitter.com/cards/types/' . $name ),
-								true
+								__( 'Learn more about this card.', 'autodescription' ),
+								'https://dev.twitter.com/cards/types/' . $name
 							);
 							?>
 						</span>
@@ -272,8 +319,11 @@ switch ( $instance ) :
 
 		<hr>
 
+		<h4><?php esc_html_e( 'Card and Content Attribution', 'autodescription' ); ?></h4>
 		<?php
-		$this->description( __( 'When the following options are filled in, Twitter might link your Twitter Site or Author Profile when your post or page is shared.', 'autodescription' ) );
+		/* source: https://developer.twitter.com/en/docs/tweets/optimize-with-cards/guides/getting-started#attribution */
+		$this->description( __( 'Twitter claims users will be able to follow and view the profiles of attributed accounts directly from the card when these fields are filled in.', 'autodescription' ) );
+		$this->description( __( 'However, for now, these fields seem to have no discernible effect.', 'autodescription' ) );
 		?>
 
 		<p>
@@ -311,6 +361,26 @@ switch ( $instance ) :
 		<?php
 		break;
 
+	case 'the_seo_framework_social_metabox_oembed':
+		?>
+		<h4><?php esc_html_e( 'oEmbed Settings', 'autodescription' ); ?></h4>
+		<?php
+		$this->description( __( 'Some social sharing services and clients, like WordPress and Discord, obtain the linked page information via oEmbed.', 'autodescription' ) );
+		?>
+		<hr>
+		<?php
+
+		$this->wrap_fields(
+			$this->make_checkbox(
+				'oembed_remove_author',
+				__( 'Remove author name?', 'autodescription' ),
+				__( "Discord shows the page author's name above the sharing embed. Check this option if you find this undesirable.", 'autodescription' ),
+				true
+			),
+			true
+		);
+
+		break;
 	case 'the_seo_framework_social_metabox_postdates':
 		$posts_i18n = esc_html__( 'Posts', 'autodescription' );
 

@@ -10,6 +10,9 @@
  * phpcs:disable WebDevStudios.All.RequireAuthor -- Don't require author tag in docblocks.
  */
 
+use \ReCaptcha\ReCaptcha;
+use \ReCaptcha\RequestMethod\CurlPost;
+
 /**
  * Powers our form processing, validation, and value cleanup.
  *
@@ -197,14 +200,33 @@ class ConstantContact_Process_Form {
 		}
 
 		if ( isset( $data['g-recaptcha-response'] ) ) {
-			$secret = ctct_get_settings_option( '_ctct_recaptcha_secret_key', '' );
 			$method = null;
 			if ( ! ini_get( 'allow_url_fopen' ) ) {
-				$method = new \ReCaptcha\RequestMethod\CurlPost();
+				$method = new CurlPost();
 			}
-			$recaptcha = new \ReCaptcha\ReCaptcha( $secret, $method );
+			$ctctrecaptcha = new ConstantContact_reCAPTCHA();
+			$ctctrecaptcha->set_recaptcha_keys();
+			$keys = $ctctrecaptcha->get_recaptcha_keys();
+			$ctctrecaptcha->set_recaptcha_class( new ReCaptcha( $keys['secret_key'], $method ) );
 
-			$resp = $recaptcha->verify( $data['g-recaptcha-response'], $_SERVER['REMOTE_ADDR'] );
+			$ctctrecaptcha->recaptcha->setExpectedHostname( parse_url( home_url(), PHP_URL_HOST ) );
+			if ( 'v3' === $ctctrecaptcha->get_recaptcha_version() ) {
+				/**
+				 * Filters the default float value for the score threshold.
+				 *
+				 * This value should be between 0.0 and 1.0.
+				 *
+				 * @since 1.7.0
+				 *
+				 * @param float  $value Threshold to require for submission approval.
+				 * @param string $value The ID of the form that was submitted.
+				 */
+				$threshold = (float) apply_filters( 'ctct_recaptcha_threshold', 0.5, $data['ctct-id'] );
+
+				$ctctrecaptcha->recaptcha->setScoreThreshold( $threshold );
+				$ctctrecaptcha->recaptcha->setExpectedAction( 'constantcontactsubmit' );
+			}
+			$resp = $ctctrecaptcha->recaptcha->verify( $data['g-recaptcha-response'], $_SERVER['REMOTE_ADDR'] );
 
 			if ( ! $resp->isSuccess() ) {
 				constant_contact_maybe_log_it( 'reCAPTCHA', 'Failed to verify with Google reCAPTCHA', [ $resp->getErrorCodes() ] );
@@ -215,7 +237,8 @@ class ConstantContact_Process_Form {
 			}
 		}
 
-		if ( empty( $data['g-recaptcha-response'] ) && $this->plugin->settings->has_recaptcha() ) {
+		$maybe_disable_recaptcha = 'on' === get_post_meta( $data['ctct-id'], '_ctct_disable_recaptcha', true );
+		if ( ! $maybe_disable_recaptcha && empty( $data['g-recaptcha-response'] ) && ConstantContact_reCAPTCHA::has_recaptcha_keys() ) {
 			return [
 				'status' => 'named_error',
 				'error'  => $this->get_spam_message( $data['ctct-id'] ),
@@ -234,18 +257,6 @@ class ConstantContact_Process_Form {
 			return [
 				'status' => 'named_error',
 				'error'  => $this->get_spam_message( $data['ctct-id'] ),
-			];
-		}
-
-		if (
-			! isset( $data['ctct_form'] ) ||
-			! wp_verify_nonce( $data['ctct_form'], 'ctct_submit_form' )
-		) {
-			constant_contact_maybe_log_it( 'Nonces', 'ctct_submit_form nonce failed to verify.' );
-			// @todo Figure out a way to pass errors back.
-			return [
-				'status' => 'named_error',
-				'error'  => __( 'We had trouble processing your submission. Please review your entries and try again.', 'constant-contact-forms' ),
 			];
 		}
 
@@ -282,6 +293,7 @@ class ConstantContact_Process_Form {
 			'ctct_usage_field',
 			'g-recaptcha-response',
 			'ctct_must_opt_in',
+			'ctct-instance',
 		], $orig_form_id );
 
 		foreach ( $data as $key => $value ) {
@@ -324,7 +336,20 @@ class ConstantContact_Process_Form {
 
 			if ( constant_contact()->api->is_connected() && 'on' === $maybe_bypass ) {
 				constant_contact()->mail->submit_form_values( $return['values'] ); // Emails but doesn't schedule cron.
-				constant_contact()->mail->opt_in_user( $this->clean_values( $return['values'] ) );
+				$api_result = constant_contact()->mail->opt_in_user( $this->clean_values( $return['values'] ) );
+
+				// Send email if API request fails.
+				if ( false === $api_result ) {
+					$clean_values  = constant_contact()->process_form->clean_values( $return['values'] );
+					$pretty_values = constant_contact()->process_form->pretty_values( $clean_values );
+					$email_values  = constant_contact()->mail->format_values_for_email( $pretty_values, $orig_form_id );
+
+					constant_contact()->mail->mail( constant_contact()->mail->get_email( $orig_form_id ), $email_values, [
+						'form_id'         => $orig_form_id,
+						'submitted_email' => constant_contact()->mail->get_user_email_from_submission( $clean_values ),
+						'custom-reason'   => __( 'An error occurred while attempting Constant Contact API request.', 'constant-contact-forms' ),
+					], true );
+				}
 			} else {
 				constant_contact()->mail->submit_form_values( $return['values'], true );
 			}
@@ -586,11 +611,12 @@ class ConstantContact_Process_Form {
 	 *
 	 * @throws Exception
 	 *
-	 * @param array      $form_data Form data to process.
-	 * @param string|int $form_id   Form ID being processed.
+	 * @param  array      $form_data Form data to process.
+	 * @param  string|int $form_id   Form ID being processed.
+	 * @param  int        $instance  Current form instance.
 	 * @return false|array
 	 */
-	public function process_wrapper( $form_data = [], $form_id = 0 ) {
+	public function process_wrapper( $form_data = [], $form_id = 0, $instance = 0 ) {
 
 		if ( empty( $_POST['ctct-id'] ) ) {
 			return false;
@@ -601,7 +627,14 @@ class ConstantContact_Process_Form {
 			return false;
 		}
 
-		$processed     = $this->process_form();
+		// Ensure calculated form instance matches POST form instance.
+		$posted_instance = absint( filter_input( INPUT_POST, 'ctct-instance', FILTER_SANITIZE_NUMBER_INT ) );
+
+		if ( $posted_instance !== $instance ) {
+			return false;
+		}
+
+		$processed     = $this->process_form( [], false );
 		$default_error = esc_html__( 'There was an error sending your form.', 'constant-contact-forms' );
 		$status        = false;
 

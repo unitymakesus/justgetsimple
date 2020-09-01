@@ -161,6 +161,11 @@
 .fl-lightbox-header {
 	position: relative;
 }
+
+.fl-builder-settings-lightbox .fl-lightbox-header h1:before{
+	content: none !important;
+}
+
 .fl-lightbox-header h1 {
 	color: #333 !important;
 	font-size: 16px !important;
@@ -174,6 +179,7 @@
 	flex-direction: row;
 	align-items: center;
 	line-height: 1;
+	letter-spacing: 0;
 }
 .fl-lightbox.ui-draggable .fl-lightbox-header {
 	cursor: move;

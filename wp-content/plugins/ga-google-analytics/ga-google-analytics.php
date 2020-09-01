@@ -9,9 +9,9 @@
 	Donate link: https://monzillamedia.com/donate.html
 	Contributors: specialk
 	Requires at least: 4.1
-	Tested up to: 5.2
-	Stable tag: 20190902
-	Version: 20190902
+	Tested up to: 5.5
+	Stable tag: 20200815
+	Version: 20200815
 	Requires PHP: 5.6.20
 	Text Domain: ga-google-analytics
 	Domain Path: /languages
@@ -32,7 +32,7 @@
 	You should have received a copy of the GNU General Public License
 	with this program. If not, visit: https://www.gnu.org/licenses/
 	
-	Copyright 2019 Monzilla Media. All rights reserved.
+	Copyright 2020 Monzilla Media. All rights reserved.
 */
 
 if (!defined('ABSPATH')) die();
@@ -60,7 +60,7 @@ if (!class_exists('GA_Google_Analytics')) {
 		
 		function constants() {
 			
-			if (!defined('GAP_VERSION')) define('GAP_VERSION', '20190902');
+			if (!defined('GAP_VERSION')) define('GAP_VERSION', '20200815');
 			if (!defined('GAP_REQUIRE')) define('GAP_REQUIRE', '4.1');
 			if (!defined('GAP_AUTHOR'))  define('GAP_AUTHOR',  'Jeff Starr');
 			if (!defined('GAP_NAME'))    define('GAP_NAME',    __('GA Google Analytics', 'ga-google-analytics'));
@@ -320,6 +320,17 @@ if (!class_exists('GA_Google_Analytics')) {
 			
 			$input['gap_id'] = wp_filter_nohtml_kses($input['gap_id']);
 			
+			if (preg_match("/^GTM-/i", $input['gap_id'])) {
+				
+				$input['gap_id'] = '';
+				
+				$message  = esc_html__('Error: your tracking code begins with', 'ga-google-analytics') .' <code>GTM-</code> ';
+				$message .= esc_html__('(for Google Tag Manager), which is not supported. Please try again with a supported tracking code.', 'ga-google-analytics');
+				
+				add_settings_error('gap_id', 'invalid-tracking-code', $message, 'error');
+				
+			}
+			
 			if (!isset($input['gap_location'])) $input['gap_location'] = null;
 			if (!array_key_exists($input['gap_location'], $this->options_locations())) $input['gap_location'] = null;
 			
@@ -347,11 +358,11 @@ if (!class_exists('GA_Google_Analytics')) {
 			if (!isset($input['gap_custom_loc'])) $input['gap_custom_loc'] = null;
 			$input['gap_custom_loc'] = ($input['gap_custom_loc'] == 1 ? 1 : 0);
 			
-			if (isset($input['tracker_object'])) $input['tracker_object'] = stripslashes(trim($input['tracker_object']));
+			if (isset($input['tracker_object'])) $input['tracker_object'] = wp_strip_all_tags(trim($input['tracker_object']));
 			
-			if (isset($input['gap_custom_code'])) $input['gap_custom_code'] = stripslashes(trim($input['gap_custom_code']));
+			if (isset($input['gap_custom_code'])) $input['gap_custom_code'] = wp_strip_all_tags(trim($input['gap_custom_code']));
 			
-			if (isset($input['gap_custom'])) $input['gap_custom'] = stripslashes(trim($input['gap_custom']));
+			if (isset($input['gap_custom'])) $input['gap_custom'] = stripslashes($input['gap_custom']);
 			
 			return $input;
 			

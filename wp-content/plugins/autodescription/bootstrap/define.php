@@ -9,7 +9,7 @@ defined( 'THE_SEO_FRAMEWORK_DB_VERSION' ) or die;
 
 /**
  * The SEO Framework plugin
- * Copyright (C) 2018 - 2019 Sybre Waaijer, CyberWire (https://cyberwire.nl/)
+ * Copyright (C) 2018 - 2020 Sybre Waaijer, CyberWire (https://cyberwire.nl/)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as published
@@ -42,16 +42,6 @@ define( 'THE_SEO_FRAMEWORK_PRESENT', true );
 define( 'THE_SEO_FRAMEWORK_SITE_OPTIONS', (string) \apply_filters( 'the_seo_framework_site_options', 'autodescription-site-settings' ) );
 
 /**
- * The plugin network options.
- *
- * Unused in our code.
- *
- * @since 2.2.2
- * @param string THE_SEO_FRAMEWORK_NETWORK_OPTIONS
- */
-define( 'THE_SEO_FRAMEWORK_NETWORK_OPTIONS', (string) \apply_filters( 'the_seo_framework_network_settings', 'autodescription-network-settings' ) );
-
-/**
  * Plugin term options key.
  *
  * @since 2.7.0
@@ -76,7 +66,7 @@ define( 'THE_SEO_FRAMEWORK_USER_OPTIONS', (string) \apply_filters( 'the_seo_fram
 define( 'THE_SEO_FRAMEWORK_SITE_CACHE', (string) \apply_filters( 'the_seo_framework_site_cache', 'autodescription-updates-cache' ) );
 
 /**
- * The plugin map URL. Has a trailing slash.
+ * The plugin folder URL. Has a trailing slash.
  * Used for calling browser files.
  *
  * @since 2.2.2
@@ -91,53 +81,81 @@ define( 'THE_SEO_FRAMEWORK_DIR_URL', \plugin_dir_url( THE_SEO_FRAMEWORK_PLUGIN_B
 define( 'THE_SEO_FRAMEWORK_PLUGIN_BASENAME', \plugin_basename( THE_SEO_FRAMEWORK_PLUGIN_BASE_FILE ) );
 
 /**
- * The plugin map absolute path. Used for calling php files.
+ * The plugin folder absolute path. Used for calling php files.
  *
  * @since 2.2.2
  */
 define( 'THE_SEO_FRAMEWORK_DIR_PATH', dirname( THE_SEO_FRAMEWORK_PLUGIN_BASE_FILE ) . DIRECTORY_SEPARATOR );
 
 /**
- * The plugin views map absolute path.
+ * The plugin views folder absolute path.
  *
  * @since 2.7.0
  */
 define( 'THE_SEO_FRAMEWORK_DIR_PATH_VIEWS', THE_SEO_FRAMEWORK_DIR_PATH . 'inc' . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR );
 
 /**
- * The plugin class map absolute path.
+ * The plugin class folder absolute path.
  *
  * @since 2.2.9
  */
 define( 'THE_SEO_FRAMEWORK_DIR_PATH_CLASS', THE_SEO_FRAMEWORK_DIR_PATH . 'inc' . DIRECTORY_SEPARATOR . 'classes' . DIRECTORY_SEPARATOR );
 
 /**
- * The plugin trait map absolute path.
+ * The plugin trait folder absolute path.
  *
  * @since 3.1.0
  */
 define( 'THE_SEO_FRAMEWORK_DIR_PATH_TRAIT', THE_SEO_FRAMEWORK_DIR_PATH . 'inc' . DIRECTORY_SEPARATOR . 'traits' . DIRECTORY_SEPARATOR );
 
 /**
- * The plugin interface map absolute path.
+ * The plugin interface folder absolute path.
  *
  * @since 2.8.0
  */
 define( 'THE_SEO_FRAMEWORK_DIR_PATH_INTERFACE', THE_SEO_FRAMEWORK_DIR_PATH . 'inc' . DIRECTORY_SEPARATOR . 'interfaces' . DIRECTORY_SEPARATOR );
 
 /**
- * The plugin function map absolute path.
+ * The plugin function folder absolute path.
  *
  * @since 2.2.9
  */
 define( 'THE_SEO_FRAMEWORK_DIR_PATH_FUNCT', THE_SEO_FRAMEWORK_DIR_PATH . 'inc' . DIRECTORY_SEPARATOR . 'functions' . DIRECTORY_SEPARATOR );
 
 /**
- * The plugin function map absolute path.
+ * The plugin compatibility folder absolute path.
  *
  * @since 2.8.0
  */
 define( 'THE_SEO_FRAMEWORK_DIR_PATH_COMPAT', THE_SEO_FRAMEWORK_DIR_PATH . 'inc' . DIRECTORY_SEPARATOR . 'compat' . DIRECTORY_SEPARATOR );
+
+/**
+ * The user capability required to access the extension overview page.
+ *
+ * == WARNING ==
+ * When this constant is used incorrectly, you can expose your site to
+ * unforeseen security risks. We assume the role supplied here is lower than the webmaster's;
+ * for example, in a WPMU environment. However, proceed with caution.
+ *
+ * @since 4.1.0
+ * @param string
+ */
+defined( 'THE_SEO_FRAMEWORK_SETTINGS_CAP' )
+	or define( 'THE_SEO_FRAMEWORK_SETTINGS_CAP', 'manage_options' );
+
+/**
+ * The user capability required to access the extension overview page.
+ *
+ * == WARNING ==
+ * When this constant is used incorrectly, you can expose your site to
+ * unforeseen security risks. We assume the role supplied here is lower than the webmaster's;
+ * for example, in a WPMU environment. However, proceed with caution.
+ *
+ * @since 4.1.0
+ * @param string
+ */
+defined( 'THE_SEO_FRAMEWORK_AUTHOR_INFO_CAP' )
+	or define( 'THE_SEO_FRAMEWORK_AUTHOR_INFO_CAP', 'edit_posts' );
 
 /**
  * Robots setting, ignore protection.

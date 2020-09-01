@@ -3,8 +3,8 @@
 if( !function_exists('add_action') )
 	die("access denied.");
 
-define('POWERPRESS_FEED_HIGHLIGHTED', 'http://www.powerpresspodcast.com/category/highlighted/feed/?order=ASC');
-define('POWERPRESS_FEED_NEWS', 'http://www.powerpresspodcast.com/feed/');
+define('POWERPRESS_FEED_HIGHLIGHTED', 'https://blubrry.com/podcast-insider/category/highlighted/feed/?order=ASC');
+define('POWERPRESS_FEED_NEWS', 'https://blubrry.com/podcast-insider/feed/');
 
 function powerpress_get_news($feed_url, $limit=10)
 {
@@ -233,37 +233,8 @@ function powerpress_dashboard_stats_content()
 function powerpress_dashboard_news_content()
 {
 	$Settings = get_option('powerpress_general');
-	
-	if( isset($Settings['disable_dashboard_news']) && $Settings['disable_dashboard_news'] == 1 )
-		return; // Lets not do anything to the dashboard for PowerPress News
 		
 	powerpressadmin_community_news();
-}
-
-function powerpress_dashboard_notice_1_content()
-{
-	$DismissedNotices = get_option('powerpress_dismissed_notices');
-	
-	if( !empty($DismissedNotices[1]) )
-		return; // Lets not do anything to the dashboard for PowerPress Notice
-	
-	$message = '<p>'. __('Apple iTunes podcast specifications for show artwork have changed! Your iTunes image should now be 1400 x 1400 in jpg format.', 'powerpress') .'</p>';
-	$message .= '<p><a href="http://www.powerpresspodcast.com/2012/05/10/itunes-podcasting-specifications-changed-may-2012-what-that-means-for-podcasting/" target="_blank">'. __('Learn more about iTunes podcasting changes', 'powerpress') .'</a></p>';
-	
-	powerpress_dashboard_notice_message(1, $message );
-}
-
-function powerpress_dashboard_notice_2_content()
-{
-	$DismissedNotices = get_option('powerpress_dismissed_notices');
-	
-	if( !empty($DismissedNotices[2]) )
-		return; // Lets not do anything to the dashboard for PowerPress Notice
-	
-	$message = '<p>'. __('Due to concerns of possible security exploits, the 1 Pixel Out Audio Player has been removed from PowerPress.', 'powerpress') .'<br />';
-	$message .= '<a href="http://blog.blubrry.com/?p=1163" target="_blank">'. __("Learn More", "powerpress") .'</a></p>';
-	
-	powerpress_dashboard_notice_message(2, $message );
 }
 
 function powerpress_dashboard_notice_message($notice_id, $message)
@@ -311,8 +282,8 @@ function powerpress_dashboard_setup()
 		return;
 	}
 	
-	if( $NewsDashboard )
-		wp_add_dashboard_widget( 'powerpress_dashboard_news', __( 'Blubrry PowerPress & Community Podcast', 'powerpress'), 'powerpress_dashboard_news_content' );
+	//if( $NewsDashboard )
+	wp_add_dashboard_widget( 'powerpress_dashboard_news', __( 'Podcast Insider by Blubrry', 'powerpress'), 'powerpress_dashboard_news_content' );
 	
 	if( !empty($_GET['powerpressdash']) && $_GET['powerpressdash'] == 3 ) {
 		return;

@@ -3,8 +3,8 @@ Contributors: amandato, blubrry
 Tags: podcasting, podcast, podcaster, powerpress, itunes, apple, apple podcasts, google podcasts, google play, enclosure, professional, apple, apple tv, ipad, iphone, soundcloud, squarespace, youtube, viddler, ustream, podcasting, audio, video, rss2, feed, player, media, rss, mp3, music, embed, feedburner, statistics, stats, flv, flash, id3, episodes, blubrry, mp4, m4v, wordpressmu, mu, wordpress mu, multisite, multi site, mediacaster, post, plugin, posts, simple, social, dashboard, TSG, Buzzsprout, MTR, WP-boxCast, CastMyBlog, tgs podcasting,  simple podcasting, seriously simple podcasting, seriously-simple-podcasting, serious, seriously, ssp, podlove, podcast.de, clammr, clammr radio, audio player, stitcher, tunein, show, shows, series, docs, documentation, support, free, add-ons, extensions, addons, libsyn, libsyn-podcasting, podbean, podomatic, spreaker
 Requires at least: 3.6
 Requires PHP: 5.2
-Tested up to: 5.2.3
-Stable tag: 8.0
+Tested up to: 5.5
+Stable tag: 8.3.6
 Donate link: https://create.blubrry.com/resources/podcast-media-hosting/
 License: GPLv2 or later
 
@@ -231,11 +231,174 @@ To install Blubrry PowerPress manually, follow these steps:
 = Next Major Release Announcements =
 * We are looking for beta testers! If you would like to beta test future versions of PowerPress, please [contact us](http://blubrry.com/contact.php#feedback) with your name and email.
 
-* PowerPress 8.1 beta 1 will be available in mid October, 2019! Please visit the [PowerPress Beta]https://create.blubrry.com/resources/powerpress/powerpress-beta/) page for more information.
+* PowerPress 8.3 beta 1 will be available in May, 2020! Please visit the [PowerPress Beta]https://create.blubrry.com/resources/powerpress/powerpress-beta/) page for more information.
 
 = Fan of PowerPress and want to show your support? =
 If you are a fan of PowerPress, we would greatly appreciate it if you could take a moment and [leave us a review on WordPress.org](https://wordpress.org/support/plugin/powerpress/reviews/?rate=5#new-post). Your support is greatly appreciated!
 
+= 8.3.6 =
+* Released 08/24/2020
+* Fixed a bug in the player settings tab that was messing with episode artwork setting
+* Re-added 'Disable Blubrry Stats in Dasboard' option, into Advanced Settings
+* Fixed a jQuery bug
+
+= 8.3.5 =
+* Released 08/11/2020
+* Small bugfix
+* Tested with WordPress 5.5 beta
+
+= 8.3.4 =
+* Released 07/01/2020
+* Added Farsi language
+* Small CSS fixes
+* Stopped showing general 'feeds' settings for custom feeds
+* Fixed a bug where the Subscription Links Under Player setting wasn't saving
+
+= 8.3.3 =
+* Released 06/03/2020
+* Styled news items in WP Dashboard
+* Fixed a bug where artwork settings weren't saving properly
+* Fxied bug where player link options would not save correctly
+
+
+= 8.3.2 =
+* Released 06/02/2020
+* Added a check in the welcome page so that if there are >1000 posts, powerpress won't query all of them
+* Added the Save button back to Audio Player, Video Player, and MP3 Tags Settings pages which it had been removed from
+* Started using WordPress functions to link JS code, as <script> tags were causing an issue
+
+= 8.3.1 =
+* Released 06/01/2020
+* Bug fix to artwork upload in Settings
+
+= 8.3 =
+* Released 06/01/2020
+* Fresh new appearance for PowerPress settings tabs
+* Now, helpful info about your show and its progress appear at the top of the Welcome tab
+* Destinations-related settings consolidated to the Destinations tab
+* Podcast SEO and Advanced Settings are now within the Settings tabs
+
+= 8.2.11 =
+* Released 04/29/2020
+* Entry Box Settings are back--this time, find them by clicking the gear in the upper right of the entry box
+* The Permalinks setting has been moved from the Website tab in Settings to the new Entry Box Settings
+* Fixed a bug from 8.2.10 where media couldn't be removed from a post
+* Fixed a bug where "Verify" error messages were not showing up in the right spot
+
+= 8.2.10 =
+* Released 04/23/2020
+* Update design for episode box--media URL section and Remove Episode moved
+* Artwork previews now will use default images rather than broken ones
+* Fixed a compatibility issue with older php versions
+
+= 8.2.9 =
+* Released 04/03/2020
+* Corrected a typo in Non-Profit Apple category
+* Fixed bug with PodPress data clobbering an already imported episode in certain circumstances.
+* Added logic to handle importing with all supported Blubrry media URLs.
+
+
+= 8.2.8 =
+* Released 3/30/2020
+* Tested with new WordPress 5.4 beta
+* Subscribe on Email is now toggled by the checkbox in the Settings tab
+* Fixed a bug where Apple category tags with no subcategory were not generated correctly
+
+= 8.2.7 =
+* Released 3/20/2020
+* Stopped filling a default season number
+* Started displaying all of PowerPress to new installs so that the Settings link isn't broken on the Plugins page
+* Fixed a bug where GUIDs were not preserved on import for some feeds with newer versions of WordPress
+* Added the dark theme again which was mistakenly removed from the minified CSS file
+* Deleted notification about Apple's category changes
+* Fixed a number of small CSS problems
+
+= 8.2.6 =
+* Released 3/4/2020
+* Fixed a bug that was messing with some users' season numbers
+* Added an option in Settings to display the whole episode box (as opposed to verifying the media link before allowing any metadata to be entered)
+* Fixed a bug that was being caused by translated characters
+* Corrected the powerpress player shortcode [powerpress] in the episode box
+* Fixed some smaller bugs dealing with the functionality of the tabs and the artwork preview for multiple categories
+
+= 8.2.5 =
+* Released 2/20/2020
+* Fixed a bug that was preventing the explicit setting from saving
+
+= 8.2.4 =
+* Released 2/18/2020
+* Minified CSS files for faster loading times
+* Consolidated CSS classes and gave them more unique names so as to avoid conflict with other plugins
+* Added the ability for PowerPress to remember the season of the last episode published and put this as a default value in this field for new posts
+* Made poster image setting visible to all
+
+= 8.2.3 =
+* Released 2/13/2020
+* Added Remove Episode option  back into episode box
+* Fixed a bug where title input wasn't showing up (for users who had selected to specify an episode title)
+* Season value is now allowed to be empty
+* Added a label for the explicit setting
+* Fixed a bug where the settings for the player size weren't showing up for video media
+
+= 8.2.2 =
+* Released 2/12/2020
+* Tweaked id3 library so as to prevent php compatibility errors
+* Fixed a bug that was throwing an error in the subscribe widget
+* Slight CSS tweaks
+
+= 8.2.1 =
+* Released 2/11/2020
+* Fixed editor detection--now styling/responsiveness will accommodate for classic editor
+* Fixed a bug where the .js file wasn't getting loaded for everyone
+* Fixed a bug that would reload the page when a "View More"-type link was clicked
+
+
+= 8.2 =
+* Released 2/10/2020
+* Eliminated Episode tab--whole episode box appears
+* New interface with multiple tabs and cleaner, clearer settings
+* Media link is now verified automatically
+* Updated id3 library to be compatible with PHP 7.4
+
+= 8.1.2 =
+* Released 1/17/2020
+* Now, if users define('POWERPRESS_NO_REMOVE_WP_HEAD'), links will not be removed from webpage head
+* Updated readme to reflect that PowerPress is compatible with the most recent version of WordPress
+
+= 8.1.1 =
+* Added images that were missing in the Getting Started section
+
+= 8.1 =
+* Eliminated Simple Mode
+* Replaced Simple Mode with a Getting Started section which shows up the first time someone opens PowerPress
+* Getting Started includes feed info settings, feed import, and media migration
+* Getting Started can also be revisited at any time
+* Added trim call for ajax returns in case website is sending extra new lines due to a theme or plugin
+* Now using the latest media detection library (getid3) in WordPress
+
+
+= 8.0.3 =
+* Released on 11/15/2019
+* Added titles to iframes so as to be compliant with ADA
+* Made a styling tweak in the subscribe shortcode
+* Now, all three Apple categories will show up regardless of whether they are set
+* Users can no longer hide certain ios11 settings in their Tools tab
+
+
+= 8.0.2 =
+* Released on 10/24/2019
+* Brought back the ability to render black subscribe buttons using [powerpress_subscribe style="dark"] (Thanks @vennstone for bringing to our attention!)
+* Improved custom CSS setting so that !important tags could be stripped from subscribe sidebar widgets (Thanks Bree @lifesgood for pointing out the problem)
+* Feed Landing Page URL setting can now be set for the default podcast feed (Thanks Daniel for the suggestion)
+* Next week, we will release an update to Blubrry's Media uploader to work better within PowerPress so that it is more accessible with text reading software such as JAWS and ZoomText (Thanks Gary for helping us!)
+* Added support for the WPML plugin (Thanks David and Bobby from WPML!)
+* Configured Websub publish API call timeout to 3 seconds.
+
+
+= 8.0.1 =
+* Released on 10/09/2019
+* Fixed submit links for iHeartRadio, Deezer, and Pandora
+* Deleted Google Play Image settings
 
 = 8.0 =
 * Released on 10/7/2019
@@ -483,13 +646,12 @@ If you are a fan of PowerPress, we would greatly appreciate it if you could take
 * Quicktime Embed option for m4a audio removed due to security concerns with Quicktime.
 * SWF embed support dropped.
 * Embed link now toggles embed box when clicked multiple times.
-* ATTENTION: The 1 pixel out audio player will be removed from PowerPress 7.1.
 
 = Additional PowerPress Version History =
 Please visit the [PowerPress Version History](http://create.blubrry.com/resources/powerpress/advanced-tools-and-options/powerpress-version-history/) page for history prior to version 6.0.
 
 == Upgrade Notice ==
-ATTENTION: The 1 pixel out audio player will be removed from PowerPress 7.1.
+None
 
 == Contributors ==
 Angelo Mandato, CIO [Blubrry](http://www.blubrry.com) - Plugin founder, architect and lead developer

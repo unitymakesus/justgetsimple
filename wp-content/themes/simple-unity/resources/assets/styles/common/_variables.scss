@@ -45,7 +45,7 @@ $color-executive-5:           #FBFFFE;
 
 // Grass
 $color-grass-1:               #114B5F;
-$color-grass-2:               #1A936F;
+$color-grass-2:               #00885F;
 $color-grass-3:               #88D498;
 $color-grass-4:               #C6DABF;
 $color-grass-5:               #F3E9D2;
@@ -58,7 +58,7 @@ $color-ocean-4:               #00A8E8;
 $color-ocean-5:               $color-white;
 
 // Sunrise
-$color-sunrise-1:             #CC5803;
+$color-sunrise-1:             #C55400;
 $color-sunrise-2:             #E2711D;
 $color-sunrise-3:             #FF9505;
 $color-sunrise-4:             #FFB627;
@@ -74,7 +74,7 @@ $themes-list: "bright", "chrome", "executive", "grass", "ocean", "sunrise";
 $color-1-list: $color-bright-1, $color-chrome-1, $color-executive-1, $color-grass-1, $color-ocean-1, $color-sunrise-1;
 $color-bullet-list: $color-bright-4, $color-chrome-3, $color-executive-4, $color-grass-4, $color-ocean-4, $color-sunrise-4;
 $color-link-list: $color-bright-2, $color-chrome-1, $color-executive-3, $color-grass-2, $color-ocean-3, $color-sunrise-1;
-$color-primary-list: $color-bright-3, $color-chrome-1, $color-executive-4, $color-grass-4, $color-ocean-4, $color-sunrise-4;
+$color-primary-list: $color-bright-1, $color-chrome-1, $color-executive-3, $color-grass-2, $color-ocean-3, $color-sunrise-1;
 $color-secondary-list: $color-bright-1, $color-chrome-2, $color-executive-3, $color-grass-1, $color-ocean-2, $color-sunrise-1;
 $color-tertiary-list: $color-bright-5, $color-chrome-5, $color-executive-5, $color-grass-5, $color-ocean-5, $color-sunrise-5;
 $opacity-list: 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100;

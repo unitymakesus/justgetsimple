@@ -8,7 +8,8 @@
  */
 
 FLBuilder::register_module(
-	'AdvancedTabsModule', array(
+	'AdvancedTabsModule',
+	array(
 		'items'      => array(
 			'title'    => __( 'Tab Items', 'uabb' ),
 			'sections' => array(
@@ -716,7 +717,8 @@ FLBuilder::register_module(
  * Register a settings form to use in the "form" field type above.
  */
 FLBuilder::register_settings_form(
-	'uabb_tab_items_form', array(
+	'uabb_tab_items_form',
+	array(
 		'title' => __( 'Add Item', 'uabb' ),
 		'tabs'  => array(
 			'general' => array(
@@ -800,20 +802,24 @@ FLBuilder::register_settings_form(
 								'label' => __( 'Embed Code / URL', 'uabb' ),
 								'rows'  => 6,
 							),
+							'ct_raw_nonce'      => array(
+								'type'    => 'text',
+								'default' => wp_create_nonce( 'uabb-module-nonce' ),
+							),
 							'ct_saved_rows'     => array(
 								'type'    => 'select',
 								'label'   => __( 'Select Row', 'uabb' ),
-								'options' => UABB_Model_Helper::get_saved_row_template(),
+								'options' => array(),
 							),
 							'ct_saved_modules'  => array(
 								'type'    => 'select',
 								'label'   => __( 'Select Module', 'uabb' ),
-								'options' => UABB_Model_Helper::get_saved_module_template(),
+								'options' => array(),
 							),
 							'ct_page_templates' => array(
 								'type'    => 'select',
 								'label'   => __( 'Select Page Template', 'uabb' ),
-								'options' => UABB_Model_Helper::get_saved_page_template(),
+								'options' => array(),
 							),
 						),
 					),

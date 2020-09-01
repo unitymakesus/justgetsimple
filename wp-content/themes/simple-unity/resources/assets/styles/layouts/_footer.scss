@@ -1,4 +1,10 @@
 .page-footer {
+  color: $color-white;
+
+  a {
+    color: $color-white;
+  }
+
   .footer-center {
     text-align: center;
 
@@ -13,14 +19,9 @@
 
   .footer-content {
     padding: 1em;
-    color: $color-white;
 
     h2, h3, h4, h5, h6 {
       margin: 0 0 0.5em;
-      color: $color-white;
-    }
-
-    a {
       color: $color-white;
     }
   }
@@ -31,10 +32,6 @@
     height: 40px;
     margin-bottom: 0;
     font-size: 0.8em;
-
-    a {
-      color: $color-white;
-    }
 
     @media #{$small-and-down} {
       height: auto;

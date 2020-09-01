@@ -15,6 +15,16 @@ a.btn {
   color: $color-white;
 }
 
+.button,
+.btn,
+button {
+  &:focus {
+    outline: 0.125rem solid;
+    outline-offset: 0.125rem;
+    outline-color: inherit;
+  }
+}
+
 @for $n from 1 through length($themes-list) {
   [data-color="#{nth($themes-list, $n)}"] {
     .btn-primary {
@@ -53,5 +63,45 @@ a.btn {
 
   span {
     color: inherit;
+  }
+}
+
+.gform_button {
+  @extend .btn;
+  @extend .btn-primary;
+}
+
+// Menu toggle
+.btn-menu-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-width: 1px;
+  border-style: solid;
+  font-size: 1.25rem;
+  margin-right: 0.5rem;
+  margin-left: auto;
+  background-color: transparent;
+  padding: 0.6rem 0.75rem;
+  color: black;
+  border-color: currentColor;
+
+  [data-text-color=light] & {
+    color: white;
+  }
+
+  > i {
+    font-size: inherit;
+  }
+
+  &:hover {
+    cursor: pointer;
+  }
+
+  &:focus {
+    background-color: transparent;
+    outline: 0.125rem solid;
+    outline-offset: 0.125rem;
+    outline-color: inherit;
   }
 }

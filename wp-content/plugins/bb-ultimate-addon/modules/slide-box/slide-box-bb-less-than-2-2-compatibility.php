@@ -8,7 +8,8 @@
  */
 
 FLBuilder::register_module(
-	'SlideBoxModule', array(
+	'SlideBoxModule',
+	array(
 		'slide_front' => array( // Tab.
 			'title'    => __( 'Slide Box Front', 'uabb' ), // Tab title.
 			'sections' => array( // Tab Sections.
@@ -599,7 +600,7 @@ FLBuilder::register_module(
 
 						'overlay_icon'              => array(
 							'type'        => 'icon',
-							'default'     => 'fa fa-plus-square-o',
+							'default'     => 'fas fa-plus-square-o',
 							'label'       => __( 'Icon', 'uabb' ),
 							'show_remove' => true,
 						),

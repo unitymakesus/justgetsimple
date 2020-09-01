@@ -1,3 +1,7 @@
 body#tinymce {
   margin: 12px !important;
+
+  &:focus {
+    outline: 0;
+  }
 }
