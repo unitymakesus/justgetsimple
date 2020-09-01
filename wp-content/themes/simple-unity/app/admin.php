@@ -313,6 +313,63 @@ add_action('customize_register', function (\WP_Customize_Manager $wp_customize) 
     )
   );
 
+  $wp_customize->add_setting( 'header_cta_2_text', //No need to use a SERIALIZED name, as `theme_mod` settings already live under one db record
+        array(
+            'default'    => '', //Default setting/value to save
+            'type'       => 'theme_mod', //Is this an 'option' or a 'theme_mod'?
+            'transport'  => 'postMessage', //What triggers a refresh of the setting? 'refresh' or 'postMessage' (instant)?
+        )
+    );
+
+    $wp_customize->add_control(
+    'simple_header_cta_2_text', //Set a unique ID for the control
+        array(
+            'label'      => __( 'CTA Button Text (2nd)', 'simple' ), //Admin-visible name of the control
+            'section'    => 'simple_header', //ID of the section this control should render in (can be one of yours, or a WordPress default section)
+            'settings'   => 'header_cta_2_text', //Which setting to load and manipulate (serialized is okay)
+            'priority'   => 10, //Determines the order this control appears in for the specified section
+            'type'       => 'text'
+        )
+    );
+
+    $wp_customize->add_setting( 'header_cta_2_link', //No need to use a SERIALIZED name, as `theme_mod` settings already live under one db record
+        array(
+        'default'    => '', //Default setting/value to save
+        'type'       => 'theme_mod', //Is this an 'option' or a 'theme_mod'?
+        'transport'  => 'postMessage', //What triggers a refresh of the setting? 'refresh' or 'postMessage' (instant)?
+        )
+    );
+
+    $wp_customize->add_control(
+        'simple_header_cta_2_link', //Set a unique ID for the control
+        array(
+        'label'      => __( 'CTA Button Link (2nd)', 'simple' ), //Admin-visible name of the control
+        'section'    => 'simple_header', //ID of the section this control should render in (can be one of yours, or a WordPress default section)
+        'settings'   => 'header_cta_2_link', //Which setting to load and manipulate (serialized is okay)
+        'priority'   => 10, //Determines the order this control appears in for the specified section
+        'type'       => 'url'
+        )
+    );
+
+    $wp_customize->add_setting( 'header_cta_2_target',
+        array(
+            'default'   => '',
+            'type'      => 'theme_mod',
+            'transport' => 'refresh',
+        )
+    );
+
+    $wp_customize->add_control(
+        'simple_header_cta_2_target',
+        array(
+            'label'     => __( 'Open CTA (2nd) in New Tab?', 'simple' ),
+            'section'   => 'simple_header',
+            'settings'  => 'header_cta_2_target',
+            'priority'  => 10,
+            'type'      => 'checkbox'
+        )
+    );
+
   $wp_customize->add_setting( 'header_color', //No need to use a SERIALIZED name, as `theme_mod` settings already live under one db record
     array(
       'default'    => 'transparent', //Default setting/value to save

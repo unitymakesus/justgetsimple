@@ -6,9 +6,17 @@
   $cta_link = get_theme_mod( 'header_cta_link' );
   $cta_target_bool = get_theme_mod( 'header_cta_target' );
   $cta_target = '';
+  $cta_text_2 = get_theme_mod( 'header_cta_2_text' );
+  $cta_link_2 = get_theme_mod( 'header_cta_2_link' );
+  $cta_target_bool_2 = get_theme_mod( 'header_cta_2_target' );
+  $cta_target_2 = '';
 
   if ($cta_target_bool == true) {
     $cta_target = 'target="_blank" rel="noopener"';
+  }
+
+  if ($cta_target_bool_2 == true) {
+    $cta_target_2 = 'target="_blank" rel="noopener"';
   }
 @endphp
 <header class="banner header-inline" role="banner" style="background-color: {{ $header_color }}">
