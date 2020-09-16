@@ -1,7 +1,13 @@
 :focus {
-  outline: 0.125rem solid;
-  outline-offset: 0.125rem;
-  outline-color: inherit;
+  outline: 0;
+}
+
+@for $n from 1 through length($themes-list) {
+  [data-color="#{nth($themes-list, $n)}"] {
+    :focus {
+      box-shadow: 0 0 0 0.2rem transparentize(nth($color-primary-list, $n), 0.5);
+    }
+  }
 }
 
 .screen-reader-text {

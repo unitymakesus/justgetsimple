@@ -81,6 +81,11 @@
       .navbar-menu > ul > li > a, .menu-trigger-wrapper label {
         color: $color-white;
       }
+
+      a:focus,
+      button:focus {
+        box-shadow: 0 0 0 0.2rem transparentize($color-white, 0.5);
+      }
     }
   }
 
