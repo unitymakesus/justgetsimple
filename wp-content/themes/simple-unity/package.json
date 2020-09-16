@@ -80,6 +80,7 @@
     "jquery": "^3.3.1",
     "macy": "^2.5.0",
     "materialize-css": "^1.0.0",
+    "modaal": "^0.4.4",
     "webfontloader": "^1.6.28"
   }
 }

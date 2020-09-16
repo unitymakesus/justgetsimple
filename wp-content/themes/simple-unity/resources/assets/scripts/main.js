@@ -1,5 +1,6 @@
 // import external dependencies
 import 'jquery';
+import 'modaal';
 import 'custom-event-polyfill';
 
 // Import everything from autoload

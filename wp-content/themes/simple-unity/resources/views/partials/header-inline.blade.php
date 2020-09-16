@@ -54,7 +54,7 @@
           {!! wp_nav_menu(['theme_location' => 'primary_navigation', 'container' => FALSE, 'menu_class' => 'flex flex-center space-between']) !!}
           @if (!empty($cta_text) && !empty($cta_link))
             <div class="cta-link">
-              <a href="{{ $cta_link }}" class="btn" {{ $cta_target }}>{{ $cta_text }}</a>
+              <a href="{{ $cta_link }}" class="btn modaal-inline-apply" {{ $cta_target }}>{{ $cta_text }}</a>
             </div>
           @endif
           @if (!empty($cta_text_2) && !empty($cta_link_2))

@@ -33,6 +33,9 @@ export default {
     });
   },
   finalize() {
+    // Apply Now signup button in header.
+    $('.modaal-inline-apply').modaal();
+
     // Media query
     var smDown = window.matchMedia( '(max-width: 768px)' );
 
