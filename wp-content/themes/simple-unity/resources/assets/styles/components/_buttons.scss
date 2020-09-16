@@ -15,14 +15,9 @@ a.btn {
   color: $color-white;
 }
 
-.button,
-.btn,
-button {
-  &:focus {
-    outline: 0.125rem solid;
-    outline-offset: 0.125rem;
-    outline-color: inherit;
-  }
+button:hover,
+a.btn:hover {
+  cursor: pointer;
 }
 
 @for $n from 1 through length($themes-list) {
@@ -33,6 +28,10 @@ button {
       &:hover, &:active, &:focus {
         background: darken(nth($color-primary-list, $n), 15%);
       }
+
+      &:focus {
+        box-shadow: 0 0 0 0.2rem transparentize(nth($color-primary-list, $n), 0.5);
+      }
     }
 
     .btn-secondary {
@@ -40,6 +39,10 @@ button {
 
       &:hover, &:active, &:focus {
         background: darken(nth($color-secondary-list, $n), 15%);
+      }
+
+      &:focus {
+        box-shadow: 0 0 0 0.2rem transparentize(nth($color-primary-list, $n), 0.5);
       }
     }
 
@@ -49,6 +52,10 @@ button {
 
       &:hover, &:active, &:focus {
         background: darken(nth($color-tertiary-list, $n), 15%);
+      }
+
+      &:focus {
+        box-shadow: 0 0 0 0.2rem transparentize(nth($color-primary-list, $n), 0.5);
       }
     }
   }
@@ -92,16 +99,5 @@ button {
 
   > i {
     font-size: inherit;
-  }
-
-  &:hover {
-    cursor: pointer;
-  }
-
-  &:focus {
-    background-color: transparent;
-    outline: 0.125rem solid;
-    outline-offset: 0.125rem;
-    outline-color: inherit;
   }
 }
