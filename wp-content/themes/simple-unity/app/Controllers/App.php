@@ -30,4 +30,9 @@ class App extends Controller
         }
         return get_the_title();
     }
+
+    public static function alertBar()
+    {
+        return get_field('global_alert_bar', 'option') ?: '';
+    }
 }

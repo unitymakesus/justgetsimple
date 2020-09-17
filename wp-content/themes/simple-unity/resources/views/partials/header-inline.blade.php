@@ -20,6 +20,7 @@
   }
 @endphp
 <header class="banner header-inline" role="banner" style="background-color: {{ $header_color }}">
+  @include('partials.alert-bar')
   <nav class="nav-primary" role="navigation">
     <div class="navbar flex flex-center space-between" data-text-color="{{ $text_color }}">
       @php
