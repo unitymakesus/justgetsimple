@@ -7,6 +7,16 @@
     :focus {
       box-shadow: 0 0 0 0.2rem transparentize(nth($color-primary-list, $n), 0.5);
     }
+
+    .a11y-link-wrap:focus {
+      &:focus {
+        box-shadow: none;
+      }
+
+      &::after {
+        box-shadow: 0 0 0 0.2rem transparentize(nth($color-primary-list, $n), 0.5);
+      }
+    }
   }
 }
 
@@ -28,6 +38,19 @@
     top: 5px;
     width: auto;
     z-index: 100000; /* Above WP toolbar. */
+  }
+}
+
+// Used for accessible link wrapper. Requires a relative parent.
+.a11y-link-wrap {
+  &::after {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    content: '';
+    z-index: 11;
   }
 }
 

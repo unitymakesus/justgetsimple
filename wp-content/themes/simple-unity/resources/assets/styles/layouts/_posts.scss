@@ -8,6 +8,7 @@
 }
 
 .excerpt {
+  position: relative;
   box-shadow: 0 5px 35px rgba(0, 0, 0, 0.2);
   border-radius: 10px;
 
@@ -83,7 +84,29 @@
     margin-bottom: 0;
   }
 
-  .entry-content {
+  .entry-content,
+  footer {
     margin-bottom: 4rem;
+  }
+
+  footer > section + section {
+    margin-top: 2rem;
+  }
+}
+
+.related-posts__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  grid-gap: $gutter-width / 2;
+  align-items: stretch;
+
+  @media #{$large-and-up} {
+    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  }
+
+  img,
+  .overlay {
+    object-fit: cover;
+    height: 225px;
   }
 }

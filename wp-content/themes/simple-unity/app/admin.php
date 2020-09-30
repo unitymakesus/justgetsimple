@@ -409,6 +409,32 @@ add_action('customize_register', function (\WP_Customize_Manager $wp_customize) 
     )
   ));
 
+    /**
+     * Simple Blog
+     */
+    $wp_customize->add_section('simple_blog' , array(
+        'title'      => __( 'Blog Settings', 'simple' ),
+        'priority'   => 50,
+        'capability' => 'edit_theme_options',
+    ));
+
+    /**
+     * Related Posts (on indivudal posts).
+     */
+    $wp_customize->add_setting('related_posts', array(
+        'default'   => '',
+        'type'      => 'theme_mod',
+        'transport' => 'refresh',
+    ));
+
+    $wp_customize->add_control('simple_related_posts', array(
+        'label'       => __( 'Enable Related Posts?', 'simple' ),
+        'description' => __( 'Displays a randomized feed of related posts (in the same category) at the bottom of each blog post.', 'simple' ),
+        'section'     => 'simple_blog',
+        'settings'    => 'related_posts',
+        'priority'    => 10,
+        'type'        => 'checkbox',
+    ));
 });
 
 /**
