@@ -138,10 +138,10 @@ export default {
      */
     menuItems.forEach((menuItem) => {
       $(menuItem).find('.menu-toggle').on('click', function(event) {
-        $(menuItem).closest('li.menu-item-has-children').toggleClass('open');
-        $(menuItem).attr('aria-expanded', (index, attr) => {
-          return attr == 'false' ? 'true' : 'false';
-        });
+        let expanded = this.getAttribute('aria-expanded') === 'true' || false;
+        this.setAttribute('aria-expanded', !expanded);
+        $(menuItem).toggleClass('open');
+
         event.preventDefault();
         return false;
       });
