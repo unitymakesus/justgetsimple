@@ -77,7 +77,7 @@
   },
   "dependencies": {
     "custom-event-polyfill": "^1.0.7",
-    "jquery": "^3.3.1",
+    "jquery": "^3.5.0",
     "macy": "^2.5.0",
     "materialize-css": "^1.0.0",
     "modaal": "^0.4.4",
