@@ -9,28 +9,6 @@ export default {
     if (window.NodeList && !NodeList.prototype.forEach) {
       NodeList.prototype.forEach = Array.prototype.forEach;
     }
-
-    /**
-     * Set aria labels for current navigation items
-     */
-    // Main navigation in header and footer
-    $('.menu-primary-menu-container .menu-item').each(function() {
-      if ($(this).hasClass('current-page-ancestor')) {
-        $(this).children('a').attr('aria-current', 'true');
-      }
-      if ($(this).hasClass('current-menu-item')) {
-        $(this).children('a').attr('aria-current', 'page');
-      }
-    });
-    // Sidebar navigation
-    $('.widget_nav_menu .menu-item').each(function() {
-      if ($(this).hasClass('current-page-ancestor')) {
-        $(this).children('a').attr('aria-current', 'true');
-      }
-      if ($(this).hasClass('current-menu-item')) {
-        $(this).children('a').attr('aria-current', 'page');
-      }
-    });
   },
   finalize() {
     // Media query
