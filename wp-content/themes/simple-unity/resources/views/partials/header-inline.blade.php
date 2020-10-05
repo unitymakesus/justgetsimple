@@ -28,10 +28,7 @@
             $logo = wp_get_attachment_image_src( $custom_logo_id , 'simple-logo' );
             $logo_2x = wp_get_attachment_image_src( $custom_logo_id, 'simple-logo-2x' );
           @endphp
-          <img src="{{ $logo[0] }}"
-               srcset="{{ $logo[0] }} 1x, {{ $logo_2x[0] }} 2x"
-               alt="{!! get_bloginfo('name', 'display') !!}"
-               width="{{ $logo[1] }}" height="{{ $logo[2] }}" />
+          <img src="{{ $logo_2x[0] }}" width="{{ $logo[1] }}" height="{{ $logo[2] }}" alt="{!! get_bloginfo('name', 'display') !!}" />
         @else
           {{ get_bloginfo('name', 'display') }}
         @endif
