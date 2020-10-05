@@ -1,0 +1,76 @@
+#plugin-logo{
+	margin: 20px;
+}
+#h4wp-logo{
+	width:259px;
+}
+#h4wp-plugin-icon{
+	width:200px;
+	position: absolute;
+	right: 20px;
+	
+}
+.wpgf2pdcrm-settings-filed-map tbody{
+	background-color: #FFFFFF;
+}
+
+.wpgf2pdcrm-settings-filed-map td{
+	padding: 10px !important;
+}
+
+.wpgf2pdcrm-settings-filed-map-header{
+	text-align:left;
+}
+
+.wpgf2pdcrm-settings-filed-map-header th{
+    height: 35px;
+    padding-left: 5px;
+}
+
+.wpgf2pdcrm_scroll_container{
+	height:440px;
+	width:100%;
+	/* background-color:#CCC; */		
+	overflow-y:auto;
+	float:left;
+	position:relative;
+	margin-left:-5px;
+}
+.wpgf2pdcrm_scroll_content{
+	width:95%;
+	float:left;
+	padding:0 0 0 5px;
+	position:relative;
+	float:left;
+	border-right: 1px #f8f7f3 solid;
+	/* background-image:url(images/bubble.png); */
+	/* background-color: black; */
+}
+
+.wpgf2pdcrm-deal-title-selector-container{
+	display:block;
+}
+
+.wpgf2pdcrm-deal-title-custom-text-container{
+	display:block;
+	padding-top:5px;
+}
+.wpgf2pd-deal-title-values-add-custom-text-input{
+	padding: 2px;
+	height: 28px;
+	line-height: 28px;
+    width: 90%;
+}
+
+.wpgf2pdcrm-settings-expiry-message-container .wpgf2pdcrm-warning,
+.wpgf2pdcrm-settings-expired-message-container .wpgf2pdcrm-warning{
+	padding: 20px;
+	border: 1px #F00 solid;
+	background-color: #FFDDCF;
+}
+
+#gaddon-setting-row-lead_labels div,
+#gaddon-setting-radio-choice-check_for_duplicates_lead0 label,
+#gaddon-setting-radio-choice-check_for_duplicates_lead0 label{
+    padding-right: 20px;
+}
