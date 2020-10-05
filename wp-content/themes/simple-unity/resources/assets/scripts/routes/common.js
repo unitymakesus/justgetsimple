@@ -202,5 +202,10 @@ export default {
         return false;
       }
     }
+
+    /**
+     * Modaal for inline content.
+     */
+    $('.modaal-inline').modaal();
   },
 };
