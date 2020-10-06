@@ -4,7 +4,7 @@ Tags: seo, xml sitemap, google search, open graph, schema.org, twitter card, per
 Requires at least: 5.1.0
 Tested up to: 5.5
 Requires PHP: 5.6.0
-Stable tag: 4.1.0
+Stable tag: 4.1.1
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -243,6 +243,10 @@ The SEO Framework does not provide the display of breadcrumbs. This is theme-ter
 If you wish to display breadcrumbs, then your theme should provide this. Alternatively, there are [other plugins](https://wordpress.org/plugins/search/breadcrumbs/) that help you do this.
 
 == Changelog ==
+
+= 4.1.1 =
+
+In this major-minor update, we improved browser performance by up to 99% (not a typo) by exchanging over 300 jQuery calls for vanilla JS ones. We also added two new options for oEmbed, freed a dozen bugs that got stuck in the UI and generators, and [improved accessibility](https://theseoframework.com/?p=3623#detailed).
 
 = 4.1.0 - Grace =
 

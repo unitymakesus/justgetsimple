@@ -310,7 +310,7 @@ jQuery( function( $ ) {
 					wp_smushit_data.resmush = r.data.resmush_ids;
 
 					// Update wp_smushit_data ( Smushed count, Smushed Percent, Image count, Super smush count, resize savings, conversion savings ).
-					if ( 'undefinied' !== typeof wp_smushit_data ) {
+					if ( 'undefined' !== typeof wp_smushit_data ) {
 						wp_smushit_data.count_smushed =
 							'undefined' !== typeof r.data.count_smushed
 								? r.data.count_smushed
@@ -343,6 +343,10 @@ jQuery( function( $ ) {
 							'undefined' !== typeof r.data.count_resize
 								? r.data.count_resize
 								: wp_smushit_data.count_resize;
+						wp_smushit_data.unsmushed =
+							'undefined' !== typeof r.data.unsmushed
+								? r.data.unsmushed
+								: wp_smushit_data.unsmushed;
 					}
 
 					if ( 'nextgen' === scan_type ) {
@@ -354,14 +358,14 @@ jQuery( function( $ ) {
 					// Hide the Existing wrapper.
 					const notices = $( '.bulk-smush-wrapper .sui-notice' );
 					if ( notices.length > 0 ) {
-						notices.hide();
-						$( '.wp-smush-pagespeed-recommendation' ).hide();
+						notices.addClass( 'sui-hidden' );
+						$( '.wp-smush-pagespeed-recommendation' ).addClass( 'sui-hidden' );
 					}
 					// Remove existing Re-Smush notices.
 					$( '.wp-smush-resmush-notice' ).remove();
 
 					// Show Bulk wrapper.
-					$( '.wp-smush-bulk-wrapper' ).show();
+					$( '.wp-smush-bulk-wrapper' ).removeClass( 'sui-hidden' );
 				}
 				// If content is received, Prepend it.
 				if ( 'undefined' !== typeof r.data.content ) {
@@ -400,12 +404,16 @@ jQuery( function( $ ) {
 					}
 				}
 				Smush.updateStats( scan_type );
+
+				const remainingCount = r.data.count || 0;
+				Smush.updateRemainingCount( remainingCount );
+				updateDisplayedContentAfterReCheck( remainingCount );
 			}
 		} ).always( function() {
 			// Hide the progress bar.
 			jQuery(
 				'.bulk-smush-wrapper .wp-smush-bulk-progress-bar-wrapper'
-			).hide();
+			).addClass( 'sui-hidden' );
 
 			// Add check complete status to button.
 			button
@@ -425,6 +433,40 @@ jQuery( function( $ ) {
 
 			$( '.wp-smush-all' ).removeAttr( 'disabled' );
 		} );
+	};
+
+	const updateDisplayedContentAfterReCheck = function( count ) {
+		const $pendingImagesWrappers = jQuery(
+			'.bulk-smush-wrapper .wp-smush-bulk-wrapper, .bulk-smush-wrapper .wp-smush-unsmushed-images-notice'
+		);
+		const $allDoneWrappers = jQuery(
+			'.bulk-smush-wrapper .wp-smush-all-done, .bulk-smush-wrapper .wp-smush-pagespeed-recommendation'
+		);
+
+		if ( $pendingImagesWrappers.length && $allDoneWrappers.length ) {
+			if ( count === 0 ) {
+				$pendingImagesWrappers.addClass( 'sui-hidden' );
+				$allDoneWrappers.removeClass( 'sui-hidden' );
+			} else {
+				$pendingImagesWrappers.removeClass( 'sui-hidden' );
+				$allDoneWrappers.addClass( 'sui-hidden' );
+
+				// Update texts mentioning the amount of unsmushed images.
+				// They're the tooltip in the summary icon, and the notice within the Bulk Smush tab content.
+				const $unsmushedNotice = jQuery( '.bulk-smush-wrapper .wp-smush-unsmushed-images-notice' ),
+					$unsmushedTooltip = jQuery( '.sui-summary-smush .sui-summary-details .sui-tooltip' ),
+					textForm = 1 === count ? 'singular' : 'plural',
+					noticeText = $unsmushedNotice.data( textForm ).replace( '{count}', count );
+
+				$unsmushedNotice.find( '.wp-smush-unsmushed-notice-count-text' ).html( noticeText );
+
+				// The tooltip doesn't exist in the NextGen page.
+				if ( $unsmushedTooltip.length ) {
+					const tooltipText = $unsmushedTooltip.data( textForm ).replace( '{count}', count );
+					$unsmushedTooltip.attr( 'data-tooltip', tooltipText );
+				}
+			}
+		}
 	};
 
 	// Scroll the element to top of the page.
@@ -838,10 +880,10 @@ jQuery( function( $ ) {
 			// Show all done notice.
 			$(
 				'.wp-smush-notice.wp-smush-all-done, .wp-smush-pagespeed-recommendation'
-			).show();
+			).removeClass( 'sui-hidden' );
 
 			// Hide Smush button.
-			$( '.wp-smush-bulk-wrapper ' ).hide();
+			$( '.wp-smush-bulk-wrapper ' ).addClass( 'sui-hidden' );
 		}
 
 		// Remove re-Smush notice.
@@ -873,8 +915,8 @@ jQuery( function( $ ) {
 		progress_bar.css( 'width', smush_percent + '%' );
 
 		// Show the default bulk smush notice.
-		$( '.wp-smush-bulk-wrapper' ).show();
-		$( '.wp-smush-bulk-wrapper .sui-notice' ).show();
+		$( '.wp-smush-bulk-wrapper' ).removeClass( 'sui-hidden' );
+		$( '.wp-smush-bulk-wrapper .sui-notice' ).removeClass( 'sui-hidden' );
 
 		const params = {
 			action: 'delete_resmush_list',
@@ -887,7 +929,7 @@ jQuery( function( $ ) {
 			if ( res.success && 'undefined' !== typeof res.data.stats ) {
 				const stats = res.data.stats;
 				// Update wp_smushit_data ( Smushed count, Smushed Percent, Image count, Super smush count, resize savings, conversion savings )
-				if ( 'undefinied' !== typeof wp_smushit_data ) {
+				if ( 'undefined' !== typeof wp_smushit_data ) {
 					wp_smushit_data.count_images =
 						'undefined' !== typeof stats.count_images
 							? parseInt( wp_smushit_data.count_images ) +
@@ -963,8 +1005,8 @@ jQuery( function( $ ) {
 					'undefined' !== typeof wp_smushit_data.unsmushed ||
 					wp_smushit_data.unsmushed.length === 0
 				) {
-					$( '.wp-smush-bulk-wrapper .sui-notice' ).hide();
-					$( '.sui-notice-success.wp-smush-all-done' ).show();
+					$( '.wp-smush-bulk-wrapper .sui-notice' ).removeClass( 'sui-hidden' );
+					$( '.sui-notice-success.wp-smush-all-done' ).addClass( 'sui-hidden' );
 				}
 
 				Smush.updateStats();
@@ -1196,4 +1238,174 @@ jQuery( function( $ ) {
 
 		goToByScroll( '#column-wp-smush-resize' );
 	} );
+
+	/**
+	 * Closes and dismisses the Tutorials meta-box under the Bulk Smush tab.
+	 *
+	 * @since 3.7.1
+	 */
+	$( '#wp-smush-dismiss-tutorials-button' ).on( 'click', function( e ) {
+		const $button = $( e.currentTarget ),
+			$metaBox = $button.closest( '#smush-box-bulk-tutorials' );
+
+		$metaBox.hide( 'slow', () => $metaBox.remove() );
+
+		$.ajax( {
+			type: 'POST',
+			url: ajaxurl,
+			data: {
+				action: 'hide_tutorials_bulk_smush',
+			},
+		} );
+
+		// Display a floating notification.
+		const noticeMessage = `<p>${ $button.data('notice') }</p>`,
+			noticeOptions = {
+				type: 'info',
+				icon: 'info',
+				dismiss: {
+					show: true,
+					label: $button.data( 'notice-close' ),
+				},
+				autoclose: {
+					show: true,
+				}
+			};
+
+		SUI.openNotice( 'wp-smush-hide-tutorials-notice', noticeMessage, noticeOptions );
+	} );
+
+	/**
+	 * Adds the slider functionality for the Tutorials under the Bulk Smush tab.
+	 *
+	 * @since 3.7.1
+	 */
+	$( '#smush-box-bulk-tutorials .wp-smush-tutorials-button' ).on( 'click', function( e ) {
+		const $button = $( e.currentTarget ),
+			$sliderContainer = $button.closest( '.wp-smush-tutorials-section' ),
+			amountOfSlides = $sliderContainer.find( '.wp-smush-slider-wrapper li' ).length;
+
+		// If there isn't more than 1 slide, we don't need the slider functionality.
+		if ( 1 >= amountOfSlides ) {
+			return;
+		}
+
+		const direction = $button.data( 'direction' ),
+			activeSlideNumber = parseInt( $sliderContainer.data( 'active' ) ),
+			newActiveNumber = 'next' === direction ? activeSlideNumber + 1 : activeSlideNumber - 1,
+			$newActiveSlide = $sliderContainer.find( `[data-slide="${ newActiveNumber }"]` );
+
+		// Return if the following slide doesn't exist for some reason.
+		if ( ! $newActiveSlide.length ) {
+			return;
+		}
+
+		const $activeSlide = $sliderContainer.find( `[data-slide="${ activeSlideNumber }"]` ),
+			$nextButton = $sliderContainer.find( '.wp-smush-slider-button-next' ),
+			$prevButton = $sliderContainer.find( '.wp-smush-slider-button-prev' );
+
+		// Hide the previous slide, show the new one.
+		$activeSlide.attr( 'tabindex', '-1' );
+		$activeSlide.addClass( 'sui-hidden' );
+		$activeSlide.attr( 'aria-hidden', 'true' );
+		$newActiveSlide.attr( 'tabindex', '0' );
+		$newActiveSlide.removeClass( 'sui-hidden' );
+		$newActiveSlide.attr( 'aria-hidden', 'false' );
+
+		// Update the "active slide" flag.
+		$sliderContainer.attr( 'data-active', newActiveNumber );
+		$sliderContainer.data( 'active', newActiveNumber );
+
+		// Focus on the new slide.
+		$newActiveSlide[0].focus();
+
+		if ( 'next' === direction ) {
+			$prevButton.removeAttr( 'disabled' );
+			$prevButton.removeAttr( 'aria-disabled' );
+
+			// Hide the 'next' button if we moved forward and we're now in the last slide.
+			if ( amountOfSlides === newActiveNumber ) {
+				$nextButton.attr( 'disabled', true );
+				$nextButton.attr( 'aria-disabled', 'true' );
+			}
+		} else {
+			$nextButton.removeAttr( 'disabled' );
+			$nextButton.removeAttr( 'aria-disabled' );
+
+			// Hide the 'prev' button if we moved backward and we're now in the first slide.
+			if ( 1 === newActiveNumber ) {
+				$prevButton.attr( 'disabled', true );
+				$prevButton.attr( 'aria-disabled', 'true' );
+			}
+		}
+	} );
+
+	/**
+	 * @namespace aria
+	 */
+	let aria = aria || {};
+
+	// Key codes.
+	aria.KeyCode = {
+		TAB: 9,
+		RETURN: 13,
+		ESC: 27,
+		SPACE: 32,
+		PAGE_UP: 33,
+		PAGE_DOWN: 34,
+		END: 35,
+		HOME: 36,
+		LEFT: 37,
+		UP: 38,
+		RIGHT: 39,
+		DOWN: 40,
+		DELETE: 46
+	};
+
+	// Handling accessibility for the tutorials tab.
+	$( '#smush-box-tutorials div[role="link"]' ).on( 'click', function( e ) {
+
+		let ref = e.target !== null ? e.target : e.srcElement;
+
+		if ( ref ) {
+			window.open( ref.getAttribute( 'data-href' ), '_blank' );
+		}
+	}).on( 'keydown', function( e ) {
+
+		const focusOnNextTut = function( direction ) {
+			const current = $( ref ).data( 'tutorial' ),
+				next = 'next' === direction ? current + 1 : current - 1;
+
+			let $nextTut = $( `#smush-box-tutorials [data-tutorial="${ next }"]` );
+
+			// When we are at the end and moving forward, or at the beginning and moving backward.
+			if ( ! $nextTut.length ) {
+				const allTuts = $( '#smush-box-tutorials .wp-smush-tutorial-item' ),
+					nextTutKey = 'next' === direction ? 0 : allTuts.length - 1;
+				$nextTut = allTuts[ nextTutKey ];
+			}
+
+			$nextTut.focus();
+		}
+
+		let key = e.which || e.keyCode,
+			ref = e.target !== null ? e.target : e.srcElement;
+
+		switch ( key ) {
+
+			case aria.KeyCode.RETURN :
+				if ( ref ) {
+					window.open( ref.getAttribute( 'data-href' ), '_blank' );
+				}
+				break;
+
+			case aria.KeyCode.LEFT :
+				focusOnNextTut( 'prev' );
+				break;
+
+			case aria.KeyCode.RIGHT :
+				focusOnNextTut( 'next' );
+				break;
+		}
+	});
 } );

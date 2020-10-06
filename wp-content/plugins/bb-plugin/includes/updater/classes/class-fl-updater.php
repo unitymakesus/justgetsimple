@@ -213,7 +213,8 @@ final class FLUpdater {
 			return $false;
 		}
 
-		$response = $this->get_response();
+		$response  = $this->get_response();
+		$changelog = __( 'Could not locate changelog.txt', 'fl-builder' );
 
 		if ( ! isset( $response->error ) ) {
 
@@ -229,6 +230,23 @@ final class FLUpdater {
 			$info->last_updated  = $response->last_updated;
 			$info->download_link = $response->package;
 			$info->sections      = (array) $response->sections;
+			return apply_filters( 'fl_plugin_info_data', $info, $response );
+		} else {
+			if ( 'bb-plugin' === $this->settings['slug'] && file_exists( trailingslashit( plugin_dir_path( FL_BUILDER_FILE ) ) . '/changelog.txt' ) ) {
+				$changelog = file_get_contents( trailingslashit( plugin_dir_path( FL_BUILDER_FILE ) ) . '/changelog.txt' );
+			}
+			if ( 'bb-theme-builder' === $this->settings['slug'] && file_exists( trailingslashit( plugin_dir_path( FL_THEME_BUILDER_FILE ) ) . '/changelog.txt' ) ) {
+				$changelog = file_get_contents( trailingslashit( plugin_dir_path( FL_THEME_BUILDER_FILE ) ) . '/changelog.txt' );
+			}
+			$info              = new stdClass();
+			$info->name        = $this->settings['name'];
+			$info->version     = $this->settings['version'];
+			$info->slug        = $this->settings['slug'];
+			$info->plugin_name = $this->settings['name'];
+			$info->homepage    = 'https://www.wpbeaverbuilder.com/';
+
+			$info->sections              = array();
+			$info->sections['changelog'] = $changelog;
 			return apply_filters( 'fl_plugin_info_data', $info, $response );
 		}
 

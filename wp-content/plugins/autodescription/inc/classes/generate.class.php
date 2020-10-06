@@ -6,7 +6,7 @@
 
 namespace The_SEO_Framework;
 
-defined( 'THE_SEO_FRAMEWORK_PRESENT' ) or die;
+\defined( 'THE_SEO_FRAMEWORK_PRESENT' ) or die;
 
 /**
  * The SEO Framework plugin
@@ -48,7 +48,7 @@ class Generate extends User_Data {
 
 		if ( null === $args ) return;
 
-		if ( is_array( $args ) ) {
+		if ( \is_array( $args ) ) {
 			if ( ! isset( $args['id'], $args['taxonomy'] ) ) {
 				$args = array_merge(
 					[
@@ -206,7 +206,7 @@ class Generate extends User_Data {
 			$max_video_preview = $this->get_option( 'max_video_preview' );
 		}
 
-		//* Check homepage SEO settings, set noindex, nofollow and noarchive
+		// Check homepage SEO settings, set noindex, nofollow and noarchive
 		if ( $this->is_real_front_page() ) {
 			$noindex   = $noindex || $this->get_option( 'homepage_noindex' );
 			$nofollow  = $nofollow || $this->get_option( 'homepage_nofollow' );
@@ -214,7 +214,7 @@ class Generate extends User_Data {
 
 			if ( ! ( $ignore & ROBOTS_IGNORE_PROTECTION ) ) :
 				$noindex = $noindex
-						|| ( $this->get_option( 'home_paged_noindex' ) && ( $this->page() > 1 || $this->paged() > 1 ) );
+					|| ( $this->get_option( 'home_paged_noindex' ) && ( $this->page() > 1 || $this->paged() > 1 ) );
 			endif;
 		} else {
 			global $wp_query;
@@ -275,12 +275,14 @@ class Generate extends User_Data {
 			foreach ( $this->get_post_types_from_taxonomy() as $post_type ) {
 				foreach ( [ 'noindex', 'nofollow', 'noarchive' ] as $r ) {
 					// SECURITY: Put in array to circumvent GLOBALS injection.
+					// FIXME: Shouldn't we check for $$r before? Saves processing power.
 					$_post_type_meta[ $r ][] = $this->is_post_type_robots_set( $r, $post_type );
 				}
 			}
 			// Only enable if all post types have the value ticked.
 			foreach ( $_post_type_meta as $_type => $_values ) {
-				$$_type = $$_type || ! in_array( false, $_values, true );
+				// FIXME: Isn't $$_type just $$r?
+				$$_type = $$_type || ! \in_array( false, $_values, true );
 			}
 
 			$taxonomy = $this->get_current_taxonomy();
@@ -415,7 +417,7 @@ class Generate extends User_Data {
 			}
 			// Only enable if all post types have the value ticked.
 			foreach ( $_post_type_meta as $_type => $_values ) {
-				$$_type = $$_type || ! in_array( false, $_values, true );
+				$$_type = $$_type || ! \in_array( false, $_values, true );
 			}
 
 			foreach ( [ 'noindex', 'nofollow', 'noarchive' ] as $r ) {
@@ -510,7 +512,7 @@ class Generate extends User_Data {
 			}
 			// Only enable if all post types have the value ticked.
 			foreach ( $_post_type_meta as $_type => $_values ) {
-				$$_type = $$_type || ! in_array( false, $_values, true );
+				$$_type = $$_type || ! \in_array( false, $_values, true );
 			}
 
 			$noindex = $noindex || $this->is_taxonomy_robots_set( 'noindex', $args['taxonomy'] );
@@ -552,13 +554,14 @@ class Generate extends User_Data {
 	 * @since 3.1.0
 	 * @since 4.0.5 The `$post_type` fallback now uses a real query ID, instead of `$GLOBALS['post']`;
 	 *              mitigating issues with singular-archives pages (blog, shop, etc.).
+	 * @since 4.1.1 Now tests for not empty, instead of isset. We no longer support PHP 5.4 since v4.0.0.
 	 *
 	 * @param string $type      Accepts 'noindex', 'nofollow', 'noarchive'.
 	 * @param string $post_type The post type, optional. Leave empty to autodetermine type.
 	 * @return bool True if noindex, nofollow, or noarchive is set; false otherwise.
 	 */
 	public function is_post_type_robots_set( $type, $post_type = '' ) {
-		return isset(
+		return ! empty(
 			$this->get_option(
 				$this->get_robots_post_type_option_id( $type )
 			)[ $post_type ?: $this->get_post_type_real_ID() ?: $this->get_admin_post_type() ]
@@ -569,13 +572,14 @@ class Generate extends User_Data {
 	 * Determines if the taxonomy has a robots value set.
 	 *
 	 * @since 4.1.0
+	 * @since 4.1.1 Now tests for not empty, instead of isset. We no longer support PHP 5.4 since v4.0.0.
 	 *
 	 * @param string $type     Accepts 'noindex', 'nofollow', 'noarchive'.
 	 * @param string $taxonomy The taxonomy, optional. Leave empty to autodetermine type.
 	 * @return bool True if noindex, nofollow, or noarchive is set; false otherwise.
 	 */
 	public function is_taxonomy_robots_set( $type, $taxonomy = '' ) {
-		return isset(
+		return ! empty(
 			$this->get_option(
 				$this->get_robots_taxonomy_option_id( $type )
 			)[ $taxonomy ?: $this->get_current_taxonomy() ]
@@ -648,7 +652,7 @@ class Generate extends User_Data {
 		if ( ! $match )
 			$match = \get_locale();
 
-		$match_len     = strlen( $match );
+		$match_len     = \strlen( $match );
 		$valid_locales = $this->fb_locales();
 
 		if ( $match_len > 5 ) {
@@ -660,7 +664,7 @@ class Generate extends User_Data {
 		if ( 5 === $match_len ) {
 			// Full locale is used.
 
-			if ( in_array( $match, $valid_locales, true ) )
+			if ( \in_array( $match, $valid_locales, true ) )
 				return $match;
 
 			// Convert to only language portion.
@@ -671,10 +675,8 @@ class Generate extends User_Data {
 		if ( 2 === $match_len ) {
 			// Only a language key is provided.
 
-			$locale_keys = (array) $this->language_keys();
-
 			// Find first matching key.
-			$key = array_search( $match, $locale_keys, true );
+			$key = array_search( $match, $this->language_keys(), true );
 
 			if ( $key ) {
 				return $valid_locales[ $key ];
@@ -764,8 +766,8 @@ class Generate extends User_Data {
 		$option = $this->get_option( 'twitter_card' );
 		$option = trim( \esc_attr( $option ) );
 
-		//* Option is equal to found cards. Output option.
-		if ( in_array( $option, $available_cards, true ) ) {
+		// Option is equal to found cards. Output option.
+		if ( \in_array( $option, $available_cards, true ) ) {
 			if ( 'summary_large_image' === $option ) {
 				$type = 'summary_large_image';
 			} elseif ( 'summary' === $option ) {

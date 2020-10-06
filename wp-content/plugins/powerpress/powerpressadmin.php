@@ -3121,7 +3121,7 @@ function powerpress_edit_category_form($cat)
 <?php
 	}
 }
-add_action('edit_category_form', 'powerpress_edit_category_form');
+add_action('category_edit_form', 'powerpress_edit_category_form');
 
 // Admin page, header
 function powerpress_admin_page_header($page=false, $nonce_field = 'powerpress-edit', $page_type='')

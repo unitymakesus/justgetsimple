@@ -6,7 +6,7 @@
 
 namespace The_SEO_Framework;
 
-defined( 'THE_SEO_FRAMEWORK_PRESENT' ) or die;
+\defined( 'THE_SEO_FRAMEWORK_PRESENT' ) or die;
 
 /**
  * The SEO Framework plugin
@@ -423,7 +423,7 @@ class Generate_Url extends Generate_Title {
 	 */
 	public function get_post_type_archive_canonical_url( $post_type = null ) {
 
-		if ( is_int( $post_type ) ) {
+		if ( \is_int( $post_type ) ) {
 			$this->_doing_it_wrong( __METHOD__, 'Only send strings or null in the first parameter.', '4.0.0' );
 			$post_type = '';
 		}
@@ -432,7 +432,7 @@ class Generate_Url extends Generate_Title {
 
 		if ( null === $post_type ) {
 			$post_type = \get_query_var( 'post_type' );
-			$post_type = is_array( $post_type ) ? reset( $post_type ) : $post_type;
+			$post_type = \is_array( $post_type ) ? reset( $post_type ) : $post_type;
 
 			$query = false;
 		}
@@ -494,7 +494,7 @@ class Generate_Url extends Generate_Title {
 			$_get = 'year';
 		}
 
-		//* Determine whether the input matches query.
+		// Determine whether the input matches query.
 		$_paginate = true;
 		switch ( $_get ) {
 			case 'day':
@@ -739,7 +739,7 @@ class Generate_Url extends Generate_Title {
 	public function remove_pagination_from_url( $url, $page = null, $use_base = null ) {
 
 		if ( $this->pretty_permalinks ) {
-			//* Defensive programming...
+			// Defensive programming...
 			static $user_slash, $base;
 			$user_slash = isset( $user_slash ) ? $user_slash :
 				( $GLOBALS['wp_rewrite']->use_trailing_slashes ? '/' : '' );
@@ -763,8 +763,8 @@ class Generate_Url extends Generate_Title {
 					$url = $this->s_url( $url );
 
 				$pos = strrpos( $url, $find );
-				//* Defensive programming, only remove if $find matches the stack length, without query arguments.
-				$continue = $pos && $pos + strlen( $find ) === strlen( $url );
+				// Defensive programming, only remove if $find matches the stack length, without query arguments.
+				$continue = $pos && $pos + \strlen( $find ) === \strlen( $url );
 
 				if ( $continue ) {
 					$url = substr( $url, 0, $pos );
@@ -842,7 +842,7 @@ class Generate_Url extends Generate_Title {
 			} elseif ( $this->is_author() ) {
 				$url = \add_query_arg( [ 'author' => $id ], $home );
 			} elseif ( $this->is_tax() ) {
-				//* Generate shortlink for object type and slug.
+				// Generate shortlink for object type and slug.
 				$object = \get_queried_object();
 
 				$tax  = isset( $object->taxonomy ) ? $object->taxonomy : '';

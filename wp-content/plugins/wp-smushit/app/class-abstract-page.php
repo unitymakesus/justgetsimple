@@ -376,15 +376,7 @@ abstract class Abstract_Page {
 		// Load page header.
 		$this->render_page_header();
 		$this->add_update_dialog();
-
-		$hide_quick_setup = false !== get_option( 'skip-smush-setup' );
-
-		// Show configure screen for only a new installation and for only network admins.
-		if ( ( ! is_multisite() && ! $hide_quick_setup ) || ( is_multisite() && ! is_network_admin() && ! $this->settings->is_network_enabled() && ! $hide_quick_setup ) ) {
-			$this->view( 'onboarding', array(), 'modals' );
-			$this->view( 'checking-files', array(), 'modals' );
-		}
-
+		$this->show_modals();
 		$this->render_inner_content();
 
 		// Nonce field.
@@ -415,6 +407,44 @@ abstract class Abstract_Page {
 			});
 		</script>
 		<?php
+	}
+
+	/**
+	 * Show onboarding and new feature dialogs.
+	 *
+	 * @since 3.7.0
+	 */
+	private function show_modals() {
+		$hide_quick_setup = false !== get_option( 'skip-smush-setup' );
+
+		// Show configure screen for only a new installation and for only network admins.
+		if ( ( ! is_multisite() && ! $hide_quick_setup ) || ( is_multisite() && ! is_network_admin() && ! $this->settings->is_network_enabled() && ! $hide_quick_setup ) ) {
+			$this->view( 'onboarding', array(), 'modals' );
+			$this->view( 'checking-files', array(), 'modals' );
+		}
+
+		// Show new features modal the modal wasn't dismissed, and docs aren't hidden.
+		if ( get_site_option( WP_SMUSH_PREFIX . 'show_upgrade_modal' ) && ! apply_filters( 'wpmudev_branding_hide_doc_link', false ) ) {
+
+			// Display only on single installs and on Network admin for multisites.
+			if ( ( ! is_multisite() && $hide_quick_setup ) || ( is_multisite() && is_network_admin() ) ) {
+				$cta_url = $this->get_tab_url( 'tutorials' );
+
+				// In MU, use the main site URL if the 'tutorials' tab isn't shown on the Network admin.
+				if ( is_multisite() && empty( $this->tabs['tutorials'] ) ) {
+					$cta_url = menu_page_url( 'smush', false ) . '&view=tutorials';
+				}
+
+				$this->view( 'updated', array( 'cta_url' => $cta_url ), 'modals' );
+				?>
+				<script>
+					window.addEventListener("load", function(){
+						window.SUI.openModal( 'smush-updated-dialog', 'wpbody-content', undefined, false );
+					});
+				</script>
+				<?php
+			}
+		}
 	}
 
 	/**
@@ -554,8 +584,13 @@ abstract class Abstract_Page {
 		<div class="sui-header wp-smush-page-header">
 			<h1 class="sui-header-title"><?php esc_html_e( 'DASHBOARD', 'wp-smushit' ); ?></h1>
 			<div class="sui-actions-right">
-				<?php if ( ! is_network_admin() && ( 'bulk' === $this->get_current_tab() || 'gallery_page_wp-smush-nextgen-bulk' === $this->page_id ) ) : ?>
-					<?php $data_type = 'gallery_page_wp-smush-nextgen-bulk' === $current_screen->id ? 'nextgen' : 'media'; ?>
+				<?php
+				if (
+					! is_network_admin() &&
+					( 'bulk' === $this->get_current_tab() || in_array( $this->page_id, array( 'nextgen-gallery_page_wp-smush-nextgen-bulk', 'gallery_page_wp-smush-nextgen-bulk' ), true ) )
+				) :
+					?>
+					<?php $data_type = in_array( $current_screen->id, array( 'nextgen-gallery_page_wp-smush-nextgen-bulk', 'gallery_page_wp-smush-nextgen-bulk' ), true ) ? 'nextgen' : 'media'; ?>
 					<button class="sui-button wp-smush-scan" data-tooltip="<?php esc_attr_e( 'Lets you check if any images can be further optimized. Useful after changing settings.', 'wp-smushit' ); ?>" data-type="<?php echo esc_attr( $data_type ); ?>">
 						<i class="sui-icon-update" aria-hidden="true"></i>
 						<?php esc_html_e( 'Re-Check Images', 'wp-smushit' ); ?>
@@ -563,12 +598,12 @@ abstract class Abstract_Page {
 				<?php endif; ?>
 				<?php if ( ! apply_filters( 'wpmudev_branding_hide_doc_link', false ) ) : ?>
 					<?php
-					$doc = 'https://premium.wpmudev.org/project/wp-smush-pro/#wpmud-hg-project-documentation';
+					$doc = 'https://premium.wpmudev.org/docs/wpmu-dev-plugins/smush/';
 					if ( WP_Smush::is_pro() ) {
 						$doc = 'https://premium.wpmudev.org/docs/wpmu-dev-plugins/smush/?utm_source=smush&utm_medium=plugin&utm_campaign=smush_pluginlist_docs';
 					}
 					?>
-					<a href="<?php echo esc_url( $doc ); ?>>" class="sui-button sui-button-ghost" target="_blank">
+					<a href="<?php echo esc_url( $doc ); ?>" class="sui-button sui-button-ghost" target="_blank">
 						<i class="sui-icon-academy" aria-hidden="true"></i> <?php esc_html_e( 'Documentation', 'wp-smushit' ); ?>
 					</a>
 				<?php endif; ?>
@@ -578,6 +613,7 @@ abstract class Abstract_Page {
 		<div class="sui-floating-notices">
 			<div role="alert" id="wp-smush-ajax-notice" class="sui-notice" aria-live="assertive"></div>
 			<div role="alert" id="wp-smush-s3support-alert" class="sui-notice" aria-live="assertive"></div>
+			<div role="alert" id="wp-smush-hide-tutorials-notice" class="sui-notice" aria-live="assertive"></div>
 			<?php do_action( 'wp_smush_header_notices' ); ?>
 		</div>
 		<?php
@@ -693,6 +729,13 @@ abstract class Abstract_Page {
 	 */
 	public function builtin_wpmudev_branding( $plugin_pages ) {
 		$plugin_pages['gallery_page_wp-smush-nextgen-bulk'] = array(
+			'wpmudev_whitelabel_sui_plugins_branding',
+			'wpmudev_whitelabel_sui_plugins_footer',
+			'wpmudev_whitelabel_sui_plugins_doc_links',
+		);
+
+		// There's a different page ID since NextGen 3.3.6.
+		$plugin_pages['nextgen-gallery_page_wp-smush-nextgen-bulk'] = array(
 			'wpmudev_whitelabel_sui_plugins_branding',
 			'wpmudev_whitelabel_sui_plugins_footer',
 			'wpmudev_whitelabel_sui_plugins_doc_links',

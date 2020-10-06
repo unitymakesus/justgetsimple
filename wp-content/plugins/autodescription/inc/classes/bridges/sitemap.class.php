@@ -23,7 +23,7 @@ namespace The_SEO_Framework\Bridges;
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-defined( 'THE_SEO_FRAMEWORK_PRESENT' ) or die;
+\defined( 'THE_SEO_FRAMEWORK_PRESENT' ) or die;
 
 /**
  * Sets up class loader as file is loaded.
@@ -33,6 +33,7 @@ defined( 'THE_SEO_FRAMEWORK_PRESENT' ) or die;
  * @link https://bugs.php.net/bug.php?id=75771
  */
 $_load_sitemap_class = function() {
+	// phpcs:ignore, TSF.Performance.Opcodes.ShouldHaveNamespaceEscape
 	new Sitemap();
 };
 
@@ -144,7 +145,7 @@ final class Sitemap {
 		 */
 		\do_action( 'the_seo_framework_sitemap_header', $sitemap_id );
 
-		call_user_func( $this->get_sitemap_endpoint_list()[ $sitemap_id ]['callback'], $sitemap_id );
+		\call_user_func( $this->get_sitemap_endpoint_list()[ $sitemap_id ]['callback'], $sitemap_id );
 	}
 
 	/**
@@ -245,7 +246,7 @@ final class Sitemap {
 	 */
 	public function output_base_sitemap() {
 
-		//* Remove output, if any.
+		// Remove output, if any.
 		static::$tsf->clean_response_header();
 
 		if ( ! headers_sent() ) {
@@ -253,7 +254,7 @@ final class Sitemap {
 			header( 'Content-type: text/xml; charset=utf-8', true );
 		}
 
-		//* Fetch sitemap content and add trailing line. Already escaped internally.
+		// Fetch sitemap content and add trailing line. Already escaped internally.
 		static::$tsf->get_view( 'sitemap/xml-sitemap' );
 		echo "\n";
 
@@ -329,7 +330,7 @@ final class Sitemap {
 		$urlset = '<urlset';
 		foreach ( $schemas as $type => $values ) {
 			$urlset .= ' ' . $type . '="';
-			if ( is_array( $values ) ) {
+			if ( \is_array( $values ) ) {
 				$urlset .= implode( ' ', $values );
 			} else {
 				$urlset .= $values;
@@ -455,9 +456,22 @@ final class Sitemap {
 	}
 
 	/**
+	 * Returns freed memory for debugging.
+	 *
+	 * This method is to be used after outputting the sitemap.
+	 *
+	 * @since 4.1.1
+	 *
+	 * @return int bytes freed.
+	 */
+	public function get_freed_memory() {
+		return $this->clean_up_globals( true );
+	}
+
+	/**
 	 * Destroys unused $GLOBALS.
 	 *
-	 * This method is to be used prior to outputting sitemap.
+	 * This method is to be used prior to outputting the sitemap.
 	 *
 	 * @since 2.6.0
 	 * @since 2.8.0 Renamed from clean_up_globals().
@@ -465,7 +479,7 @@ final class Sitemap {
 	 *              2. Renamed from clean_up_globals_for_sitemap()
 	 *
 	 * @param bool $get_freed_memory Whether to return the freed memory in bytes.
-	 * @return int $freed_memory
+	 * @return int $freed_memory in bytes
 	 */
 	private function clean_up_globals( $get_freed_memory = false ) {
 
@@ -495,7 +509,7 @@ final class Sitemap {
 		];
 
 		foreach ( $remove as $key => $value ) {
-			if ( is_array( $value ) ) {
+			if ( \is_array( $value ) ) {
 				foreach ( $value as $v )
 					unset( $GLOBALS[ $key ][ $v ] );
 			} else {

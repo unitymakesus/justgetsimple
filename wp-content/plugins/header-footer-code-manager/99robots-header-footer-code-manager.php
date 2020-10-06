@@ -1,11 +1,11 @@
 <?php
 /**
  * Plugin Name: Header Footer Code Manager
- * Plugin URI: https://99robots.com/products
- * Description: Header Footer Code Manager by 99 Robots is a quick and simple way for you to add tracking code snippets, conversion pixels, or other scripts required by third party services for analytics, tracking, marketing, or chat functions. For detailed documentation, please visit the plugin's <a href="https://99robots.com/"> official page</a>.
- * Version: 1.1.7
+ * Plugin URI: https://draftpress.com/products
+ * Description: Header Footer Code Manager by 99 Robots is a quick and simple way for you to add tracking code snippets, conversion pixels, or other scripts required by third party services for analytics, tracking, marketing, or chat functions. For detailed documentation, please visit the plugin's <a href="https://draftpress.com/"> official page</a>.
+ * Version: 1.1.8
  * Author: 99robots
- * Author URI: https://99robots.com/
+ * Author URI: https://draftpress.com/
  * Disclaimer: Use at your own risk. No warranty expressed or implied is provided.
  * Text Domain: 99robots-header-footer-code-manager
  * Domain Path: /languages
@@ -358,7 +358,13 @@ function hfcm_add_snippets( $location = '', $content = '' ) {
 					break;
 				case 's_categories':
 					if ( hfcm_not_empty( $scriptdata, 's_categories' ) && in_category( json_decode( $scriptdata->s_categories ) ) ) {
-						$out = hfcm_render_snippet( $scriptdata );
+
+						if(is_category(json_decode( $scriptdata->s_categories ))){
+							$out = hfcm_render_snippet( $scriptdata );
+						}
+						if(!is_archive() && !is_home()){
+							$out = hfcm_render_snippet( $scriptdata );
+						}
 					}
 					break;
 				case 's_custom_posts':
@@ -386,8 +392,13 @@ function hfcm_add_snippets( $location = '', $content = '' ) {
 					}
 					break;
 				case 's_tags':
-					if ( hfcm_not_empty( $scriptdata, 's_tags' ) && has_tag( json_decode( $scriptdata->s_tags ) ) ) {
-						$out = hfcm_render_snippet( $scriptdata );
+					if ( hfcm_not_empty( $scriptdata, 's_tags' ) && has_tag( json_decode( $scriptdata->s_tags ) )) {
+						if(is_tag(json_decode( $scriptdata->s_tags ))){
+							$out = hfcm_render_snippet( $scriptdata );
+						}
+						if(!is_archive() && !is_home()){
+							$out = hfcm_render_snippet( $scriptdata );
+						}
 					}
 			}
 

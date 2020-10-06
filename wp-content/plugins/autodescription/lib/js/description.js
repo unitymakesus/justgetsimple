@@ -79,7 +79,7 @@ window.tsfDescription = function( $ ) {
 			defaultDescription:   '',
 		};
 		_loadDescriptionActions( element );
-		return descriptionInputInstances.get( element.id );
+		return getInputElement( element.id );
 	}
 
 	/**
@@ -241,7 +241,7 @@ window.tsfDescription = function( $ ) {
 	 * @access private
 	 *
 	 * @function
-	 * @param {!jQuery.Event} event
+	 * @param {Event} event
 	 * @return {undefined}
 	 */
 	const _setReferenceDescription = event => {
@@ -255,9 +255,12 @@ window.tsfDescription = function( $ ) {
 		let referenceValue = tsf.escapeString( tsf.decodeEntities( tsf.sDoubleSpace( text.trim() ) ) );
 
 		references.forEach( reference => {
+			// We require the event below when adjusting some states... Don't uncomment this.
+			// if ( reference.innerHTML = referenceValue ) return;
+
 			reference.innerHTML = referenceValue;
 			// Fires change event. Defered to another thread.
-			setTimeout( () => { $( reference ).change() }, 0 );
+			setTimeout( () => { reference.dispatchEvent( new Event( 'change' ) ) }, 0 );
 		} );
 	}
 
@@ -269,7 +272,7 @@ window.tsfDescription = function( $ ) {
 	 * @access private
 	 *
 	 * @function
-	 * @param {!jQuery.Event} event
+	 * @param {Event} event
 	 * @return {undefined}
 	 */
 	const _updatePlaceholder = event => {
@@ -284,7 +287,7 @@ window.tsfDescription = function( $ ) {
 	 * @since 3.1.0 Now uses the new guidelines via a filterable function in PHP.
 	 *
 	 * @function
-	 * @param {!jQuery.Event} event
+	 * @param {Event} event
 	 * @return {undefined}
 	 */
 	const _updateCounter = event => {
@@ -310,7 +313,7 @@ window.tsfDescription = function( $ ) {
 	 * @access private
 	 *
 	 * @function
-	 * @param {!jQuery.Event} event
+	 * @param {Event} event
 	 * @return {undefined}
 	 */
 	const _updatePixels = event => {
@@ -342,7 +345,8 @@ window.tsfDescription = function( $ ) {
 	 */
 	const triggerInput = id => {
 		if ( id ) {
-			$( descriptionInputInstances.get( id ) ).trigger( 'input.tsfUpdateDescriptions' );
+			let el = getInputElement( id );
+			el && el.dispatchEvent( new Event( 'input' ) );
 		} else {
 			// We don't want it to loop infinitely. Check element.id value first.
 			descriptionInputInstances.forEach( element => element.id && triggerInput( element.id ) );
@@ -362,7 +366,8 @@ window.tsfDescription = function( $ ) {
 	 */
 	const triggerCounter = id => {
 		if ( id ) {
-			$( descriptionInputInstances.get( id ) ).trigger( 'tsf-update-description-counter' );
+			let el = getInputElement( id );
+			el && el.dispatchEvent( new CustomEvent( 'tsf-update-description-counter' ) );
 		} else {
 			// We don't want it to loop infinitely. Check element.id value first.
 			descriptionInputInstances.forEach( element => element.id && triggerCounter( element.id ) );
@@ -378,7 +383,7 @@ window.tsfDescription = function( $ ) {
 	 * @uses _onUpdateCounterTrigger
 	 *
 	 * @function
-	 * @param {!jQuery.Event} event
+	 * @param {Event} event
 	 * @return {undefined}
 	 */
 	const _onUpdateDescriptionsTrigger = event => {
@@ -397,7 +402,7 @@ window.tsfDescription = function( $ ) {
 	 * @see triggerCounter
 	 *
 	 * @function
-	 * @param {!jQuery.Event} event
+	 * @param {Event} event
 	 * @return {undefined}
 	 */
 	const _onUpdateCounterTrigger = event => {
@@ -411,6 +416,7 @@ window.tsfDescription = function( $ ) {
 	 *
 	 * @since 4.0.0
 	 * @since 4.1.0 Added first parameter, id.
+	 * @since 4.1.1 Now passes the right parameter to the input event.
 	 * @access public
 	 *
 	 * @function
@@ -419,7 +425,7 @@ window.tsfDescription = function( $ ) {
 	 */
 	const enqueueTriggerInput = id => {
 		( id in _enqueueTriggerInputBuffer ) && clearTimeout( _enqueueTriggerInputBuffer[ id ] );
-		_enqueueTriggerInputBuffer[ id ] = setTimeout( triggerInput, 10 );
+		_enqueueTriggerInputBuffer[ id ] = setTimeout( () => triggerInput( id ), 10 );
 	}
 
 	/**
@@ -430,15 +436,19 @@ window.tsfDescription = function( $ ) {
 	 * @access public
 	 *
 	 * @function
-	 * @param {!jQuery.Event}
+	 * @param {Event}
 	 * @param {string} id The input id. When not set, all inputs will be triggered.
 	 * @return {undefined}
 	 */
 	const triggerUnregisteredInput = id => {
 		if ( 'tsfAys' in window ) {
-			let settingsChangedCache = tsfAys.getChangedState;
+			let wereSettingsChanged = tsfAys.areSettingsChanged();
+
 			triggerInput( id );
-			if ( ! settingsChangedCache ) tsfAys.reset();
+
+			// Only reset if we polluted the change listener, and only if a change wasn't already registered.
+			if ( ! wereSettingsChanged && tsfAys.areSettingsChanged() )
+				tsfAys.reset();
 		} else {
 			triggerInput( id );
 		}
@@ -497,6 +507,7 @@ window.tsfDescription = function( $ ) {
 	 * Initializes the description environment.
 	 *
 	 * @since 4.1.0
+	 * @since 4.1.1 No longer passes the event to the enqueueUnregisteredInputTrigger() callback.
 	 * @access private
 	 *
 	 * @function
@@ -509,7 +520,7 @@ window.tsfDescription = function( $ ) {
 		$( document ).on( 'wp-window-resized', _doResize );
 
 		// When counters are updated, trigger an input; which will reassess them.
-		window.addEventListener( 'tsf-counter-updated', enqueueTriggerInput );
+		window.addEventListener( 'tsf-counter-updated', () => enqueueUnregisteredInputTrigger() );
 	}
 
 	/**
@@ -525,12 +536,8 @@ window.tsfDescription = function( $ ) {
 	const _loadDescriptionActions = descriptionInput => {
 		if ( ! descriptionInput instanceof Element ) return;
 
-		$( descriptionInput )
-			.off( 'input.tsfUpdateDescriptions', _onUpdateDescriptionsTrigger )
-			.on( 'input.tsfUpdateDescriptions', _onUpdateDescriptionsTrigger );
-		$( descriptionInput )
-			.off( 'tsf-update-description-counter', _onUpdateCounterTrigger )
-			.on( 'tsf-update-description-counter', _onUpdateCounterTrigger );
+		descriptionInput.addEventListener( 'input', _onUpdateDescriptionsTrigger );
+		descriptionInput.addEventListener( 'tsf-update-description-counter', _onUpdateCounterTrigger );
 
 		enqueueUnregisteredInputTrigger( descriptionInput.id );
 	}
@@ -561,7 +568,7 @@ window.tsfDescription = function( $ ) {
 		triggerInput,
 		enqueueTriggerInput,
 		triggerUnregisteredInput,
-		enqueueUnregisteredInputTrigger,
+		enqueueUnregisteredInputTrigger, // this should've been enqueueTriggerUnregisteredInput...
 	}, {
 		l10n
 	} );

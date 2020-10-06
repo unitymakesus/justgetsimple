@@ -4,13 +4,14 @@
  * @subpackage The_SEO_Framework\Admin\Settings
  */
 
-use The_SEO_Framework\Bridges\SeoSettings;
-
-defined( 'THE_SEO_FRAMEWORK_PRESENT' ) and $_this = the_seo_framework_class() and $this instanceof $_this or die;
-
+// phpcs:disable, VariableAnalysis.CodeAnalysis.VariableAnalysis.UndefinedVariable -- includes.
 // phpcs:disable, WordPress.WP.GlobalVariablesOverride -- This isn't the global scope.
 
-//* Fetch the required instance within this file.
+use The_SEO_Framework\Bridges\SeoSettings;
+
+defined( 'THE_SEO_FRAMEWORK_PRESENT' ) and the_seo_framework()->_verify_include_secret( $_secret ) or die;
+
+// Fetch the required instance within this file.
 $instance = $this->get_view_instance( 'the_seo_framework_sitemaps_metabox', $instance );
 
 switch ( $instance ) :
@@ -79,7 +80,7 @@ switch ( $instance ) :
 		<h4><?php esc_html_e( 'Sitemap Output', 'autodescription' ); ?></h4>
 		<?php
 
-		//* Echo checkbox.
+		// Echo checkbox.
 		$this->wrap_fields(
 			$this->make_checkbox(
 				'sitemaps_output',
@@ -116,7 +117,7 @@ switch ( $instance ) :
 		<?php
 		$this->description( __( 'The sitemap is generated with two queries: Hierarchical and non-hierarchical post types. This setting affects how many posts are requested from the database per query. The homepage and blog page are included separately.', 'autodescription' ) );
 
-		if ( \has_filter( 'the_seo_framework_sitemap_post_limit' ) ) :
+		if ( has_filter( 'the_seo_framework_sitemap_post_limit' ) ) :
 			?>
 			<input type=hidden name="<?php $this->field_name( 'sitemap_query_limit' ); ?>" value="<?php echo absint( $this->get_sitemap_post_limit() ); ?>">
 			<p>
@@ -212,7 +213,7 @@ switch ( $instance ) :
 		<?php
 		$this->description( __( 'The modified time suggests to search engines where to look for content changes first.', 'autodescription' ) );
 
-		//* Echo checkbox.
+		// Echo checkbox.
 		$this->wrap_fields(
 			$this->make_checkbox(
 				'sitemaps_modified',
@@ -234,7 +235,7 @@ switch ( $instance ) :
 		<?php
 		$this->description( __( 'The priority index suggests to search engines which pages are deemed more important. It has no known impact on the SEO value and it is generally ignored.', 'autodescription' ) );
 
-		//* Echo checkbox.
+		// Echo checkbox.
 		$this->wrap_fields(
 			$this->make_checkbox(
 				'sitemaps_priority',
@@ -291,7 +292,7 @@ switch ( $instance ) :
 			$ping_checkbox .= $this->make_checkbox( $option, $ping_label, '', true );
 		}
 
-		//* Echo checkbox.
+		// Echo checkbox.
 		$this->wrap_fields( $ping_checkbox, true );
 		break;
 
@@ -358,8 +359,8 @@ switch ( $instance ) :
 			true
 		);
 
-		$ph_id  = \get_theme_mod( 'custom_logo' ) ?: 0;
-		$ph_src = $ph_id ? \wp_get_attachment_image_src( $ph_id, [ 29, 29 ] ) : [];
+		$ph_id  = get_theme_mod( 'custom_logo' ) ?: 0;
+		$ph_src = $ph_id ? wp_get_attachment_image_src( $ph_id, [ 29, 29 ] ) : [];
 
 		$logo_placeholder = ! empty( $ph_src[0] ) ? $ph_src[0] : '';
 		?>

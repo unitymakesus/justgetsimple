@@ -93,6 +93,8 @@ class Ajax {
 		add_action( 'wp_ajax_wp_smushit_bulk', array( $this, 'process_smush_request' ) );
 		// Remove from skip list.
 		add_action( 'wp_ajax_remove_from_skip_list', array( $this, 'remove_from_skip_list' ) );
+		// Hide Tutorials from bulk Smush.
+		add_action( 'wp_ajax_hide_tutorials_bulk_smush', array( $this, 'hide_tutorials_bulk_smush' ) );
 
 		/**
 		 * DIRECTORY SMUSH
@@ -118,6 +120,9 @@ class Ajax {
 		 * SETTINGS
 		 */
 		add_action( 'wp_ajax_recheck_api_status', array( $this, 'recheck_api_status' ) );
+
+		// Hide the new features modal.
+		add_action( 'wp_ajax_hide_new_features', array( $this, 'hide_new_features_modal' ) );
 	}
 
 	/***************************************
@@ -131,6 +136,16 @@ class Ajax {
 	public function skip_smush_setup() {
 		check_ajax_referer( 'smush_quick_setup' );
 		update_option( 'skip-smush-setup', true );
+		wp_send_json_success();
+	}
+
+	/**
+	 * Hide the new features modal
+	 *
+	 * @since 3.7.0
+	 */
+	public function hide_new_features_modal() {
+		delete_site_option( WP_SMUSH_PREFIX . 'show_upgrade_modal' );
 		wp_send_json_success();
 	}
 
@@ -364,8 +379,6 @@ class Ajax {
 	public function scan_images() {
 		check_ajax_referer( 'save_wp_smush_options', 'wp_smush_options_nonce' );
 
-		wp_cache_delete( 'media_attachments', 'wp-smush' );
-
 		$resmush_list = array();
 
 		// Scanning for NextGen or Media Library.
@@ -425,7 +438,7 @@ class Ajax {
 		}
 
 		// Set to empty by default.
-		$ajax_response = '';
+		$content = '';
 
 		// Get Smushed Attachments.
 		if ( 'nextgen' !== $type ) {
@@ -571,6 +584,13 @@ class Ajax {
 			update_option( $key, $resmush_list, false );
 		}
 
+		// Delete resmush list if empty.
+		if ( empty( $resmush_list ) ) {
+			delete_option( $key );
+		}
+
+		$unsmushed_ids = array();
+
 		// Get updated stats for NextGen.
 		if ( 'nextgen' === $type ) {
 			// Reinitialize NextGen stats.
@@ -580,15 +600,25 @@ class Ajax {
 			$image_count         = $core->nextgen->ng_admin->image_count;
 			$smushed_count       = $core->nextgen->ng_admin->smushed_count;
 			$super_smushed_count = $core->nextgen->ng_admin->super_smushed;
+
+			$count = $core->nextgen->ng_admin->remaining_count;
+
+			if ( 0 < $count ) {
+				$raw_unsmushed = $core->nextgen->ng_stats->get_ngg_images( 'unsmushed' );
+				if ( ! empty( $raw_unsmushed ) && is_array( $raw_unsmushed ) ) {
+					$unsmushed_ids = array_keys( $raw_unsmushed );
+				}
+			}
+		} else {
+			$count = $core->remaining_count;
+
+			if ( 0 < $count ) {
+				$unsmushed_ids = array_values( $core->get_unsmushed_attachments() );
+			}
 		}
 
-		// Delete resmush list if empty.
-		if ( empty( $resmush_list ) ) {
-			delete_option( $key );
-		}
-
-		$resmush_count = $count = count( $resmush_list );
-		$count        += 'nextgen' === $type ? $core->nextgen->ng_admin->remaining_count : $core->remaining_count;
+		$resmush_count = count( $resmush_list );
+		$count        += $resmush_count;
 
 		// Return the Remsmush list and UI to be appended to Bulk Smush UI.
 		if ( $return_ui ) {
@@ -601,7 +631,7 @@ class Ajax {
 			}
 
 			if ( $resmush_count ) {
-				$ajax_response = WP_Smush::get_instance()->admin()->bulk_resmush_content( $count );
+				$content = WP_Smush::get_instance()->admin()->bulk_resmush_content( $count );
 			}
 		}
 
@@ -624,10 +654,9 @@ class Ajax {
 			}
 		}
 
-		// If there is a Ajax response return it, else return null.
-		$return = ! empty( $ajax_response ) ? array(
+		$return = array(
 			'resmush_ids'        => $resmush_list,
-			'content'            => $ajax_response,
+			'unsmushed'          => $unsmushed_ids,
 			'count_image'        => $image_count,
 			'count_supersmushed' => $super_smushed_count,
 			'count_smushed'      => $smushed_count,
@@ -636,7 +665,11 @@ class Ajax {
 			'size_after'         => $stats['size_after'],
 			'savings_resize'     => ! empty( $stats['savings_resize'] ) ? $stats['savings_resize'] : 0,
 			'savings_conversion' => ! empty( $stats['savings_conversion'] ) ? $stats['savings_conversion'] : 0,
-		) : array();
+		);
+
+		if ( ! empty( $content ) ) {
+			$return['content'] = $content;
+		}
 
 		// Include the count.
 		if ( ! empty( $count ) && $count ) {
@@ -941,6 +974,16 @@ class Ajax {
 				'links' => WP_Smush::get_instance()->library()->get_optimization_links( absint( $_POST['id'] ) ),
 			)
 		);
+	}
+
+	/**
+	 * Stores the 'dismissed' status of the tutorials meta-box under the Bulk Smush tab.
+	 *
+	 * @since 3.7.1
+	 */
+	public function hide_tutorials_bulk_smush() {
+		$this->settings->set_setting( WP_SMUSH_PREFIX . 'hide_tutorials_from_bulk_smush', true );
+		wp_send_json_success();
 	}
 
 	/***************************************

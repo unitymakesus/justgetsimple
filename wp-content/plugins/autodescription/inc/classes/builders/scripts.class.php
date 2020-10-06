@@ -23,7 +23,7 @@ namespace The_SEO_Framework\Builders;
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-defined( 'THE_SEO_FRAMEWORK_PRESENT' ) or die;
+\defined( 'THE_SEO_FRAMEWORK_PRESENT' ) or die;
 
 /**
  * Sets up class loader as file is loaded.
@@ -33,6 +33,7 @@ defined( 'THE_SEO_FRAMEWORK_PRESENT' ) or die;
  * @link https://bugs.php.net/bug.php?id=75771
  */
 $_load_scripts_class = function() {
+	// phpcs:ignore, TSF.Performance.Opcodes.ShouldHaveNamespaceEscape
 	new Scripts();
 };
 
@@ -487,8 +488,8 @@ final class Scripts {
 
 			if (
 			   ! isset( $_colors[ $_scheme ]->colors ) // phpcs:ignore, WordPress.WhiteSpace
-			|| ! is_array( $_colors[ $_scheme ]->colors )
-			|| count( $_colors[ $_scheme ]->colors ) < 4
+			|| ! \is_array( $_colors[ $_scheme ]->colors )
+			|| \count( $_colors[ $_scheme ]->colors ) < 4
 			) {
 				$_colors = [
 					'#222',

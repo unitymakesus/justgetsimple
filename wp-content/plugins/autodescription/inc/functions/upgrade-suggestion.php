@@ -23,7 +23,9 @@ namespace The_SEO_Framework\Suggestion;
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-defined( 'THE_SEO_FRAMEWORK_PRESENT' ) or die;
+// phpcs:disable, VariableAnalysis.CodeAnalysis.VariableAnalysis.UndefinedVariable -- includes.
+
+\defined( 'THE_SEO_FRAMEWORK_PRESENT' ) or die;
 
 /**
  * This file holds functions for installing TSFEM.
@@ -34,6 +36,7 @@ defined( 'THE_SEO_FRAMEWORK_PRESENT' ) or die;
  * @access private
  */
 
+// phpcs:ignore, TSF.Performance.Opcodes.ShouldHaveNamespaceEscape
 _prepare( $previous_version, $current_version );
 /**
  * Prepares a suggestion notification to ALL applicable plugin users on upgrade;
@@ -63,13 +66,13 @@ function _prepare( $previous_version, $current_version ) {
 	// phpcs:ignore, WordPress.PHP.StrictComparisons.LooseComparison -- might be mixed types.
 	if ( $previous_version == $current_version ) return;
 	//? 1
-	if ( defined( 'TSF_DISABLE_SUGGESTIONS' ) && TSF_DISABLE_SUGGESTIONS ) return;
+	if ( \defined( 'TSF_DISABLE_SUGGESTIONS' ) && TSF_DISABLE_SUGGESTIONS ) return;
 	//? 2
 	if ( ! \is_main_site() ) return;
 	//? 3a
-	if ( defined( 'TSF_EXTENSION_MANAGER_VERSION' ) ) return;
+	if ( \defined( 'TSF_EXTENSION_MANAGER_VERSION' ) ) return;
 
-	if ( ! function_exists( '\\get_plugins' ) )
+	if ( ! \function_exists( '\\get_plugins' ) )
 		require_once ABSPATH . 'wp-admin/includes/plugin.php';
 
 	//? 3b
@@ -84,7 +87,7 @@ function _prepare( $previous_version, $current_version ) {
 
 	// phpcs:disable, Generic.Formatting.MultipleStatementAlignment, WordPress.WhiteSpace.PrecisionAlignment
 	//? PHP_VERSION_ID is definitely defined, but let's keep it homonymous with the envtest of TSFEM.
-	   ! defined( 'PHP_VERSION_ID' ) || PHP_VERSION_ID < $requirements['php'] and $test = 1
+	   ! \defined( 'PHP_VERSION_ID' ) || PHP_VERSION_ID < $requirements['php'] and $test = 1
 	or version_compare( $GLOBALS['wp_version'], $requirements['wp'], '<' ) and $test = 2
 	or $test = true;
 	// phpcs:enable, Generic.Formatting.MultipleStatementAlignment, WordPress.WhiteSpace.PrecisionAlignment
@@ -92,6 +95,7 @@ function _prepare( $previous_version, $current_version ) {
 	//? 4
 	if ( true !== $test ) return;
 
+	// phpcs:ignore, TSF.Performance.Opcodes.ShouldHaveNamespaceEscape
 	_suggest_extension_manager( $previous_version, $current_version );
 }
 
@@ -99,7 +103,7 @@ function _prepare( $previous_version, $current_version ) {
  * Registers "look at TSFEM" notification to applicable plugin users on upgrade.
  *
  * @since 3.0.6
- * @since 4.1.0 Is now a persistent notice, that outputs at most 3 times, on any admin page, only for users that can install plugins.
+ * @since 4.1.0 Is now a persistent notice, that outputs at most 3 times, on some admin pages, only for users that can install plugins.
  * @access private
  *
  * @param string $previous_version The previous version the site upgraded from, if any.
@@ -109,14 +113,27 @@ function _suggest_extension_manager( $previous_version, $current_version ) {
 
 	$tsf = \the_seo_framework();
 
-	$suggest_key = 'suggest-extension-manager';
+	$suggest_key        = 'suggest-extension-manager';
+	$suggest_args       = [
+		'type'   => 'info',
+		'icon'   => false,
+		'escape' => false,
+	];
+	$suggest_conditions = [
+		'screens'      => [],
+		'excl_screens' => [ 'update-core', 'post', 'term', 'upload', 'media', 'plugin-editor', 'plugin-install', 'themes', 'widgets', 'user', 'nav-menus', 'theme-editor', 'profile', 'export', 'site-health', 'export-personal-data', 'erase-personal-data' ],
+		'capability'   => 'install_plugins',
+		'user'         => 0,
+		'count'        => 3,
+		'timeout'      => DAY_IN_SECONDS * 7,
+	];
 
-	if ( $previous_version < '4103' )
+	if ( $previous_version < '4100' && $current_version < '4200' )
 		$tsf->register_dismissible_persistent_notice(
 			$tsf->convert_markdown(
 				vsprintf(
 					'<p>The SEO Framework was updated to v4.1! It brings 9 new features and [over 350 QOL improvements for performance and accessibility](%s).</p>
-					<p>Did you know we have [10 premium extensions](%s), adding features beyond SEO? Our anti-spam extension runs locally, has a 99.98%% catch rate, and adds only 0.13Kb to your website.</p>
+					<p>Did you know we have [10 premium extensions](%s), adding features beyond SEO? Our anti-spam extension runs locally, has a 99.98%% catch rate, and adds only 0.13KB to your website.</p>
 					<p>We want to make TSF even better for you &mdash; please consider [filling out our survey](%s), it has 5 questions and should take you about 2 minutes. Thank you.</p>',
 					[
 						'https://theseoframework.com/?p=3598',
@@ -128,18 +145,7 @@ function _suggest_extension_manager( $previous_version, $current_version ) {
 				[ 'a_internal' => false ]
 			),
 			$suggest_key,
-			[
-				'type'   => 'info',
-				'icon'   => false,
-				'escape' => false,
-			],
-			[
-				'screens'      => [],
-				'excl_screens' => [ 'update-core', 'post', 'term', 'upload', 'media', 'plugin-editor', 'plugin-install', 'themes', 'widgets', 'user', 'nav-menus', 'theme-editor', 'profile', 'export', 'site-health', 'export-personal-data', 'erase-personal-data' ],
-				'capability'   => 'install_plugins',
-				'user'         => 0,
-				'count'        => 3,
-				'timeout'      => DAY_IN_SECONDS * 7,
-			]
+			$suggest_args,
+			$suggest_conditions
 		);
 }

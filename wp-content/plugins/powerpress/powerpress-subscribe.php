@@ -820,21 +820,20 @@ function powerpress_do_subscribe_widget($settings, $PowerPressSettings)
                 $html .= '<a href="'.  esc_url( $settings['stitcher_url'] ) .'" class="pp-sub-btn'.$settings['subscribe_widget_shape'].' pp-sub-stitcher" title="'.  esc_attr( __('Subscribe on Stitcher', 'powerpress') ) .'"><span class="pp-sub-ic"></span>'.  esc_html( __('Stitcher', 'powerpress') ) .'</a>';
             }
 
-            if( !empty($settings['subscribe_feature_blubrry_shortcode']) ) {
+            if( !empty($settings['subscribe_feature_blubrry_shortcode']) && !empty($settings['blubrry_url']) ) {
 
                 $html .= '<a href="'.  esc_url( $settings['blubrry_url'] ) .'" class="pp-sub-btn'.$settings['subscribe_widget_shape'].' pp-sub-blubrry" title="'.  esc_attr( __('Subscribe on Blubrry', 'powerpress') ) .'"><span class="pp-sub-ic"></span>'.  esc_html( __('Blubrry', 'powerpress') ) .'</a>';
             }
 
-
-    if( !empty($settings['subscribe_feature_iheart_shortcode']) ) {
+            if( !empty($settings['subscribe_feature_iheart_shortcode']) && !empty($settings['iheart_url']) ) {
                 $html .= '<a href="'.  esc_url( $settings['iheart_url'] ) .'" class="pp-sub-btn'.$settings['subscribe_widget_shape'].' pp-sub-iheartradio" title="'.  esc_attr( __('Subscribe on iHeartRadio', 'powerpress') ) .'"><span class="pp-sub-ic"></span>'.  esc_html( __('iHeartRadio', 'powerpress') ) .'</a>';
             }
 
-            if( !empty($settings['subscribe_feature_pandora_shortcode']) ) {
+            if( !empty($settings['subscribe_feature_pandora_shortcode']) && !empty($settings['pandora_url']) ) {
                 $html .= '<a href="'.  esc_url( $settings['pandora_url'] ) .'" class="pp-sub-btn'.$settings['subscribe_widget_shape'].' pp-sub-pandora" title="'.  esc_attr( __('Subscribe on Pandora', 'powerpress') ) .'"><span class="pp-sub-ic"></span>'.  esc_html( __('Pandora', 'powerpress') ) .'</a>';
             }
 
-            if( !empty($settings['subscribe_feature_deezer_shortcode']) ) {
+            if( !empty($settings['subscribe_feature_deezer_shortcode']) && !empty($settings['deezer_url']) ) {
 
                 $html .= '<a href="'.  esc_url( $settings['deezer_url'] ) .'" class="pp-sub-btn'.$settings['subscribe_widget_shape'].' pp-sub-deezer" title="'.  esc_attr( __('Subscribe on Deezer', 'powerpress') ) .'"><span class="pp-sub-ic"></span>'.  esc_html( __('Deezer', 'powerpress') ) .'</a>';
             }

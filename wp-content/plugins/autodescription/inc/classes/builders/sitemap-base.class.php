@@ -23,7 +23,7 @@ namespace The_SEO_Framework\Builders;
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-defined( 'THE_SEO_FRAMEWORK_PRESENT' ) or die;
+\defined( 'THE_SEO_FRAMEWORK_PRESENT' ) or die;
 
 /**
  * Generates the base sitemap.
@@ -78,8 +78,9 @@ class Sitemap_Base extends Sitemap {
 		foreach ( $this->generate_front_and_blog_url_items(
 			compact( 'show_priority', 'show_modified' ),
 			$count
-		) as $_values )
+		) as $_values ) {
 			$content .= $this->build_url_item( $_values );
+		}
 
 		$post_types = array_diff( static::$tsf->get_supported_post_types(), [ 'attachment' ] );
 
@@ -119,7 +120,7 @@ class Sitemap_Base extends Sitemap {
 			$_args = (array) \apply_filters(
 				'the_seo_framework_sitemap_hpt_query_args',
 				[
-					'posts_per_page'   => $_hierarchical_posts_limit + count( $_exclude_ids ),
+					'posts_per_page'   => $_hierarchical_posts_limit + \count( $_exclude_ids ),
 					'post_type'        => $hierarchical_post_types,
 					'orderby'          => 'date',
 					'order'            => 'ASC',
@@ -138,7 +139,7 @@ class Sitemap_Base extends Sitemap {
 
 			// Stop confusion: trim query to set value (by one or two, depending on whether the homepage and blog are included).
 			// This is ultimately redundant, but it'll stop support requests by making the input value more accurate.
-			if ( count( $hierarchical_post_ids ) > $_hierarchical_posts_limit ) {
+			if ( \count( $hierarchical_post_ids ) > $_hierarchical_posts_limit ) {
 				array_splice( $hierarchical_post_ids, $_hierarchical_posts_limit );
 			}
 		}
@@ -187,10 +188,12 @@ class Sitemap_Base extends Sitemap {
 				$non_hierarchical_post_ids,
 			]
 		);
-		$total_items = count( $_items );
+		$total_items = \count( $_items );
 
 		// 49998 = 50000-2 (home+blog), max sitemap items.
 		if ( $total_items > 49998 ) array_splice( $_items, 49998 );
+		// We could also calculate the sitemap length (may not be above 10 MB)...
+		// ...but that'd mean each entry must be at least 200 chars long on avg. Good luck with that.
 
 		foreach ( $this->generate_url_item_values(
 			$_items,
@@ -210,8 +213,11 @@ class Sitemap_Base extends Sitemap {
 		}
 
 		/**
+		 * NOTE: This filter is slower than `the_seo_framework_sitemap_additional_urls`, because it's not a generator.
+		 * If you only need to add a few URLs (fewer than 500), then you can safely use this.
+		 *
 		 * @since 2.5.2
-		 * @since 4.0.0 Added $args parameter
+		 * @since 4.0.0 Added $args parameter.
 		 * @param string $extend Custom sitemap extension. Must be escaped.
 		 * @param array $args : {
 		 *   bool $show_priority : Whether to display priority
@@ -227,8 +233,9 @@ class Sitemap_Base extends Sitemap {
 			]
 		);
 
-		if ( $extend )
+		if ( $extend ) {
 			$content .= "\t" . $extend . "\n";
+		}
 
 		return $content;
 	}
@@ -312,6 +319,12 @@ class Sitemap_Base extends Sitemap {
 					} else {
 						$_values['lastmod'] = $_lastmod_blog;
 					}
+
+					/**
+					 * @since 4.1.1
+					 * @param string $lastmod The lastmod time in SQL notation (`Y-m-d H:i:s`). Expected to explicitly follow that format!
+					 */
+					$_values['lastmod'] = (string) \apply_filters( 'the_seo_framework_sitemap_blog_lastmod', $_values['lastmod'] );
 				}
 
 				if ( $args['show_priority'] ) {
@@ -341,10 +354,14 @@ class Sitemap_Base extends Sitemap {
 						],
 						OBJECT
 					);
-					$latest_post   = isset( $latests_posts[0] ) ? $latests_posts[0] : null;
-					$_publish_post = isset( $latest_post->post_date_gmt ) ? $latest_post->post_date_gmt : '0000-00-00 00:00:00';
 
-					$_values['lastmod'] = $_publish_post;
+					$_values['lastmod'] = isset( $latests_posts[0]->post_date_gmt ) ? $latests_posts[0]->post_date_gmt : '0000-00-00 00:00:00';
+
+					/**
+					 * @since 4.1.1
+					 * @param string $lastmod The lastmod time in SQL notation (`Y-m-d H:i:s`). Expected to explicitly follow that format!
+					 */
+					$_values['lastmod'] = (string) \apply_filters( 'the_seo_framework_sitemap_blog_lastmod', $_values['lastmod'] );
 				}
 
 				if ( $args['show_priority'] ) {
@@ -361,6 +378,7 @@ class Sitemap_Base extends Sitemap {
 	 * Generates sitemap URL item values.
 	 *
 	 * @since 4.0.0
+	 * @since 4.1.1 Now clears WordPress's post cache every time an item is generated.
 	 * @generator
 	 * @iterator
 	 *
@@ -375,7 +393,14 @@ class Sitemap_Base extends Sitemap {
 	 */
 	protected function generate_url_item_values( $post_ids, $args, &$count = 0 ) {
 
+		static $using_external_object_cache = null;
+
+		$using_external_object_cache = isset( $using_external_object_cache ) ? $using_external_object_cache : (bool) \wp_using_ext_object_cache();
+
 		foreach ( $post_ids as $post_id ) {
+			// Setup post cache, which is also used in is_post_included_in_sitemap() and create_canonical_url().
+			$post = \get_post( $post_id );
+
 			if ( $this->is_post_included_in_sitemap( $post_id ) ) {
 				$_values        = [];
 				$_values['loc'] = static::$tsf->create_canonical_url(
@@ -386,19 +411,19 @@ class Sitemap_Base extends Sitemap {
 				);
 
 				if ( $args['show_modified'] ) {
-					$post = \get_post( $post_id );
-
 					$_values['lastmod'] = isset( $post->post_modified_gmt ) ? $post->post_modified_gmt : '0000-00-00 00:00:00';
 				}
 
 				if ( $args['show_priority'] ) {
-					// Add at least 1 to prevent going negative. We add 9 to smoothen the slope.
+					// Add at least 1 to prevent going negative. We added 8 extra (= 9) to smoothen the slope.
 					$_values['priority'] = .949999 - ( $count / ( $args['total_items'] + 9 ) );
 				}
 
 				++$count;
 				yield $_values;
 			}
+
+			$using_external_object_cache or \clean_post_cache( $post );
 		}
 	}
 
@@ -406,10 +431,11 @@ class Sitemap_Base extends Sitemap {
 	 * Builds and returns a sitemap URL item.
 	 *
 	 * @since 4.0.0
+	 * @since 4.1.1 Now uses `create_xml_entry()` to parse the XML.
 	 *
 	 * @param array $args : {
 	 *   string               $loc      : The item's URI.
-	 *   string|void|false    $lastmod  : string if set and not '0000-00-00 00:00:00', false otherwise.
+	 *   string|void|false    $lastmod  : string if set and not '0000-00-00 00:00:00', false otherwise. Expected to be GMT.
 	 *   int|float|void|false $priority : int if set, false otherwise.
 	 * }
 	 * @return string The sitemap item.
@@ -420,28 +446,20 @@ class Sitemap_Base extends Sitemap {
 
 		static $timestamp_format = null;
 
-		$timestamp_format = $timestamp_format ?: static::$tsf->get_timestamp_format();
+		if ( ! isset( $timestamp_format ) )
+			$timestamp_format = static::$tsf->get_timestamp_format();
 
-		// sprintf is heavy. Should we parse this as an array, and mark them up later, instead?
-		// @link https://github.com/sybrew/The-SEO-Framework-Extension-Manager/blob/2.4.0/extensions/essentials/articles/trunk/inc/classes/sitemapbuilder.class.php#L268-L292
-		return sprintf(
-			"\t<url>\n%s\t</url>\n",
-			vsprintf(
-				'%s%s%s',
-				[
-					sprintf(
-						"\t\t<loc>%s</loc>\n",
-						$args['loc'] // Already escaped.
-					),
-					isset( $args['lastmod'] ) && '0000-00-00 00:00:00' !== $args['lastmod']
-						? sprintf( "\t\t<lastmod>%s</lastmod>\n", static::$tsf->gmt2date( $timestamp_format, $args['lastmod'] ) )
-						: '',
-					isset( $args['priority'] ) && is_numeric( $args['priority'] )
-						? sprintf( "\t\t<priority>%s</priority>\n", number_format( $args['priority'], 1, '.', ',' ) )
-						: '',
-				]
-			)
-		);
+		$xml = [
+			'loc' => $args['loc'], // Already escaped.
+		];
+
+		if ( isset( $args['lastmod'] ) && '0000-00-00 00:00:00' !== $args['lastmod'] )
+			$xml['lastmod'] = static::$tsf->gmt2date( $timestamp_format, $args['lastmod'] );
+
+		if ( isset( $args['priority'] ) && is_numeric( $args['priority'] ) )
+			$xml['priority'] = number_format( $args['priority'], 1, '.', ',' );
+
+		return $this->create_xml_entry( [ 'url' => $xml ], 1 );
 	}
 
 	/**
@@ -487,8 +505,8 @@ class Sitemap_Base extends Sitemap {
 		$custom_urls = (array) \apply_filters( 'the_seo_framework_sitemap_additional_urls', [], $args );
 
 		foreach ( $custom_urls as $url => $values ) {
-			if ( ! is_array( $values ) ) {
-				//* If there are no args, it's assigned as URL (per example)
+			if ( ! \is_array( $values ) ) {
+				// If there are no args, it's assigned as URL (per example)
 				$url = $values;
 			}
 

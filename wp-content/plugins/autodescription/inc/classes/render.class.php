@@ -6,7 +6,7 @@
 
 namespace The_SEO_Framework;
 
-defined( 'THE_SEO_FRAMEWORK_PRESENT' ) or die;
+\defined( 'THE_SEO_FRAMEWORK_PRESENT' ) or die;
 
 /**
  * The SEO Framework plugin
@@ -808,7 +808,7 @@ class Render extends Admin_Init {
 		);
 
 		// If the page should not be indexed, consider removing the canonical URL.
-		if ( in_array( 'noindex', $this->get_robots_meta(), true ) ) {
+		if ( \in_array( 'noindex', $this->get_robots_meta(), true ) ) {
 			// If the URL is filtered, don't empty it.
 			// If a custom canonical URL is set, don't empty it.
 			if ( $url === $_url && ! $this->has_custom_canonical_url() ) {
@@ -1001,7 +1001,7 @@ class Render extends Admin_Init {
 	 */
 	public function robots() {
 
-		//* Don't do anything if the blog isn't set to public.
+		// Don't do anything if the blog isn't set to public.
 		if ( false === $this->is_blog_public() ) return '';
 
 		$meta = $this->get_robots_meta();

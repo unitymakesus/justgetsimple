@@ -6,7 +6,7 @@
 
 namespace The_SEO_Framework;
 
-defined( 'THE_SEO_FRAMEWORK_PRESENT' ) or die;
+\defined( 'THE_SEO_FRAMEWORK_PRESENT' ) or die;
 
 /**
  * The SEO Framework plugin
@@ -91,7 +91,7 @@ class Admin_Pages extends Profile {
 			$menu['callback']
 		);
 
-		//* Enqueue scripts
+		// Enqueue scripts
 		\add_action( 'admin_print_scripts-' . $this->seo_settings_page_hook, [ $this, '_init_admin_scripts' ], 11 );
 		\add_action( 'load-' . $this->seo_settings_page_hook, [ $this, '_register_seo_settings_meta_boxes' ] );
 	}
@@ -375,7 +375,7 @@ class Admin_Pages extends Profile {
 		$this->init_admin_scripts();
 		Builders\Scripts::enqueue();
 
-		if ( in_array( $type, [ 'warning', 'info' ], true ) )
+		if ( \in_array( $type, [ 'warning', 'info' ], true ) )
 			$type = "notice-$type";
 
 		return vsprintf(
@@ -425,7 +425,7 @@ class Admin_Pages extends Profile {
 	 *    'escape' => bool   Optional. Whether to escape the $message. Default true.
 	 * }
 	 */
-	protected function output_dismissible_persistent_notice( $message, $key, array $args ) {
+	protected function output_dismissible_persistent_notice( $message, $key, array $args ) { // phpcs:ignore,VariableAnalysis.CodeAnalysis
 		$this->get_view( 'notice/persistent', get_defined_vars() );
 	}
 
@@ -449,8 +449,8 @@ class Admin_Pages extends Profile {
 
 			if ( ! \current_user_can( $cond['capability'] ) ) continue;
 			if ( $cond['user'] && $cond['user'] !== $this->get_user_id() ) continue;
-			if ( $cond['screens'] && ! in_array( $base, $cond['screens'], true ) ) continue;
-			if ( $cond['excl_screens'] && in_array( $base, $cond['excl_screens'], true ) ) continue;
+			if ( $cond['screens'] && ! \in_array( $base, $cond['screens'], true ) ) continue;
+			if ( $cond['excl_screens'] && \in_array( $base, $cond['excl_screens'], true ) ) continue;
 
 			if ( $cond['timeout'] > -1 && $cond['timeout'] < time() ) {
 				$this->clear_persistent_notice( $key );
@@ -584,7 +584,7 @@ class Admin_Pages extends Profile {
 	 */
 	public function wrap_fields( $input = '', $echo = false ) {
 
-		if ( is_array( $input ) )
+		if ( \is_array( $input ) )
 			$input = implode( PHP_EOL, $input );
 
 		if ( $echo ) {
@@ -752,7 +752,7 @@ class Admin_Pages extends Profile {
 					vsprintf(
 						'<input type=checkbox class="%s" name="%s" id="%s" value="1" %s %s %s /> %s',
 						[
-							esc_attr( implode( ' ', $cb_classes ) ),
+							\esc_attr( implode( ' ', $cb_classes ) ),
 							$field_name,
 							$field_id,
 							\checked( $value, true, false ),
