@@ -106,3 +106,10 @@
 .fl-node-5cb689ac24ec7.fl-button-lightbox-content {
   max-width: 1200px;
 }
+
+// Grid columns
+@media #{$medium-and-down} {
+  .fl-col-small {
+    max-width: none !important;
+  }
+}

@@ -18,11 +18,10 @@ export default {
         },
       });
 
-      // Recalc layout from WP Smush lazyload event (uses lazysizes lib)
-      // https://github.com/aFarkas/lazysizes
-      $(document).on('lazyloaded', () => {
+      // Recalc on image (lazy) load.
+      macyGrid.runOnImageLoad(() => {
         macyGrid.recalculate(true);
-      });
+      }, true);
     }
   },
 };

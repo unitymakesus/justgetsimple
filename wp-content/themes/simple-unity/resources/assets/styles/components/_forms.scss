@@ -1,9 +1,3 @@
-.gform_body {
-  label {
-    color: inherit;
-  }
-}
-
 .gform_wrapper .gform_body {
   .gsection {
     border-bottom: 0;
@@ -16,7 +10,7 @@
   .gsection_title,
   .gfield_label {
     font-weight: normal;
-    color: $color-grey-dark;
+    color: inherit;
   }
 
   .gfield {
@@ -37,7 +31,9 @@
       background: none !important;
 
       input {
-        border: none !important;
+        border-left-color: $error-color;
+        border-right-color: $error-color;
+        border-top-color: $error-color;
         border-bottom: 2px solid $error-color !important;
       }
 
