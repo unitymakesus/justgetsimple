@@ -19,9 +19,9 @@ export default {
       });
 
       // Recalc on image (lazy) load.
-      macyGrid.runOnImageLoad(() => {
+      $(document).on('lazyloaded', () => {
         macyGrid.recalculate(true);
-      }, true);
+      });
     }
   },
 };

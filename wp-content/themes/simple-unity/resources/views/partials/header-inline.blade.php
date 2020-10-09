@@ -28,7 +28,7 @@
             $logo = wp_get_attachment_image_src( $custom_logo_id , 'simple-logo' );
             $logo_2x = wp_get_attachment_image_src( $custom_logo_id, 'simple-logo-2x' );
           @endphp
-          <img src="{{ $logo_2x[0] }}" width="{{ $logo[1] }}" height="{{ $logo[2] }}" alt="{!! get_bloginfo('name', 'display') !!}" />
+          <img class="smush-ignore" src="{{ $logo_2x[0] }}" width="{{ $logo[1] }}" height="{{ $logo[2] }}" alt="{!! get_bloginfo('name', 'display') !!}" />
         @else
           {{ get_bloginfo('name', 'display') }}
         @endif
