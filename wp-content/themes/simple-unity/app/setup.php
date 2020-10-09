@@ -92,6 +92,7 @@ add_action('after_setup_theme', function () {
     add_theme_support( 'align-wide' );
     add_theme_support( 'disable-custom-colors' );
     add_theme_support( 'wp-block-styles' );
+    add_theme_support( 'responsive-embeds' );
 
     /**
      * Enqueue editor styles for Gutenberg

@@ -1,0 +1,16 @@
+/** Captions */
+.wp-caption {
+  display: inline-block;
+  margin: 0 0 1rem;
+}
+
+.wp-caption img {
+  margin-bottom: 0.5rem;
+  line-height: 1;
+  max-width: 100%;
+  height: auto;
+}
+
+.wp-caption-text {
+  font-size: 90%;
+}
