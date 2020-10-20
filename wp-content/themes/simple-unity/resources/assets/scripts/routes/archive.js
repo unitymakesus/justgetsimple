@@ -8,13 +8,19 @@ export default {
       var macyGrid = Macy({   // eslint-disable-line no-unused-vars
         container: '.grid',
         trueOrder: true,
-        columns: 2,
+        mobileFirst: true,
+        columns: 1,
         margin: {
           x: 20,
-          y: 30,
+          y: 20,
         },
         breakAt: {
-          767: 1,
+          768: {
+            columns: 2,
+          },
+          992: {
+            columns: 3,
+          },
         },
       });
 

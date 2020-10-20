@@ -62,16 +62,15 @@
 
 .archive {
   .content {
-    @extend .container;
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding-left: $gutter-width / 2;
+    padding-right: $gutter-width / 2;
   }
 
-  .wrap {
-    @extend .row;
-  }
-
-  .main {
-    @extend .col;
-    @extend .s12;
+  .pagination {
+    margin: 2rem 0;
   }
 }
 
