@@ -5,7 +5,7 @@
 
     </div>
     <div class="col m8 s6 xs12">
-    <h2 itemprop="name"><?php the_title(); ?></h2>
+    <h1 itemprop="name"><?php the_title(); ?></h1>
 
     <?php if (!empty($title = get_field('title'))) { ?>
       <div class="title" itemprop="jobTitle"><?php echo $title; ?></div>
