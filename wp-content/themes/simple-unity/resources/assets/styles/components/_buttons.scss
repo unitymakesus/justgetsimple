@@ -73,8 +73,15 @@ a.btn:hover {
   }
 }
 
-.gform_button {
+.gform_button,
+.give-submit {
   @extend .btn;
+  @extend .btn-primary;
+}
+
+.give-donation-level-btn {
+  @extend .btn;
+  @extend .btn-small;
   @extend .btn-primary;
 }
 
