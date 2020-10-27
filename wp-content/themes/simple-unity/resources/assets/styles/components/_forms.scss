@@ -422,3 +422,21 @@ textarea.materialize-textarea {
     }
   }
 }
+
+// GiveWP
+.give-list-inline,
+#give-gateway-radio-list {
+  li {
+    padding-left: 0 !important;
+  }
+
+  li::before {
+    display: none !important;
+  }
+}
+
+#give-gateway-radio-list input[type="radio"] {
+  position: relative !important;
+  opacity: 1 !important;
+  pointer-events: visible !important;
+}
