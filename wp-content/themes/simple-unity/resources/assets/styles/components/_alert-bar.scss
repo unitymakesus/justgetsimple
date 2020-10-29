@@ -1,0 +1,18 @@
+.alert-bar {
+  padding: 1rem;
+
+  p {
+    &:first-of-type() {
+      margin-top: 0;
+    }
+
+    &:last-of-type() {
+      margin-bottom: 0;
+    }
+  }
+
+  a {
+    color: inherit;
+    text-decoration: underline;
+  }
+}
