@@ -47,6 +47,12 @@
             </div>
           @endif
         </div>
+      @else
+        @if (!empty($cta_text) && !empty($cta_link))
+          <div class="cta-link">
+            <a href="{{ $cta_link }}" class="btn" {{ $cta_target }}>{{ $cta_text }}</a>
+          </div>
+        @endif
       @endif
     </div>
   </nav>
