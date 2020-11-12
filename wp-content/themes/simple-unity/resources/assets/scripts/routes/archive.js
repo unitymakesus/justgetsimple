@@ -1,11 +1,9 @@
 import Macy from 'macy';
 
 export default {
-  init() {
-  },
   finalize() {
     if (document.querySelector('.grid') !== null) {
-      var macyGrid = Macy({   // eslint-disable-line no-unused-vars
+      let macyGrid = Macy({ // eslint-disable-line no-unused-vars
         container: '.grid',
         trueOrder: true,
         mobileFirst: true,
@@ -24,8 +22,8 @@ export default {
         },
       });
 
-      // Recalc on image (lazy) load.
-      $(document).on('lazyloaded', () => {
+      // Recalculate the layout for lazyloaded images (via Smush).
+      document.addEventListener('lazyloaded', () => {
         macyGrid.recalculate(true);
       });
     }
