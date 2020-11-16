@@ -1,6 +1,6 @@
 <article class="{{ $class }}">
   @if (has_post_thumbnail())
-    {!! the_post_thumbnail('large') !!}
+    {!! the_post_thumbnail('medium_large') !!}
   @else
     <div class="overlay"></div>
   @endif
