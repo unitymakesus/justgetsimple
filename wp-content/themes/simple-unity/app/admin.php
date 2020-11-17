@@ -480,3 +480,12 @@ add_action('acf/init', function () {
         ]);
     }
 });
+
+/**
+ * Disable User Role Editor admin protection.
+ *
+ * @return bool
+ */
+add_filter('ure_supress_administrators_protection', function ($supress) {
+	return true;
+}, 10, 1);
